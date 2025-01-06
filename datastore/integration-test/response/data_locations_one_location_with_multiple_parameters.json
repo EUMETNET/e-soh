@@ -61,7 +61,7 @@
             },
             "measurementType": {
                 "method": "minimum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 0.0
@@ -84,7 +84,7 @@
             },
             "measurementType": {
                 "method": "minimum",
-                "period": "PT14H"
+                "duration": "PT14H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 0.0
@@ -107,7 +107,7 @@
             },
             "measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 0.0
@@ -130,7 +130,7 @@
             },
             "measurementType": {
                 "method": "maximum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0
@@ -153,7 +153,7 @@
             },
             "measurementType": {
                 "method": "maximum",
-                "period": "PT24H"
+                "duration": "PT24H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0
@@ -176,7 +176,7 @@
             },
             "measurementType": {
                 "method": "maximum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0
@@ -199,7 +199,7 @@
             },
             "measurementType": {
                 "method": "minimum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0
@@ -222,7 +222,7 @@
             },
             "measurementType": {
                 "method": "minimum",
-                "period": "PT14H"
+                "duration": "PT14H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0
@@ -245,7 +245,7 @@
             },
             "measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0
@@ -268,7 +268,7 @@
             },
             "measurementType": {
                 "method": "point",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "rodeo:standard_name": "rainfall_amount",
             "rodeo:level": 2.0
@@ -291,7 +291,7 @@
             },
             "measurementType": {
                 "method": "point",
-                "period": "PT24H"
+                "duration": "PT24H"
             },
             "rodeo:standard_name": "rainfall_amount",
             "rodeo:level": 2.0
@@ -314,7 +314,7 @@
             },
             "measurementType": {
                 "method": "point",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "rodeo:standard_name": "rainfall_amount",
             "rodeo:level": 2.0

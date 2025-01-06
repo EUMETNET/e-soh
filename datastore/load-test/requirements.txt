@@ -10,7 +10,7 @@ blinker==1.9.0
     # via flask
 brotli==1.1.0
     # via geventhttpclient
-certifi==2024.8.30
+certifi==2024.12.14
     # via
     #   geventhttpclient
     #   requests
@@ -61,7 +61,7 @@ msgpack==1.1.0
     # via locust
 numpy==2.2.0
     # via shapely
-protobuf==5.29.1
+protobuf==5.29.2
     # via grpcio-tools
 psutil==6.1.0
     # via locust

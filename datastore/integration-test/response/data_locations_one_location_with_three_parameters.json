@@ -68,7 +68,7 @@
             },
             "measurementType": {
                 "method": "maximum",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 1.5
@@ -91,7 +91,7 @@
             },
             "measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
             "rodeo:standard_name": "relative_humidity",
             "rodeo:level": 2.0
@@ -114,7 +114,7 @@
             },
             "measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
             "rodeo:standard_name": "wind_from_direction",
             "rodeo:level": 2.0

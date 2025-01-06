@@ -4,7 +4,7 @@
 #
 #    pip-compile --no-emit-index-url requirements.in
 #
-certifi==2024.8.30
+certifi==2024.12.14
     # via
     #   netcdf4
     #   requests
@@ -32,7 +32,7 @@ packaging==24.2
     # via xarray
 pandas==2.2.3
     # via xarray
-protobuf==5.29.1
+protobuf==5.29.2
     # via grpcio-tools
 python-dateutil==2.9.0.post0
     # via pandas

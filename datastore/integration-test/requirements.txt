@@ -4,7 +4,7 @@
 #
 #    pip-compile --no-emit-index-url requirements.in
 #
-certifi==2024.8.30
+certifi==2024.12.14
     # via requests
 charset-normalizer==3.4.0
     # via requests
@@ -24,7 +24,7 @@ packaging==24.2
     # via pytest
 pluggy==1.5.0
     # via pytest
-protobuf==5.29.1
+protobuf==5.29.2
     # via grpcio-tools
 pytest==7.4.4
     # via -r requirements.in
