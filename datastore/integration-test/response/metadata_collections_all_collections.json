@@ -103,7 +103,7 @@
                         "reference": "Time aggregation functions"
                     },
                     {
-                        "id": "periods",
+                        "id": "durations",
                         "interval": [
                             [
                                 "PT0S",

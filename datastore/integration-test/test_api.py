@@ -113,11 +113,11 @@ def test_from_a_single_collection_get_locations_within_a_bbox():
     actual_response_is_expected_response(actual_response, expected_json)
 
 
-def test_from_a_single_collection_get_locations_within_a_bbox_with_periods_range_filtering():
+def test_from_a_single_collection_get_locations_within_a_bbox_with_durations_range_filtering():
     collection_id = "observations"
     bbox = "5.0,52.0,6.0,52.1"
     actual_response = requests.get(
-        url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}&periods=PT0S/PT24H"
+        url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}&durations=PT0S/PT24H"
     )
 
     expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
@@ -167,15 +167,15 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_methods_and_l
     actual_response_is_expected_response(actual_response, expected_json)
 
 
-def test_from_a_single_collection_get_locations_within_a_bbox_with_period_and_standard_name_filtering():
+def test_from_a_single_collection_get_locations_within_a_bbox_with_duration_and_standard_name_filtering():
     collection_id = "observations"
     bbox = "5.0,52.0,6.0,52.1"
-    periods = "PT10M, PT1M"
+    durations = "PT10M, PT1M"
     standard_names = "air_temperature, wind_from_direction"
     datetime = "2022-12-31T00:50:00Z/2022-12-31T02:10:00Z"
     actual_response = requests.get(
         url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}&standard_names={standard_names}"
-        f"&periods={periods}&datetime={datetime}"
+        f"&durations={durations}&datetime={datetime}"
     )
 
     expected_json = load_json("response/data_locations_two_points_with_five_parameters.json")
@@ -209,12 +209,12 @@ def test_from_a_single_collection_get_a_single_location_with_multiple_custom_cov
     standard_names = "air_temperature, wind_speed, dew_point_temperature, duration_of_sunshine"
     levels = "0/1.8"
     methods = "maximum, point"
-    periods = "PT1M/PT10M"
+    durations = "PT1M/PT10M"
     datetime = "2022-12-31T00:50:00Z/2022-12-31T02:10:00Z"
     actual_response = requests.get(
         url=BASE_URL + f"/collections/{collection_id}/locations/{location_id}"
         f"?standard_names={standard_names}&levels={levels}&methods={methods}"
-        f"&periods={periods}&datetime={datetime}"
+        f"&durations={durations}&datetime={datetime}"
     )
 
     expected_json = load_json("response/data_position_one_location_with_one_parameter.json")
@@ -224,13 +224,13 @@ def test_from_a_single_collection_get_a_single_location_with_multiple_custom_cov
     actual_response_is_expected_response(actual_response, expected_json)
 
 
-def test_from_a_single_collection_get_a_single_location_with_period_range_filtering():
+def test_from_a_single_collection_get_a_single_location_with_duration_range_filtering():
     collection_id = "observations"
     location_id = "0-20000-0-06260"
-    periods = "PT6H/.."
+    durations = "PT6H/.."
     datetime = "2022-12-31T00:00:00Z"
     actual_response = requests.get(
-        url=BASE_URL + f"/collections/{collection_id}/locations/{location_id}" f"?periods={periods}&datetime={datetime}"
+        url=BASE_URL + f"/collections/{collection_id}/locations/{location_id}" f"?durations={durations}&datetime={datetime}"
     )
 
     expected_json = load_json("response/data_locations_one_location_with_multiple_parameters.json")
@@ -317,12 +317,12 @@ def test_from_a_single_collection_get_a_single_position_with_all_available_custo
     standard_names = "air_temperature"
     levels = "1.5"
     methods = "maximum"
-    periods = "PT10M"
+    durations = "PT10M"
     datetime = "2022-12-31T00:50:00Z/2022-12-31T02:10:00Z"
     actual_response = requests.get(
         url=BASE_URL + f"/collections/{collection_id}/position"
         f"?coords={coords}&standard_names={standard_names}&levels={levels}"
-        f"&methods={methods}&periods={periods}&datetime={datetime}"
+        f"&methods={methods}&durations={durations}&datetime={datetime}"
     )
 
     expected_json = load_json("response/data_position_one_location_with_one_parameter.json")
@@ -332,15 +332,15 @@ def test_from_a_single_collection_get_a_single_position_with_all_available_custo
     actual_response_is_expected_response(actual_response, expected_json)
 
 
-def test_from_a_single_collection_get_a_single_position_with_repeating_level_interval_and_period():
+def test_from_a_single_collection_get_a_single_position_with_repeating_level_interval_and_duration():
     collection_id = "observations"
     coords = "POINT(5.179705 52.0988218)"
     levels = "R6/1.5/0.1"
-    periods = "PT1M"
+    durations = "PT1M"
     datetime = "2022-12-31T00:00:00Z"
     actual_response = requests.get(
         url=BASE_URL + f"/collections/{collection_id}/position"
-        f"?coords={coords}&levels={levels}&periods={periods}&datetime={datetime}"
+        f"?coords={coords}&levels={levels}&durations={durations}&datetime={datetime}"
     )
 
     expected_json = load_json("response/data_position_one_location_with_three_parameters.json")
@@ -401,11 +401,11 @@ def test_from_a_single_collection_get_an_area_with_parameter_with_wildcard():
     actual_response_is_expected_response(actual_response, expected_json)
 
 
-def test_from_a_single_collection_get_an_area_with_non_existing_periods():
+def test_from_a_single_collection_get_an_area_with_non_existing_durations():
     collection_id = "observations"
     coords = "POLYGON((4.0 52.4, 4.7 52.4,4.7 52.6,4.0 52.6, 4.0 52.4))"
     actual_response = requests.get(
-        url=BASE_URL + f"/collections/{collection_id}/area" f"?coords={coords}&periods=PT7H/PT7H"
+        url=BASE_URL + f"/collections/{collection_id}/area" f"?coords={coords}&durations=PT7H/PT7H"
     )
 
     expected_json = load_json("response/404_not_found.json")
