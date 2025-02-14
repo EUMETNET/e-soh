@@ -92,7 +92,7 @@ async def verify_parameter_names(parameter_names: list) -> None:
 
 def create_url_from_request(request):
     # IMPORTANT: We rely on proxy to block attempts to modify the URL (e.g. blocking "Host" header)
-    return request.base_url
+    return f"{request.base_url}collections"
 
 
 def split_and_strip(cs_string: str) -> list[str]:
