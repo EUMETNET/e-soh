@@ -91,15 +91,8 @@ async def verify_parameter_names(parameter_names: list) -> None:
 
 
 def create_url_from_request(request):
-    # The server root_path contains the path added by a reverse proxy
-    base_path = request.scope.get("root_path")
-
-    # The host will (should) be correctly set from X-Forwarded-Host and X-Forwarded-Scheme
-    # headers by any proxy in front of it
-    host = request.headers["host"]
-    scheme = request.url.scheme
-
-    return f"{scheme}://{host}{base_path}/collections"
+    # IMPORTANT: We rely on proxy to block attempts to modify the URL (e.g. blocking "Host" header)
+    return request.base_url
 
 
 def split_and_strip(cs_string: str) -> list[str]:
