@@ -44,6 +44,7 @@ response_fields_needed_for_data_api = [
     "unit",
     "obstime_instant",
     "value",
+    "links",
 ]
 
 
@@ -120,6 +121,7 @@ async def get_locations(
             "level",
             "period",
             "function",
+            "links",
         ],
     )
     # Add spatial polygon to the time series request if bbox exists.

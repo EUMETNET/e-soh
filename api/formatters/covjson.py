@@ -86,6 +86,7 @@ def convert_to_covjson(observations):
 
         parameters = {}
         ranges = {}
+        links = []
         for data in group:
             if all(math.isnan(v) for v in data.values):
                 continue  # Drop ranges if completely nan.
@@ -98,9 +99,16 @@ def convert_to_covjson(observations):
             ranges[parameter_id] = NdArrayFloat(
                 values=values_no_nan, axisNames=["t", "y", "x"], shape=[len(values_no_nan), 1, 1]
             )
+            for li in data.ts_mdata.links:
+                link = {}
+                for link_attr in ["href", "rel", "type", "hreflang", "title"]:
+                    val = getattr(li, link_attr)
+                    if len(val):
+                        link[link_attr] = val
+                links.append(link)
 
         custom_fields = {"rodeo:wigosId": data.ts_mdata.platform}
-        coverages.append(Coverage(domain=domain, parameters=parameters, ranges=ranges, **custom_fields))
+        coverages.append(Coverage(domain=domain, parameters=parameters, ranges=ranges, links=links, **custom_fields))
 
     if len(coverages) == 0:
         raise HTTPException(status_code=404, detail="Requested data not found.")

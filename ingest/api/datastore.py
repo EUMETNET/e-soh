@@ -32,6 +32,13 @@ def build_grpc_messages(msg: str) -> None:
             setattr(ts_metadata, i, msg["properties"][i])
         elif i in msg["properties"]["content"]:
             setattr(ts_metadata, i, msg["properties"]["content"][i])
+        elif i == "links":
+            for li in msg["links"]:
+                ll = dstore.Link()
+                for link_attr in ["href", "rel", "type", "hreflang", "title"]:
+                    if link_attr in li:
+                        setattr(ll, link_attr, li[link_attr])
+                ts_metadata.links.append(ll)
 
     level = str(ts_metadata.level)
     period = str(ts_metadata.period)
