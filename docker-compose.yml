@@ -105,6 +105,10 @@ services:
     environment:
       - DSHOST=${DSHOST:-store}
       - DSPORT=${DSPORT:-50050}
+      - DYNAMICTIME=$DYNAMICTIME
+      - LOTIME=$LOTIME
+      - HITIME=$HITIME
+      - CLEANUPINTERVAL=$CLEANUPINTERVAL
       - MQTT_HOST=${MQTT_HOST:-mqtt}
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
