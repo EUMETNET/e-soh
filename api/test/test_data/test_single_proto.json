@@ -10,7 +10,8 @@
                 "function": "mean",
                 "period": 600,
                 "parameter_name": "wind_speed:10.0:mean:PT10M",
-                "timeseries_id": "d036b10ac4f6e62049b9a496f04e0a81"
+                "timeseries_id": "d036b10ac4f6e62049b9a496f04e0a81",
+                "links": []
             },
             "obs_mdata": [
                 {

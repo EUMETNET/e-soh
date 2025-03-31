@@ -89,7 +89,8 @@
                     ]
                 }
             },
-            "rodeo:wigosId": "0-20000-0-06269"
+            "rodeo:wigosId": "0-20000-0-06269",
+            "links": []
         },
         {
             "type": "Coverage",
@@ -179,7 +180,8 @@
                     ]
                 }
             },
-            "rodeo:wigosId": "0-20000-0-06257"
+            "rodeo:wigosId": "0-20000-0-06257",
+            "links": []
         }
     ],
     "parameters": {
