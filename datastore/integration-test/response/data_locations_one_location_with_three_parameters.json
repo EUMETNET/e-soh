@@ -194,5 +194,19 @@
             ]
         }
     },
+    "links": [
+        {
+          "href": "Insert documentation about E-SOH datastore",
+          "rel": "canonical"
+        },
+        {
+          "href": "Insert documentation about E-SOH datastore",
+          "rel": "canonical"
+        },
+        {
+          "href": "Insert documentation about E-SOH datastore",
+          "rel": "canonical"
+        }
+      ],
     "rodeo:wigosId": "0-20000-0-06260"
 }

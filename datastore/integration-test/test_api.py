@@ -419,6 +419,7 @@ def test_items_get_area():
     bbox = "4.5,52.4,4.6,52.57"
     actual_response = requests.get(url=BASE_URL + f"/collections/{collection_id}/items?bbox={bbox}")
 
+    print("CURR URL: {0}".format(f"/collections/{collection_id}/items?bbox={bbox}"))
     assert actual_response.status_code == 200
     assert actual_response.headers["Content-Type"] == "application/geo+json"
     expected_json = load_json("response/items_within_area_single_platform.json")
