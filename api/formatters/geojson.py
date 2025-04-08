@@ -8,7 +8,7 @@ from utilities import convert_cm_to_m
 
 
 def _make_properties(ts):
-    ts_metadata = {key.name: value for key, value in ts.ts_mdata.ListFields() if value}
+    ts_metadata = {key.name: value for key, value in ts.ts_mdata.ListFields() if value and key.name != "links"}
 
     ts_metadata["platform_vocabulary"] = (
         "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=" + ts.ts_mdata.platform

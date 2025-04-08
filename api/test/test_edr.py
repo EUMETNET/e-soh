@@ -20,7 +20,7 @@ expected_metadata_endpoint_response_fields = [
     "level",
     "period",
     "function",
-    "links"
+    "links",
 ]
 
 expected_data_endpoint_response_fields = [
@@ -34,7 +34,7 @@ expected_data_endpoint_response_fields = [
     "unit",
     "obstime_instant",
     "value",
-    "links"
+    "links",
 ]
 
 
