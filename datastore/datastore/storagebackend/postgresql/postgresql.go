@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	_ "github.com/lib/pq"
 )
 
@@ -118,10 +117,10 @@ func setUpsertTSSelectCmd() {
 
 // openDB opens database identified by host/port/user/password/dbname.
 // Returns (DB, nil) upon success, otherwise (..., error).
-func openDB(host, port, user, password, dbname string) (*sql.DB, error) {
+func openDB(host, port, user, password, dbname, enable_ssl string) (*sql.DB, error) {
 	connInfo := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, enable_ssl)
 
 	db, err := sql.Open("postgres", connInfo)
 	if err != nil {
@@ -147,10 +146,10 @@ func NewPostgreSQL() (*PostgreSQL, error) {
 	user := common.Getenv("PGUSER", "postgres")
 	password := common.Getenv("PGPASSWORD", "mysecretpassword")
 	dbname := common.Getenv("PGDBNAME", "data")
-
+    enable_ssl := common.Getenv("ENABLE_SSL", "disable")
 	var err error
 
-	sbe.Db, err = openDB(host, port, user, password, dbname)
+	sbe.Db, err = openDB(host, port, user, password, dbname, enable_ssl)
 	if err != nil {
 		return nil, fmt.Errorf("openDB() failed: %v", err)
 	}
