@@ -74,7 +74,7 @@ class ESohUser(HttpUser):
         top = cy + sz
         polygon = f"POLYGON(({left} {bottom},{right} {bottom},{right} {top},{left} {top},{left} {bottom}))"
         url = f"/collections/observations/area?coords={polygon}&standard_names={standard_name}&datetime={dt_string}/.."
-        self.client.get(url, name=f"area {sz*2.0}deg x {sz*2.0}deg x 1h", headers=headers)
+        self.client.get(url, name=f"area {sz * 2.0}deg x {sz * 2.0}deg x 1h", headers=headers)
         # if sz == 2.0:
         #     j = response.json()
         #     # print(sz*2.0)
