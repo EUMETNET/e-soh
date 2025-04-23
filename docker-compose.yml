@@ -37,6 +37,7 @@ services:
       - DB_USER=postgres
       - DB_PASS=mysecretpassword
       - DB_URL=db
+      - DB_NAME=data
     depends_on:
       db:
         condition: service_healthy
@@ -51,6 +52,7 @@ services:
     environment:
       - PGHOST=db
       - PGPORT=5432
+      - PGDBNAME=data
       - DYNAMICTIME=$DYNAMICTIME
       - LOTIME=$LOTIME
       - HITIME=$HITIME

@@ -142,14 +142,15 @@ go mod tidy
 
 The following environment variables are supported:
 
-| Variable | Mandatory | Default value | Description |
-| :--      | :--       | :--           | :-- |
+| Variable          | Mandatory | Default value | Description |
+|:------------------| :--       | :--           | :-- |
 | `SERVERPORT`      | No  | `50050`            | Server port number. |
 | `PGHOST`          | No  | `localhost`        | PostgreSQL host. |
 | `PGPORT`          | No  | `5433`             | PostgreSQL port number. |
-| `PGBUSER`         | No  | `postgres`         | PostgreSQL user name. |
+| `PGUSER`          | No  | `postgres`         | PostgreSQL user name. |
 | `PGPASSWORD`      | No  | `mysecretpassword` | PostgreSQL password. |
 | `PGDBNAME`        | No  | `data`             | PostgreSQL database name. |
+| `ENABLE_SSL`        | No  | `disable`          | Weather to use ssl for connection |
 | `DYNAMICTIME`     | No  | `true`             | Whether the valid time range is _dynamic_ or _static_ (defined below). |
 | `LOTIME`          | No  | `86400`            | The _earliest_ valid time as seconds to be either [1] subtracted from the current time (if the valid time range is _dynamic_) or [2] added to UNIX epoch (1970-01-01T00:00:00Z) (if the valid time range is _static_). In the case of a _static_ valid time range, the `LOTIME` can optionally be specified as an ISO-8601 datetime of the exact form `2023-10-10T00:00:00Z`. |
 | `HITIME`          | No  | `-600`               | Same as `LOTIME`, but for the _latest_ valid time. Note a default leeway of 10 minutes into the future to reduce risk of missing visual observations. |
