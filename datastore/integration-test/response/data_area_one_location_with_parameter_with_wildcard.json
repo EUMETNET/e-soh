@@ -61,7 +61,7 @@
             },
             "measurementType": {
                 "method": "maximum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0
@@ -84,7 +84,7 @@
             },
             "measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0

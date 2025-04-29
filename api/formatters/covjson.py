@@ -49,7 +49,7 @@ def make_parameter(ts_mdata):
         ),
         measurementType=MeasurementType(
             method=ts_mdata.function,
-            period=period,
+            duration=period,
         ),
         unit=Unit(label={"en": ts_mdata.unit}),
         **custom_fields,

@@ -64,7 +64,7 @@
                     },
                     "measurementType": {
                         "method": "mean",
-                        "period": "PT1M"
+                        "duration": "PT1M"
                     },
                     "rodeo:standard_name": "air_temperature",
                     "rodeo:level": 2.0
@@ -154,7 +154,7 @@
                     },
                     "measurementType": {
                         "method": "mean",
-                        "period": "PT1M"
+                        "duration": "PT1M"
                     },
                     "rodeo:standard_name": "air_temperature",
                     "rodeo:level": 2.0
@@ -201,7 +201,7 @@
             },
             "measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
             "rodeo:standard_name": "air_temperature",
             "rodeo:level": 2.0

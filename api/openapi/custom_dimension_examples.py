@@ -42,7 +42,7 @@ levels = {
     },
 }
 
-periods = {
+durations = {
     "Default": {
         "value": "",
     },

@@ -18,7 +18,7 @@ click==8.1.7
     # via uvicorn
 covjson-pydantic==0.5.0
     # via -r requirements.in
-edr-pydantic==0.5.0
+edr-pydantic @ git+https://github.com/mo-lukecarr/edr-pydantic.git@duration
     # via -r requirements.in
 fastapi==0.115.6
     # via -r requirements.in
@@ -50,15 +50,15 @@ prometheus-client==0.21.1
     # via prometheus-fastapi-instrumentator
 prometheus-fastapi-instrumentator==7.0.0
     # via -r requirements.in
-protobuf==5.29.1
+protobuf==5.29.2
     # via grpcio-tools
-pydantic==2.10.3
+pydantic==2.10.4
     # via
     #   covjson-pydantic
     #   edr-pydantic
     #   fastapi
     #   geojson-pydantic
-pydantic-core==2.27.1
+pydantic-core==2.27.2
     # via pydantic
 python-dotenv==1.0.1
     # via uvicorn
@@ -80,12 +80,10 @@ typing-extensions==4.12.2
     #   pydantic
     #   pydantic-core
 uvicorn[standard]==0.32.1
-    # via
-    #   -r requirements.in
-    #   uvicorn
+    # via -r requirements.in
 uvloop==0.21.0
     # via uvicorn
-watchfiles==1.0.0
+watchfiles==1.0.3
     # via uvicorn
 websockets==14.1
     # via uvicorn
