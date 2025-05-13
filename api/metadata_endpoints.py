@@ -155,7 +155,7 @@ async def get_collection_metadata(base_url: str, is_self) -> Collection:
             ),
             measurementType=MeasurementType(
                 method=ts.function,
-                period=period,
+                duration=period,
             ),
             unit=Unit(label=ts.unit),
             **custom_fields,
@@ -176,7 +176,7 @@ async def get_collection_metadata(base_url: str, is_self) -> Collection:
     levels = [convert_cm_to_m(level) for level in await get_unique_values_for_metadata("level")]
     standard_names = await get_unique_values_for_metadata("standard_name")
     methods = await get_unique_values_for_metadata("function")
-    periods = [seconds_to_iso_8601_duration(period) for period in await get_unique_values_for_metadata("period")]
+    durations = [seconds_to_iso_8601_duration(period) for period in await get_unique_values_for_metadata("period")]
 
     collection = Collection(
         id="observations",
@@ -220,9 +220,9 @@ async def get_collection_metadata(base_url: str, is_self) -> Collection:
                     reference="Time aggregation functions",
                 ),
                 Custom(
-                    id="periods",
-                    interval=[[periods[0], periods[-1]]],
-                    values=periods,
+                    id="durations",
+                    interval=[[durations[0], durations[-1]]],
+                    values=durations,
                     reference="https://en.wikipedia.org/wiki/ISO_8601#Durations",
                 ),
             ],

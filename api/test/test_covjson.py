@@ -23,7 +23,7 @@ def test_single_parameter_convert():
     assert type(coverage_collection) is Coverage
 
     # Assert that the coverage collection has the correct parameter
-    assert "wind_speed:10.0:mean:PT10M" in coverage_collection.parameters.keys()
+    assert "wind_speed:10.0:mean:PT10M" in coverage_collection.parameters
 
     # Check that correct values exist in the coverage collection
     assert 9.21 in coverage_collection.ranges["wind_speed:10.0:mean:PT10M"].values
@@ -58,7 +58,7 @@ def test_multiple_parameter_convert():
     # Check that the coverage collection has the correct parameters
     assert (
         set(["wind_from_direction:2.0:mean:PT10M", "wind_speed:10.0:mean:PT10M", "relative_humidity:2.0:mean:PT1M"])
-        == coverage_collection.parameters.keys()
+        == coverage_collection.parameters.root.keys()
     )
 
     # Check that correct values exist in the coverage collection
@@ -89,9 +89,7 @@ def test_single_parameter_area_convert():
     assert all([type(coverage) is Coverage for coverage in coverage_collection.coverages])
 
     # Check that each coverage has the correct parameter
-    assert all(
-        ["air_temperature:2.0:mean:PT1M" in coverage.parameters.keys() for coverage in coverage_collection.coverages]
-    )
+    assert all(["air_temperature:2.0:mean:PT1M" in coverage.parameters for coverage in coverage_collection.coverages])
 
     coverage_collection_json = json.loads(coverage_collection.model_dump_json(exclude_none=True))
     assert coverage_collection_json == compare_data

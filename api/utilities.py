@@ -140,7 +140,7 @@ async def add_request_parameters(
     standard_names: str | None,
     levels: str | None,
     methods: str | None,
-    periods: str | None,
+    durations: str | None,
 ):
     if parameter_name:
         parameter_name = split_and_strip(parameter_name)
@@ -161,8 +161,8 @@ async def add_request_parameters(
     if methods:
         request.filter["function"].values.extend(split_and_strip(methods))
 
-    if periods:
-        request.filter["period"].values.extend(get_periods_or_range(periods))
+    if durations:
+        request.filter["period"].values.extend(get_periods_or_range(durations))
 
 
 def get_periods_or_range(periods: str) -> list[str]:

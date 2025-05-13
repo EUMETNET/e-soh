@@ -49,7 +49,7 @@ def make_parameter(ts_mdata):
         ),
         measurementType=MeasurementType(
             method=ts_mdata.function,
-            period=period,
+            duration=period,
         ),
         unit=Unit(label={"en": ts_mdata.unit}),
         **custom_fields,
@@ -107,7 +107,7 @@ def convert_to_covjson(observations):
     elif len(coverages) == 1:
         return coverages[0]
     else:
-        parameter_union = reduce(operator.ior, (c.parameters for c in coverages), {})
+        parameter_union = reduce(operator.ior, (c.parameters.root for c in coverages), {})
         return CoverageCollection(coverages=coverages, parameters=dict(sorted(parameter_union.items())))
 
 
