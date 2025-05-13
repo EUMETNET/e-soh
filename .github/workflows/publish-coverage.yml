@@ -1,0 +1,63 @@
+name: Comment coverage report on the pull request
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  post-coverage-report:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: 'Download artifacts'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            var artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: ${{github.event.workflow_run.id }},
+            });
+
+            var matchDatastoreArtifact = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "test-results-artifact"
+            })[0];
+            var download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchDataStoreArtifact.id,
+               archive_format: 'zip',
+            });
+            var fs = require('fs');
+            fs.writeFileSync('${{github.workspace}}/test-results-artifact.zip', Buffer.from(download.data));
+
+            var matchIngestArtifact = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "ingest-test-results-artifact"
+            })[0];
+            var download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchIngestArtifact.id,
+               archive_format: 'zip',
+            });
+            var fs = require('fs');
+            fs.writeFileSync('${{github.workspace}}/ingest-test-results-artifact', Buffer.from(download.data));
+      - name: Unzip datastore artifacts
+        run: unzip test-results-artifact.zip
+      - name: Unzip ingest artifacts
+        run: unzip ingest-test-results-artifact.zip
+      - name: Read the PR number from file
+        id: pr_number
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./PR-number.txt
+      - name: Publish pytest coverage as comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          issue-number: ${{ steps.pr_number.outputs.content }}
+          multiple-files: |
+            API Unit Tests, ./datastore-pytest-coverage.txt, ./datastore-pytest.xml
+            Ingest Unit Tests, ./ingest-pytest-coverage.txt, ./ingest-pytest.xml
