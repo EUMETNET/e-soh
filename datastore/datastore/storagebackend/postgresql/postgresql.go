@@ -5,12 +5,12 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
+	_ "github.com/lib/pq"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	_ "github.com/lib/pq"
 )
 
 // PostgreSQL is an implementation of the StorageBackend interface that
@@ -146,7 +146,7 @@ func NewPostgreSQL() (*PostgreSQL, error) {
 	user := common.Getenv("PGUSER", "postgres")
 	password := common.Getenv("PGPASSWORD", "mysecretpassword")
 	dbname := common.Getenv("PGDBNAME", "data")
-    enable_ssl := common.Getenv("ENABLE_SSL", "disable")
+	enable_ssl := common.Getenv("ENABLE_SSL", "disable")
 	var err error
 
 	sbe.Db, err = openDB(host, port, user, password, dbname, enable_ssl)

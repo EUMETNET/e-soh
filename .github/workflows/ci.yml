@@ -160,7 +160,6 @@ jobs:
 
       - name: Comment coverage
         uses: MishaKav/pytest-coverage-comment@main
-        if: github.repository == 'EUMETNET/e-soh'
         with:
           title: Unit Test Coverage Report
           pytest-coverage-path: ./artifacts/test-results/api/test/output/pytest-coverage.txt
