@@ -230,7 +230,8 @@ def test_from_a_single_collection_get_a_single_location_with_duration_range_filt
     durations = "PT6H/.."
     datetime = "2022-12-31T00:00:00Z"
     actual_response = requests.get(
-        url=BASE_URL + f"/collections/{collection_id}/locations/{location_id}" f"?durations={durations}&datetime={datetime}"
+        url=BASE_URL + f"/collections/{collection_id}/locations/{location_id}"
+        f"?durations={durations}&datetime={datetime}"
     )
 
     expected_json = load_json("response/data_locations_one_location_with_multiple_parameters.json")

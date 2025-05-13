@@ -89,9 +89,7 @@ def test_single_parameter_area_convert():
     assert all([type(coverage) is Coverage for coverage in coverage_collection.coverages])
 
     # Check that each coverage has the correct parameter
-    assert all(
-        ["air_temperature:2.0:mean:PT1M" in coverage.parameters for coverage in coverage_collection.coverages]
-    )
+    assert all(["air_temperature:2.0:mean:PT1M" in coverage.parameters for coverage in coverage_collection.coverages])
 
     coverage_collection_json = json.loads(coverage_collection.model_dump_json(exclude_none=True))
     assert coverage_collection_json == compare_data
