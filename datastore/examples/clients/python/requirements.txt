@@ -4,11 +4,11 @@
 #
 #    pip-compile --no-emit-index-url requirements.in
 #
-grpcio==1.68.1
+grpcio==1.71.0
     # via grpcio-tools
-grpcio-tools==1.68.1
+grpcio-tools==1.71.0
     # via -r requirements.in
-protobuf==5.29.2
+protobuf==5.29.4
     # via grpcio-tools
 
 # The following packages are considered to be unsafe in a requirements file:

@@ -6,17 +6,17 @@
 #
 annotated-types==0.7.0
     # via pydantic
-anyio==4.7.0
+anyio==4.9.0
     # via starlette
-attrs==24.3.0
+attrs==25.3.0
     # via
     #   jsonschema
     #   referencing
-certifi==2024.12.14
+certifi==2025.4.26
     # via requests
-charset-normalizer==3.4.0
+charset-normalizer==3.4.2
     # via requests
-click==8.1.7
+click==8.2.0
     # via uvicorn
 fastapi==0.108.0
     # via -r requirements.in
@@ -28,7 +28,7 @@ grpcio-tools==1.62.1
     # via -r requirements.in
 gunicorn==22.0.0
     # via -r requirements.in
-h11==0.14.0
+h11==0.16.0
     # via uvicorn
 idna==3.10
     # via
@@ -38,35 +38,35 @@ isodate==0.6.1
     # via -r requirements.in
 jsonschema==4.19.2
     # via -r requirements.in
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.4.1
     # via jsonschema
 numpy==1.25.2
     # via -r requirements.in
-packaging==24.2
+packaging==25.0
     # via gunicorn
 paho-mqtt==2.1.0
     # via -r requirements.in
 prometheus-client==0.21.1
     # via prometheus-fastapi-instrumentator
-prometheus-fastapi-instrumentator==7.0.0
+prometheus-fastapi-instrumentator==7.1.0
     # via -r requirements.in
-protobuf==4.25.5
+protobuf==4.25.7
     # via
     #   -r requirements.in
     #   grpcio-tools
-pydantic==2.10.4
+pydantic==2.11.4
     # via fastapi
-pydantic-core==2.27.2
+pydantic-core==2.33.2
     # via pydantic
 python-multipart==0.0.20
     # via -r requirements.in
-referencing==0.35.1
+referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
 requests==2.31.0
     # via -r requirements.in
-rpds-py==0.22.3
+rpds-py==0.24.0
     # via
     #   jsonschema
     #   referencing
@@ -78,13 +78,17 @@ starlette==0.32.0.post1
     # via
     #   fastapi
     #   prometheus-fastapi-instrumentator
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
     #   anyio
     #   fastapi
     #   pydantic
     #   pydantic-core
-urllib3==2.2.3
+    #   referencing
+    #   typing-inspection
+typing-inspection==0.4.0
+    # via pydantic
+urllib3==2.4.0
     # via requests
 uvicorn==0.25.0
     # via -r requirements.in
