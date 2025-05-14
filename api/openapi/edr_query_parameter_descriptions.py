@@ -13,7 +13,7 @@ levels = (
     "'__R__ *number of intervals / min-level / height to increment by*'."
 )
 methods = "Comma seperated list of parameter aggregation methods to query."
-periods = "Define the aggregation period(s) to return data from using either a comma seperated list or " "a range."
+durations = "Define the aggregation period(s) to return data from using either a comma seperated list or " "a range."
 wigos_id = "WIGOS Station Identifier (WSI) of the station to query data from."
 format = "Specify wanted return format."
 point = "Point to query data from in Well-Known Text (WKT) point coordinates."

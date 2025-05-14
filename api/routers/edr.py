@@ -100,11 +100,11 @@ async def get_locations(
             openapi_examples=custom_dimension_examples.methods,
         ),
     ] = None,
-    periods: Annotated[
+    durations: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.durations,
+            openapi_examples=custom_dimension_examples.durations,
         ),
     ] = None,
 ) -> EDRFeatureCollection:  # Hack to use string
@@ -130,7 +130,7 @@ async def get_locations(
             [dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords],
         )
 
-    await add_request_parameters(ts_request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(ts_request, parameter_name, datetime, standard_names, levels, methods, durations)
 
     grpc_response = await get_obs_request(ts_request)
     observations = grpc_response.observations
@@ -249,11 +249,11 @@ async def get_data_location_id(
             openapi_examples=custom_dimension_examples.methods,
         ),
     ] = None,
-    periods: Annotated[
+    durations: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.durations,
+            openapi_examples=custom_dimension_examples.durations,
         ),
     ] = None,
 ):
@@ -264,7 +264,7 @@ async def get_data_location_id(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, durations)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -323,11 +323,11 @@ async def get_data_position(
             openapi_examples=custom_dimension_examples.methods,
         ),
     ] = None,
-    periods: Annotated[
+    durations: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.durations,
+            openapi_examples=custom_dimension_examples.durations,
         ),
     ] = None,
 ):
@@ -357,7 +357,7 @@ async def get_data_position(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, durations)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -413,11 +413,11 @@ async def get_data_area(
             openapi_examples=custom_dimension_examples.methods,
         ),
     ] = None,
-    periods: Annotated[
+    durations: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.durations,
+            openapi_examples=custom_dimension_examples.durations,
         ),
     ] = None,
 ):
@@ -448,7 +448,7 @@ async def get_data_area(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, durations)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations

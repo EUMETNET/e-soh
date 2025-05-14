@@ -331,21 +331,21 @@ def test_get_position_with_incorrect_geometry_type():
     assert response.json() == {"detail": {"coords": "Invalid geometric type: Polygon"}}
 
 
-def test_get_data_with_incorrect_period_range_format():
-    response = client.get("/collections/observations/locations/0-20000-0-06260?periods=PT10M/PT1H/PT24H")
+def test_get_data_with_incorrect_duration_range_format():
+    response = client.get("/collections/observations/locations/0-20000-0-06260?durations=PT10M/PT1H/PT24H")
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Invalid ISO 8601 range format: PT10M/PT1H/PT24H"}
 
 
 def test_get_data_with_range_parameter_empty():
-    response = client.get("/collections/observations/locations/0-20000-0-06260?periods=/PT10M")
+    response = client.get("/collections/observations/locations/0-20000-0-06260?durations=/PT10M")
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Invalid ISO 8601 period:  / PT10M"}
 
 
-def test_get_data_with_incorrect_period_range():
+def test_get_data_with_incorrect_duration_range():
     with patch("utilities.get_ts_ag_request") as mock_get_ts_aq_request, patch(
         "utilities.get_unique_values_for_metadata"
     ) as mock_get_unique_values_for_metadata:
@@ -353,13 +353,13 @@ def test_get_data_with_incorrect_period_range():
         mock_get_ts_aq_request.return_value = None
         mock_get_unique_values_for_metadata.return_value = ["PT1M", "PT10M", "PT1H"]
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?periods=PT1H/PT10M")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?durations=PT1H/PT10M")
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Invalid ISO 8601 range: PT1H > PT10M"}
 
 
-def test_get_data_with_a_period_not_found_in_datastore():
+def test_get_data_with_a_duration_not_found_in_datastore():
     with patch("utilities.get_ts_ag_request") as mock_get_ts_aq_request, patch(
         "utilities.get_unique_values_for_metadata"
     ) as mock_get_unique_values_for_metadata:
@@ -367,7 +367,7 @@ def test_get_data_with_a_period_not_found_in_datastore():
         mock_get_ts_aq_request.return_value = None
         mock_get_unique_values_for_metadata.return_value = ["PT1M", "PT10M", "PT1H"]
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?periods=XXXX/PT1M")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?durations=XXXX/PT1M")
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Invalid ISO 8601 duration: XXXX"}
@@ -399,14 +399,14 @@ def test_get_data_with_invalid_levels_repeating_interval():
         assert response.json() == {"detail": "Invalid levels repeating-interval: R10/20/100/10"}
 
 
-def test_get_data_with_lowercase_period_range_without_existing_data():
+def test_get_data_with_lowercase_duration_range_without_existing_data():
     with patch("routers.edr.get_obs_request") as mock_get_obs_request:
 
         test_data = load_json("test/test_data/test_empty_proto.json")
 
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/position?coords=POINT(5.179705 52.0988218)&periods=p1m/P1Y")
+        response = client.get("/collections/observations/position?coords=POINT(5.179705 52.0988218)&durations=p1m/P1Y")
 
         assert response.status_code == 404
         assert response.json() == {"detail": "Requested data not found."}
@@ -427,14 +427,14 @@ def test_get_data_with_combination_levels_filtering():
         assert m_args.filter["level"].values == ["0", "10", "20", "30", "40", "50", "150/180", "1000"]
 
 
-def test_get_data_with_combination_periods_filtering():
+def test_get_data_with_combination_durations_filtering():
     with patch("routers.edr.get_obs_request") as mock_get_obs_request:
 
         # Load with random test data for making a mock_obs_request
         test_data = load_json("test/test_data/test_coverages_proto.json")
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?periods=PT0S, PT1M/PT10M")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?durations=PT0S, PT1M/PT10M")
 
         m_args = mock_get_obs_request.call_args[0][0]
 

@@ -6,26 +6,30 @@
 #
 apscheduler==3.11.0
     # via -r requirements.in
+bidict==0.23.1
+    # via python-socketio
 blinker==1.9.0
     # via flask
 brotli==1.1.0
     # via geventhttpclient
-certifi==2024.8.30
+certifi==2025.4.26
     # via
     #   geventhttpclient
     #   requests
-charset-normalizer==3.4.0
+charset-normalizer==3.4.2
     # via requests
-click==8.1.7
+click==8.2.0
     # via flask
 configargparse==1.7
-    # via locust
+    # via
+    #   locust
+    #   locust-cloud
 flask==3.1.0
     # via
     #   flask-cors
     #   flask-login
     #   locust
-flask-cors==5.0.0
+flask-cors==5.0.1
     # via locust
 flask-login==0.6.3
     # via locust
@@ -33,55 +37,75 @@ gevent==24.11.1
     # via
     #   geventhttpclient
     #   locust
+    #   locust-cloud
 geventhttpclient==2.3.3
     # via locust
-greenlet==3.1.1
+greenlet==3.2.2
     # via gevent
 grpc-interceptor==0.15.4
     # via -r requirements.in
-grpcio==1.68.1
+grpcio==1.71.0
     # via
     #   grpc-interceptor
     #   grpcio-tools
-grpcio-tools==1.68.1
+grpcio-tools==1.71.0
     # via -r requirements.in
+h11==0.16.0
+    # via wsproto
 idna==3.10
     # via requests
 itsdangerous==2.2.0
     # via flask
-jinja2==3.1.4
+jinja2==3.1.6
     # via flask
-locust==2.32.4
+locust==2.37.1
     # via -r requirements.in
+locust-cloud==1.21.5
+    # via locust
 markupsafe==3.0.2
     # via
     #   jinja2
     #   werkzeug
 msgpack==1.1.0
     # via locust
-numpy==2.2.0
+numpy==2.2.5
     # via shapely
-protobuf==5.29.1
+platformdirs==4.3.8
+    # via locust-cloud
+protobuf==5.29.4
     # via grpcio-tools
-psutil==6.1.0
+psutil==7.0.0
     # via locust
-pyzmq==26.2.0
+python-engineio==4.12.1
+    # via python-socketio
+python-socketio[client]==5.13.0
+    # via locust-cloud
+pyzmq==26.4.0
     # via locust
 requests==2.32.3
-    # via locust
-shapely==2.0.6
+    # via
+    #   locust
+    #   python-socketio
+shapely==2.1.0
     # via -r requirements.in
-tzlocal==5.2
+simple-websocket==1.1.0
+    # via python-engineio
+tzlocal==5.3.1
     # via apscheduler
-urllib3==2.2.3
+urllib3==2.4.0
     # via
     #   geventhttpclient
     #   requests
+websocket-client==1.8.0
+    # via python-socketio
 werkzeug==3.1.3
     # via
     #   flask
+    #   flask-cors
     #   flask-login
     #   locust
+wsproto==1.2.0
+    # via simple-websocket
 zope-event==5.0
     # via gevent
 zope-interface==7.2
