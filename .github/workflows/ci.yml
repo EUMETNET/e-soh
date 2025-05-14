@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      # Most of the steps in this workflow use just: https://github.com/casey/just
+      # Most of the steps in this workflow use "just": https://github.com/casey/just
       # Just can be used to run commands, it is similar to Make.
       # The just file is located in the root of the repository:  "justfile"
       - name: Install just
