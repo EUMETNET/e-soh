@@ -28,7 +28,7 @@ jobs:
             var download = await github.rest.actions.downloadArtifact({
                owner: context.repo.owner,
                repo: context.repo.repo,
-               artifact_id: matchDataStoreArtifact.id,
+               artifact_id: matchDatastoreArtifact.id,
                archive_format: 'zip',
             });
             var fs = require('fs');
