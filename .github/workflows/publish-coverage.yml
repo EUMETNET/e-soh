@@ -44,7 +44,7 @@ jobs:
                archive_format: 'zip',
             });
             var fs = require('fs');
-            fs.writeFileSync('${{github.workspace}}/ingest-test-results-artifact', Buffer.from(download.data));
+            fs.writeFileSync('${{github.workspace}}/ingest-test-results-artifact.zip', Buffer.from(download.data));
       - name: Unzip datastore artifacts
         run: unzip test-results-artifact.zip
       - name: Unzip ingest artifacts
