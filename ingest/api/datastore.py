@@ -20,7 +20,7 @@ def dtime2tstamp(dtime):
     return tstamp
 
 
-def build_grpc_messages(msg: str) -> None:
+def build_grpc_messages(msg: dict) -> None:
     """
     This method sets up required fields in TSMetadata, ObsMetadata and ingest data to datastore
     """

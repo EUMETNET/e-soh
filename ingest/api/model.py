@@ -31,6 +31,7 @@ with open("api/std_name_units.json") as f:
 class Coordinate(BaseModel):
     lat: float
     lon: float
+    height: float | None = None
 
 
 class Geometry(BaseModel):
@@ -288,6 +289,11 @@ class Properties(BaseModel):
     processing_level: Optional[str] = Field(
         None,
         description="A textual description of the processing (or quality control) level of the data.",
+    )
+    qc: Optional[str] = Field(None, description="Quality control flag for the data.")
+    qc_vocabulary: Optional[str] = Field(
+        None,
+        description="Controlled vocabulary for the names used in the 'qc' attribute.",
     )
     content: Content = Field(..., description="Actual data content")
     integrity: Optional[Integrity] = Field(
