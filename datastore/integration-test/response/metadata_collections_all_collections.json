@@ -8,10 +8,16 @@
     "collections": [
         {
             "id": "observations",
+            "title": "Meteorological Observations in Europe",
             "links": [
                 {
                     "href": "http://localhost:8008/collections/observations",
                     "rel": "data"
+                },
+                {
+                    "href": "https://creativecommons.org/licenses/by/4.0/",
+                    "rel": "license",
+                    "type": "text/html"
                 }
             ],
             "extent": {
@@ -24,7 +30,7 @@
                             55.399166666667
                         ]
                     ],
-                    "crs": "EPSG:4326"
+                    "crs": "OGC:CRS84"
                 },
                 "temporal": {
                     "interval": [
@@ -36,7 +42,7 @@
                     "values": [
                         "2022-12-31T00:00:00Z/2022-12-31T23:50:00Z"
                     ],
-                    "trs": "datetime"
+                    "trs": "Gregorian"
                 },
                 "custom": [
                     {
@@ -162,7 +168,7 @@
                 }
             },
             "crs": [
-                "WGS84"
+                "OGC:CRS84"
             ],
             "output_formats": [
                 "CoverageJSON"

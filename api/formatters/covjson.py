@@ -66,8 +66,8 @@ def convert_to_covjson(observations):
     for (lat, lon, times), group in groupby(data, lambda x: x.dom):
         referencing = [
             ReferenceSystemConnectionObject(
-                coordinates=["y", "x"],
-                system=ReferenceSystem(type="GeographicCRS", id="http://www.opengis.net/def/crs/EPSG/0/4326"),
+                coordinates=["x", "y"],
+                system=ReferenceSystem(type="GeographicCRS", id="http://www.opengis.net/def/crs/OGC/1.3/CRS84"),
             ),
             ReferenceSystemConnectionObject(
                 coordinates=["t"],
@@ -96,7 +96,7 @@ def convert_to_covjson(observations):
             parameters[parameter_id] = make_parameter(data.ts_mdata)
 
             ranges[parameter_id] = NdArrayFloat(
-                values=values_no_nan, axisNames=["t", "y", "x"], shape=[len(values_no_nan), 1, 1]
+                values=values_no_nan, axisNames=["t", "x", "y"], shape=[len(values_no_nan), 1, 1]
             )
 
         custom_fields = {"rodeo:wigosId": data.ts_mdata.platform}
