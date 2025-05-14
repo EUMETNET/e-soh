@@ -31,6 +31,7 @@ from utilities import seconds_to_iso_8601_duration
 from utilities import convert_cm_to_m
 
 from openapi.openapi_metadata import openapi_metadata
+from openapi.collections_metadata import collections_metadata
 
 
 logger = logging.getLogger(__name__)
@@ -126,7 +127,8 @@ def get_conformance() -> ConformanceModel:
     )
 
 
-async def get_collection_metadata(base_url: str, is_self) -> Collection:
+async def get_collection_metadata(base_url: str, collection_id: str, is_self) -> Collection:
+    # TODO: Add the collection_id to the request to support multiple collections
     ts_request = dstore.GetTSAGRequest(attrs=["parameter_name", "standard_name", "unit", "level", "period", "function"])
     ts_response = await get_ts_ag_request(ts_request)
     # logger.info(ts_response.ByteSize())
@@ -179,9 +181,11 @@ async def get_collection_metadata(base_url: str, is_self) -> Collection:
     periods = [seconds_to_iso_8601_duration(period) for period in await get_unique_values_for_metadata("period")]
 
     collection = Collection(
-        id="observations",
+        id=collections_metadata[collection_id]["id"],
+        title=collections_metadata[collection_id]["title"],
         links=[
             Link(href=f"{base_url}/observations", rel="self" if is_self else "data"),
+            Link(href=collections_metadata[collection_id]["license"]["url"], rel="license", type="text/html"),
         ],
         extent=Extent(
             spatial=Spatial(
@@ -193,12 +197,12 @@ async def get_collection_metadata(base_url: str, is_self) -> Collection:
                         spatial_extent.top,
                     ]
                 ],
-                crs="EPSG:4326",
+                crs="OGC:CRS84",
             ),
             temporal=Temporal(
                 interval=[[interval_start, interval_end]],
                 values=[f"{datetime_to_iso_string(interval_start)}/{datetime_to_iso_string(interval_end)}"],
-                trs="datetime",
+                trs="Gregorian",
             ),
             custom=[
                 Custom(
@@ -250,17 +254,16 @@ async def get_collection_metadata(base_url: str, is_self) -> Collection:
                 )
             ),
         ),
-        crs=["WGS84"],
+        crs=collections_metadata[collection_id]["crs"],
         output_formats=["CoverageJSON"],
         parameter_names={parameter_id: all_parameters[parameter_id] for parameter_id in sorted(all_parameters)},
     )
     return collection
 
 
-async def get_collections(base_url: str) -> Collections:
+async def get_collections(base_url: str, collections: list[str]) -> Collections:
     return Collections(
         links=[
             Link(href=f"{base_url}", rel="self"),
         ],
-        collections=[await get_collection_metadata(base_url, is_self=False)],
-    )
+        collections=[await get_collection_metadata(base_url, collection_id=collection, is_self=False) for collection in collections])
