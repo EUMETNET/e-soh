@@ -1,5 +1,5 @@
 collections_metadata = {
-    "observations":{
+    "observations": {
         "id": "observations",
         "title": "Meteorological Observations in Europe",
         "license": {

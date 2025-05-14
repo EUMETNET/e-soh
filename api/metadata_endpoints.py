@@ -266,4 +266,8 @@ async def get_collections(base_url: str, collections: list[str]) -> Collections:
         links=[
             Link(href=f"{base_url}", rel="self"),
         ],
-        collections=[await get_collection_metadata(base_url, collection_id=collection, is_self=False) for collection in collections])
+        collections=[
+            await get_collection_metadata(base_url, collection_id=collection, is_self=False)
+            for collection in collections
+        ],
+    )
