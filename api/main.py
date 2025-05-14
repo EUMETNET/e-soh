@@ -85,7 +85,9 @@ def create_collection_metadata_endpoint(collection_id: str):
     async def collection_metadata(request: Request) -> Collection:
         base_url = create_url_from_request(request)
         return await metadata_endpoints.get_collection_metadata(base_url, collection_id, is_self=True)
+
     return collection_metadata
+
 
 # Create dynamic routes for each collection
 for collection_id in all_collections:
