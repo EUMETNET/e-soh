@@ -215,56 +215,136 @@ func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error)
 */
 // --- END a variant of getObsTime that also supports intervals ---------------------------------
 
-// getGeoPointID retrieves the ID of the row in table geo_point that matches point,
-// inserting a new row if necessary. The ID is first looked up in a cache in order to save
-// unnecessary database access.
-// Returns (ID, nil) upon success, otherwise (..., error).
-func getGeoPointID(db *sql.DB, point *datastore.Point, cache map[string]int64) (int64, error) {
+//// getGeoPointID retrieves the ID of the row in table geo_point that matches point,
+//// inserting a new row if necessary. The ID is first looked up in a cache in order to save
+//// unnecessary database access.
+//// Returns (ID, nil) upon success, otherwise (..., error).
+//func getGeoPointID(db *sql.DB, point *datastore.Point, cache map[string]int64) (int64, error) {
+//
+//	var id int64 = -1
+//
+//	// first try a cache lookup
+//	cacheKey := fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())
+//	if id, found := cache[cacheKey]; found {
+//		return id, nil
+//	}
+//
+//	// Get a Tx for making transaction requests.
+//	tx, err := db.Begin()
+//	if err != nil {
+//		return -1, fmt.Errorf("db.Begin() failed: %v", err)
+//	}
+//	// Defer a rollback in case anything fails.
+//	defer tx.Rollback()
+//
+//	// NOTE: the 'WHERE false' is a feature that ensures that another transaction cannot
+//	// delete the row
+//	insertCmd := `
+//		INSERT INTO geo_point (point) VALUES (ST_MakePoint($1, $2)::geography)
+//		ON CONFLICT (point) DO UPDATE SET point = EXCLUDED.point WHERE false
+//	`
+//
+//	_, err = tx.Exec(insertCmd, point.GetLon(), point.GetLat())
+//	if err != nil {
+//		return -1, fmt.Errorf("tx.Exec() failed: %v", err)
+//	}
+//
+//	selectCmd := "SELECT id FROM geo_point WHERE point = ST_MakePoint($1, $2)::geography"
+//
+//	err = tx.QueryRow(selectCmd, point.GetLon(), point.GetLat()).Scan(&id)
+//	if err != nil {
+//		return -1, fmt.Errorf("tx.QueryRow() failed: %v", err)
+//	}
+//
+//	// Commit the transaction.
+//	if err = tx.Commit(); err != nil {
+//		return -1, fmt.Errorf("tx.Commit() failed: %v", err)
+//	}
+//
+//	// cache ID
+//	cache[cacheKey] = id
+//
+//	return id, nil
+//}
 
-	var id int64 = -1
+func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
 
-	// first try a cache lookup
-	cacheKey := fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())
-	if id, found := cache[cacheKey]; found {
-		return id, nil
+	valsExpr := []string{}
+	phVals := []interface{}{}
+
+	// TODO: Clean up point handling in maps... struct versus string
+	type p struct {
+		lon float64
+		lat float64
+	}
+	// Collect all unique points
+	points := map[p]bool{}
+	for _, obs := range observations {
+		point := obs.GetObsMdata().GetGeoPoint()
+		points[p{point.Lon, point.Lat}] = true
 	}
 
+	index := 0
+	//for _, obs := range observations {
+	// Loop over unique points
+	for point := range points {
+		// TODO: CLean this up
+		valsExpr0 := fmt.Sprintf(`(ST_MakePoint($%d, $%d)::geography)`,
+			index+1,
+			index+2,
+		)
+		//point := obs.GetObsMdata().GetGeoPoint()
+		phVals0 := []interface{}{point.lon, point.lat}
+
+		valsExpr = append(valsExpr, valsExpr0)
+		phVals = append(phVals, phVals0...)
+		index += len(phVals0)
+	}
+
+	// TODO: Do we need a transaction here?
 	// Get a Tx for making transaction requests.
 	tx, err := db.Begin()
 	if err != nil {
-		return -1, fmt.Errorf("db.Begin() failed: %v", err)
+		return nil, fmt.Errorf("db.Begin() failed: %v", err)
 	}
 	// Defer a rollback in case anything fails.
 	defer tx.Rollback()
 
-	// NOTE: the 'WHERE false' is a feature that ensures that another transaction cannot
-	// delete the row
-	insertCmd := `
-		INSERT INTO geo_point (point) VALUES (ST_MakePoint($1, $2)::geography)
+	cmd := fmt.Sprintf(`
+		INSERT INTO geo_point (point) VALUES %s
 		ON CONFLICT (point) DO UPDATE SET point = EXCLUDED.point WHERE false
-	`
+	`, strings.Join(valsExpr, ","))
 
-	_, err = tx.Exec(insertCmd, point.GetLon(), point.GetLat())
+	_, err = tx.Exec(cmd, phVals...)
 	if err != nil {
-		return -1, fmt.Errorf("tx.Exec() failed: %v", err)
+		return nil, fmt.Errorf("db.Exec() failed: %v", err)
 	}
 
-	selectCmd := "SELECT id FROM geo_point WHERE point = ST_MakePoint($1, $2)::geography"
+	cmd = fmt.Sprintf(`
+		SELECT id, ST_X(point::geometry), ST_Y(point::geometry) FROM geo_point WHERE point in (%s)
+	`, strings.Join(valsExpr, ","))
 
-	err = tx.QueryRow(selectCmd, point.GetLon(), point.GetLat()).Scan(&id)
+	rows, err := tx.Query(cmd, phVals...)
 	if err != nil {
-		return -1, fmt.Errorf("tx.QueryRow() failed: %v", err)
+		return nil, fmt.Errorf("tx.QueryRow() failed: %v", err)
+	}
+	defer rows.Close()
+
+	gpIDmap := map[string]int64{}
+	var id int64
+	var x, y float64
+	for rows.Next() {
+		rows.Scan(&id, &x, &y)
+		//log.Printf("%v %v %v", id, x, y)
+		gpIDmap[fmt.Sprintf("%v %v", x, y)] = id
 	}
 
 	// Commit the transaction.
 	if err = tx.Commit(); err != nil {
-		return -1, fmt.Errorf("tx.Commit() failed: %v", err)
+		return nil, fmt.Errorf("tx.Commit() failed: %v", err)
 	}
 
-	// cache ID
-	cache[cacheKey] = id
-
-	return id, nil
+	return gpIDmap, nil
 }
 
 // createInsertVals generates from (tsID, obsTimes, gpIDs, and omds) two arrays:
@@ -404,7 +484,7 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 	tsInfos := map[int64]tsInfo{}
 
 	tsIDCache := map[string]int64{}
-	gpIDCache := map[string]int64{}
+	//gpIDCache := map[string]int64{}
 
 	loTime, hiTime := common.GetValidTimeRange()
 
@@ -414,6 +494,13 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			"too many observations in a single call: %d > %d",
 			len(request.Observations), putObsLimit)
 	}
+
+	gpIDCache, err := getGeoPointIDs(sbe.Db, request.Observations)
+	if err != nil {
+		return codes.Internal, fmt.Sprintf("getGeoPointIDs() failed: %v", err)
+	}
+
+	log.Printf("Inserted %v points", len(gpIDCache))
 
 	// populate tsInfos
 	for _, obs := range request.Observations {
@@ -440,10 +527,12 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			return codes.Internal, fmt.Sprintf("upsertTS() failed: %v", err)
 		}
 
-		gpID, err := getGeoPointID(sbe.Db, obs.GetObsMdata().GetGeoPoint(), gpIDCache)
-		if err != nil {
-			return codes.Internal, fmt.Sprintf("getGeoPointID() failed: %v", err)
-		}
+		point := obs.GetObsMdata().GetGeoPoint()
+		gpID := gpIDCache[fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())]
+		//gpID, err := getGeoPointID(sbe.Db, obs.GetObsMdata().GetGeoPoint(), gpIDCache)
+		//if err != nil {
+		//	return codes.Internal, fmt.Sprintf("getGeoPointID() failed: %v", err)
+		//}
 
 		var obsTimes []*timestamppb.Timestamp
 		var gpIDs []int64
