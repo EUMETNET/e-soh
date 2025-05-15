@@ -176,7 +176,7 @@ func init() { // automatically called once on program startup (on first import o
 			pbName := common.ToSnakeCase(goName)
 			switch field.Type.Kind() {
 			case reflect.Int64:
-				obsInt64Pb2go[pbName] = goName // assignment to nil map - debug!
+				obsInt64Pb2go[pbName] = goName
 				obsInt64MdataGoNames = append(obsInt64MdataGoNames, goName)
 				obsInt64MdataCols = append(
 					obsInt64MdataCols, fmt.Sprintf("observation.%s", pbName))
