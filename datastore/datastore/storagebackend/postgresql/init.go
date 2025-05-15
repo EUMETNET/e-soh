@@ -163,6 +163,9 @@ func init() { // automatically called once on program startup (on first import o
 	}
 
 	// create obs{Int64|String}Pb2go, obs{Int64|String}MdataGoNames, and obs{Int64|String}MdataCols
+	obsInt64Pb2go = map[string]string{}
+	obsInt64MdataGoNames = []string{}
+	obsInt64MdataCols = []string{}
 	obsStringPb2go = map[string]string{}
 	obsStringMdataGoNames = []string{}
 	obsStringMdataCols = []string{}
@@ -173,7 +176,7 @@ func init() { // automatically called once on program startup (on first import o
 			pbName := common.ToSnakeCase(goName)
 			switch field.Type.Kind() {
 			case reflect.Int64:
-				obsInt64Pb2go[pbName] = goName
+				obsInt64Pb2go[pbName] = goName // assignment to nil map - debug!
 				obsInt64MdataGoNames = append(obsInt64MdataGoNames, goName)
 				obsInt64MdataCols = append(
 					obsInt64MdataCols, fmt.Sprintf("observation.%s", pbName))
