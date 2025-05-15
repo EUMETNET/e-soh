@@ -133,6 +133,7 @@ func init() { // automatically called once on program startup (on first import o
 
 	// create ts{Int64|String}StructFields
 	tsInt64StructFields = []reflect.StructField{}
+	tsStringStructFields = []reflect.StructField{}
 	for _, field := range reflect.VisibleFields(reflect.TypeOf(datastore.TSMetadata{})) {
 		if field.IsExported() {
 			switch field.Type.Kind() {
@@ -262,6 +263,9 @@ func init() { // automatically called once on program startup (on first import o
 	supIncRespFields.Set("links")
 	// --- END TSMetadata fields -------------------
 	// --- BEGIN ObsMetadata fields -------------------
+	for _, f := range obsInt64MdataCols {
+		supIncRespFields.Set(strings.TrimPrefix(f, "observation."))
+	}
 	for _, f := range obsStringMdataCols {
 		supIncRespFields.Set(strings.TrimPrefix(f, "observation."))
 	}
