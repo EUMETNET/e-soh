@@ -18,6 +18,8 @@
                 "value": "91.0"
             },
             "processing_level": "q1",
+            "quality_code": "0",
+            "quality_code_vocabulary": "placeholder",
             "license": "http//spdx.org/licenses/CC-BY-4.0(CC-BY-4.0)",
             "platform": "0-20000-0-01001",
             "platform_vocabulary": "placeholder",
