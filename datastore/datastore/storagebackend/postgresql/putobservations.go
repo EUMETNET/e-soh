@@ -5,6 +5,7 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 
@@ -271,14 +272,19 @@ func getGeoPointID(db *sql.DB, point *datastore.Point, cache map[string]int64) (
 //     statement, and
 //   - in phVals: the total, flat list of all placeholder values.
 func createInsertVals(
-	tsID int64, obsTimes *[]*timestamppb.Timestamp, gpIDs *[]int64,
-	omds *[]*datastore.ObsMetadata, valsExpr *[]string, phVals *[]interface{}) {
+	tsInfos map[int64]tsInfo, valsExpr *[]string, phVals *[]interface{}) {
+	//tsID int64, obsTimes *[]*timestamppb.Timestamp, gpIDs *[]int64,
+	//omds *[]*datastore.ObsMetadata, valsExpr *[]string, phVals *[]interface{}) {
 	// assert(len(*obsTimes) > 0)
 	// assert(len(*obsTimes) == len(*gpIDs) == len(*omds))
 
 	index := 0
-	for i := 0; i < len(*obsTimes); i++ {
-		valsExpr0 := fmt.Sprintf(`(
+	for tsID, tsInfo := range tsInfos {
+		obsTimes := tsInfo.obsTimes
+		omds := tsInfo.omds
+		gpIDs := tsInfo.gpIDs
+		for i := 0; i < len(*obsTimes); i++ {
+			valsExpr0 := fmt.Sprintf(`(
 			$%d,
 			to_timestamp($%d),
 			$%d,
@@ -289,32 +295,33 @@ func createInsertVals(
 			$%d,
 			$%d
 			)`,
-			index+1,
-			index+2,
-			index+3,
-			index+4,
-			index+5,
-			index+6,
-			index+7,
-			index+8,
-			index+9,
-		)
+				index+1,
+				index+2,
+				index+3,
+				index+4,
+				index+5,
+				index+6,
+				index+7,
+				index+8,
+				index+9,
+			)
 
-		phVals0 := []interface{}{
-			tsID,
-			common.Tstamp2float64Secs((*obsTimes)[i]),
-			(*omds)[i].GetId(),
-			(*gpIDs)[i],
-			common.Tstamp2float64Secs((*omds)[i].GetPubtime()),
-			(*omds)[i].GetDataId(),
-			(*omds)[i].GetHistory(),
-			(*omds)[i].GetProcessingLevel(),
-			(*omds)[i].GetValue(),
+			phVals0 := []interface{}{
+				tsID,
+				common.Tstamp2float64Secs((*obsTimes)[i]),
+				(*omds)[i].GetId(),
+				(*gpIDs)[i],
+				common.Tstamp2float64Secs((*omds)[i].GetPubtime()),
+				(*omds)[i].GetDataId(),
+				(*omds)[i].GetHistory(),
+				(*omds)[i].GetProcessingLevel(),
+				(*omds)[i].GetValue(),
+			}
+
+			*valsExpr = append(*valsExpr, valsExpr0)
+			*phVals = append(*phVals, phVals0...)
+			index += len(phVals0)
 		}
-
-		*valsExpr = append(*valsExpr, valsExpr0)
-		*phVals = append(*phVals, phVals0...)
-		index += len(phVals0)
 	}
 }
 
@@ -322,25 +329,30 @@ func createInsertVals(
 //
 // Returns nil upon success, otherwise error.
 func upsertObs(
-	db *sql.DB, tsID int64, obsTimes *[]*timestamppb.Timestamp, gpIDs *[]int64,
-	omds *[]*datastore.ObsMetadata) error {
+	db *sql.DB, tsInfos map[int64]tsInfo) error {
+	//db *sql.DB, tsID int64, obsTimes *[]*timestamppb.Timestamp, gpIDs *[]int64,
+	//omds *[]*datastore.ObsMetadata) error {
 
-	// assert(obsTimes != nil)
-	if obsTimes == nil {
-		return fmt.Errorf("precondition failed: obsTimes == nil")
+	for _, tsInfo := range tsInfos {
+		obsTimes := tsInfo.obsTimes
+		// assert(obsTimes != nil)
+		if obsTimes == nil {
+			return fmt.Errorf("precondition failed: obsTimes == nil")
+		}
+
+		// assert(len(*obsTimes) > 0)
+		if len(*obsTimes) == 0 {
+			return fmt.Errorf("precondition failed: len(*obsTimes) == 0")
+		}
+
+		// assert(len(*obsTimes) == len(*gpIDs) == len(*omds))
+		// for now don't check explicitly for this precondition
 	}
-
-	// assert(len(*obsTimes) > 0)
-	if len(*obsTimes) == 0 {
-		return fmt.Errorf("precondition failed: len(*obsTimes) == 0")
-	}
-
-	// assert(len(*obsTimes) == len(*gpIDs) == len(*omds))
-	// for now don't check explicitly for this precondition
 
 	valsExpr := []string{}
 	phVals := []interface{}{}
-	createInsertVals(tsID, obsTimes, gpIDs, omds, &valsExpr, &phVals)
+	createInsertVals(tsInfos, &valsExpr, &phVals)
+	//createInsertVals(tsID, obsTimes, gpIDs, omds, &valsExpr, &phVals)
 
 	cmd := fmt.Sprintf(`
 		INSERT INTO observation (
@@ -372,14 +384,17 @@ func upsertObs(
 	return nil
 }
 
+type tsInfo struct {
+	obsTimes *[]*timestamppb.Timestamp
+	gpIDs    *[]int64 // geo point IDs
+	omds     *[]*datastore.ObsMetadata
+}
+
 // PutObservations ... (see documentation in StorageBackend interface)
 func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.Code, string) {
 
-	type tsInfo struct {
-		obsTimes *[]*timestamppb.Timestamp
-		gpIDs    *[]int64 // geo point IDs
-		omds     *[]*datastore.ObsMetadata
-	}
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	log.Printf("Entered PutObservations with %v observations...", len(request.Observations))
 
 	tsInfos := map[int64]tsInfo{}
 
@@ -448,13 +463,20 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 		*tsInfo0.omds = append(*tsInfo0.omds, obs.GetObsMdata())
 	}
 
-	// insert/update observations for each time series
-	for tsID, tsInfo := range tsInfos {
-		if err := upsertObs(
-			sbe.Db, tsID, tsInfo.obsTimes, tsInfo.gpIDs, tsInfo.omds); err != nil {
-			return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
-		}
+	log.Printf("Got tsInfo of size %v...", len(tsInfos))
+
+	// insert/update observations for all time series
+	if err := upsertObs(sbe.Db, tsInfos); err != nil {
+		return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
 	}
+	//for tsID, tsInfo := range tsInfos {
+	//	if err := upsertObs(
+	//		sbe.Db, tsID, tsInfo.obsTimes, tsInfo.gpIDs, tsInfo.omds); err != nil {
+	//		return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
+	//	}
+	//}
+
+	log.Printf("Inserted observations")
 
 	return codes.OK, ""
 }
