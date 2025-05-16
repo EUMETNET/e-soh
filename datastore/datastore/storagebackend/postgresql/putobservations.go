@@ -189,6 +189,94 @@ func upsertTS(
 	return id, nil
 }
 
+func upsertTSs(
+	db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
+
+	mapTScolVals := map[string][]interface{}{}
+	mapTScolValsConstraint := map[string][]interface{}{}
+
+	// Collect all unique timeseries values by constraint.
+	// If there are observations that have the same unique constraint value, last one wins.
+	// This looks like premature optimisation... but it is not. Postgres will throw error on duplicates in the INSERT
+	for _, obs := range observations {
+		tsMdata := obs.GetTsMdata()
+		colVals, colValsUnique, err := getTSColVals(tsMdata)
+		if err != nil {
+			return nil, fmt.Errorf("getTSColVals() failed: %v", err)
+		}
+
+		cacheKey := fmt.Sprintf("%v", colValsUnique)
+		//log.Printf("cachkeKey: %v", cacheKey)
+		mapTScolVals[cacheKey] = colVals
+		mapTScolValsConstraint[cacheKey] = colValsUnique
+	}
+
+	phVals := []interface{}{}
+	phValsConstraint := []interface{}{}
+
+	for _, colVals := range mapTScolVals {
+		phVals = append(phVals, colVals...)
+
+	}
+	for _, colValsUnique := range mapTScolValsConstraint {
+		phValsConstraint = append(phValsConstraint, colValsUnique...)
+	}
+
+	insertCmd := getUpsertTSInsertCmd(len(mapTScolVals))
+
+	// start transaction
+	// TODO: Do we need it?
+	tx, err := db.Begin()
+	if err != nil {
+		return nil, fmt.Errorf("db.Begin() failed: %v", err)
+	}
+	defer tx.Rollback()
+
+	log.Printf("Before row insert")
+
+	// STEP 1: upsert row
+	_, err = tx.Exec(insertCmd, phVals...)
+	if err != nil {
+		return nil, fmt.Errorf("tx.Exec() failed: %v", err)
+	}
+
+	log.Printf("After row insert")
+
+	// STEP 2: retrieve id's
+	selectCmd := getUpsertTSSelectCmd(len(mapTScolValsConstraint))
+	rows, err := tx.Query(selectCmd, phValsConstraint...)
+	if err != nil {
+		return nil, fmt.Errorf("tx.Query() failed: %v", err)
+	}
+
+	log.Printf("After select query")
+
+	defer rows.Close()
+	colNamesUnique := getTSColNamesUnique()
+	var tsID int64
+	colValsStrings := make([]interface{}, len(colNamesUnique))
+	colValPtrs := []interface{}{&tsID}
+	for i := range colNamesUnique {
+		colValPtrs = append(colValPtrs, &colValsStrings[i])
+	}
+
+	tsIDmap := map[string]int64{}
+	for rows.Next() {
+		rows.Scan(colValPtrs...)
+		//log.Printf("%v %v", tsID, colValsStrings)
+		tsIDmap[fmt.Sprintf("%v", colValsStrings)] = tsID
+	}
+	//log.Printf("%v", tsIDmap)
+	log.Printf("After getting data from rows query")
+
+	// commit transaction
+	if err = tx.Commit(); err != nil {
+		return nil, fmt.Errorf("tx.Commit() failed: %v", err)
+	}
+
+	return tsIDmap, nil
+}
+
 // getObsTime extracts the obs time from obsMdata.
 // Returns (obs time, nil) upon success, otherwise (..., error).
 func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error) {
@@ -278,6 +366,7 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 		lat float64
 	}
 	// Collect all unique points
+	// This looks like premature optimisation... but it is not. Postgres will throw error on duplicates in the INSERT
 	points := map[p]bool{}
 	for _, obs := range observations {
 		point := obs.GetObsMdata().GetGeoPoint()
@@ -285,7 +374,6 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 	}
 
 	index := 0
-	//for _, obs := range observations {
 	// Loop over unique points
 	for point := range points {
 		// TODO: CLean this up
@@ -293,7 +381,6 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 			index+1,
 			index+2,
 		)
-		//point := obs.GetObsMdata().GetGeoPoint()
 		phVals0 := []interface{}{point.lon, point.lat}
 
 		valsExpr = append(valsExpr, valsExpr0)
@@ -483,9 +570,6 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 
 	tsInfos := map[int64]tsInfo{}
 
-	tsIDCache := map[string]int64{}
-	//gpIDCache := map[string]int64{}
-
 	loTime, hiTime := common.GetValidTimeRange()
 
 	// reject call if # of observations exceeds limit
@@ -495,12 +579,18 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			len(request.Observations), putObsLimit)
 	}
 
-	gpIDCache, err := getGeoPointIDs(sbe.Db, request.Observations)
+	gpIDMap, err := getGeoPointIDs(sbe.Db, request.Observations)
 	if err != nil {
 		return codes.Internal, fmt.Sprintf("getGeoPointIDs() failed: %v", err)
 	}
 
-	log.Printf("Inserted %v points", len(gpIDCache))
+	log.Printf("Returned %v unique points", len(gpIDMap))
+
+	tsIDMap, err := upsertTSs(sbe.Db, request.Observations)
+	if err != nil {
+		return codes.Internal, fmt.Sprintf("upsertTSs() failed: %v", err)
+	}
+	log.Printf("Returned %v unique timseries", len(tsIDMap))
 
 	// populate tsInfos
 	for _, obs := range request.Observations {
@@ -522,17 +612,18 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 				obsTime.AsTime(), hiTime, loTime, common.GetValidTimeRangeSettings())
 		}
 
-		tsID, err := upsertTS(sbe.Db, obs.GetTsMdata(), tsIDCache)
+		// Look up timeseries key.
+		// TODO: This feels inefficient, calling getTSColVals again...
+		tsMdata := obs.GetTsMdata()
+		_, colValsUnique, err := getTSColVals(tsMdata)
 		if err != nil {
-			return codes.Internal, fmt.Sprintf("upsertTS() failed: %v", err)
+			return codes.Internal, fmt.Sprintf("getTSColVals() failed: %v", err)
 		}
+		key := fmt.Sprintf("%v", colValsUnique)
+		tsID := tsIDMap[key]
 
 		point := obs.GetObsMdata().GetGeoPoint()
-		gpID := gpIDCache[fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())]
-		//gpID, err := getGeoPointID(sbe.Db, obs.GetObsMdata().GetGeoPoint(), gpIDCache)
-		//if err != nil {
-		//	return codes.Internal, fmt.Sprintf("getGeoPointID() failed: %v", err)
-		//}
+		gpID := gpIDMap[fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())]
 
 		var obsTimes []*timestamppb.Timestamp
 		var gpIDs []int64
