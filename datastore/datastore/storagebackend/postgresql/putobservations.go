@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/lib/pq"
@@ -243,6 +244,7 @@ func upsertTSs(
 	log.Printf("After row insert")
 
 	// STEP 2: retrieve id's
+	// TODO: This query is the bottleneck. I did get it faster once. Why? Index seems to work
 	selectCmd := getUpsertTSSelectCmd(len(mapTScolValsConstraint))
 	rows, err := tx.Query(selectCmd, phValsConstraint...)
 	if err != nil {
@@ -568,100 +570,103 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	log.Printf("Entered PutObservations with %v observations...", len(request.Observations))
 
-	tsInfos := map[int64]tsInfo{}
+	// Chunk observations by 2000, as otherwise the SQL queries have to many parameters
+	for observations := range slices.Chunk(request.Observations, 1000) {
+		tsInfos := map[int64]tsInfo{}
 
-	loTime, hiTime := common.GetValidTimeRange()
+		loTime, hiTime := common.GetValidTimeRange()
 
-	// reject call if # of observations exceeds limit
-	if len(request.Observations) > putObsLimit {
-		return codes.OutOfRange, fmt.Sprintf(
-			"too many observations in a single call: %d > %d",
-			len(request.Observations), putObsLimit)
-	}
-
-	gpIDMap, err := getGeoPointIDs(sbe.Db, request.Observations)
-	if err != nil {
-		return codes.Internal, fmt.Sprintf("getGeoPointIDs() failed: %v", err)
-	}
-
-	log.Printf("Returned %v unique points", len(gpIDMap))
-
-	tsIDMap, err := upsertTSs(sbe.Db, request.Observations)
-	if err != nil {
-		return codes.Internal, fmt.Sprintf("upsertTSs() failed: %v", err)
-	}
-	log.Printf("Returned %v unique timseries", len(tsIDMap))
-
-	// populate tsInfos
-	for _, obs := range request.Observations {
-
-		obsTime, err := getObsTime(obs.GetObsMdata())
-		if err != nil {
-			return codes.Internal, fmt.Sprintf("getObsTime() failed: %v", err)
-		}
-
-		if obsTime.AsTime().Before(loTime) {
+		// reject call if # of observations exceeds limit
+		if len(observations) > putObsLimit {
 			return codes.OutOfRange, fmt.Sprintf(
-				"obs time too old: %v < %v (hiTime: %v; settings: %s)",
-				obsTime.AsTime(), loTime, hiTime, common.GetValidTimeRangeSettings())
+				"too many observations in a single call: %d > %d",
+				len(observations), putObsLimit)
 		}
 
-		if obsTime.AsTime().After(hiTime) {
-			return codes.OutOfRange, fmt.Sprintf(
-				"obs time too new: %v > %v (loTime: %v; settings: %s)",
-				obsTime.AsTime(), hiTime, loTime, common.GetValidTimeRangeSettings())
-		}
-
-		// Look up timeseries key.
-		// TODO: This feels inefficient, calling getTSColVals again...
-		tsMdata := obs.GetTsMdata()
-		_, colValsUnique, err := getTSColVals(tsMdata)
+		gpIDMap, err := getGeoPointIDs(sbe.Db, observations)
 		if err != nil {
-			return codes.Internal, fmt.Sprintf("getTSColVals() failed: %v", err)
+			return codes.Internal, fmt.Sprintf("getGeoPointIDs() failed: %v", err)
 		}
-		key := fmt.Sprintf("%v", colValsUnique)
-		tsID := tsIDMap[key]
 
-		point := obs.GetObsMdata().GetGeoPoint()
-		gpID := gpIDMap[fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())]
+		log.Printf("Returned %v unique points", len(gpIDMap))
 
-		var obsTimes []*timestamppb.Timestamp
-		var gpIDs []int64
-		var omds []*datastore.ObsMetadata
-		var tsInfo0 tsInfo
-		var found bool
-		if tsInfo0, found = tsInfos[tsID]; !found {
-			obsTimes = []*timestamppb.Timestamp{}
-			gpIDs = []int64{}
-			omds = []*datastore.ObsMetadata{}
-			tsInfos[tsID] = tsInfo{
-				obsTimes: &obsTimes,
-				gpIDs:    &gpIDs,
-				omds:     &omds,
+		tsIDMap, err := upsertTSs(sbe.Db, observations)
+		if err != nil {
+			return codes.Internal, fmt.Sprintf("upsertTSs() failed: %v", err)
+		}
+		log.Printf("Returned %v unique timseries", len(tsIDMap))
+
+		// populate tsInfos
+		for _, obs := range observations {
+
+			obsTime, err := getObsTime(obs.GetObsMdata())
+			if err != nil {
+				return codes.Internal, fmt.Sprintf("getObsTime() failed: %v", err)
 			}
-			tsInfo0, found = tsInfos[tsID]
-			// assert(found)
-			_ = found
+
+			if obsTime.AsTime().Before(loTime) {
+				return codes.OutOfRange, fmt.Sprintf(
+					"obs time too old: %v < %v (hiTime: %v; settings: %s)",
+					obsTime.AsTime(), loTime, hiTime, common.GetValidTimeRangeSettings())
+			}
+
+			if obsTime.AsTime().After(hiTime) {
+				return codes.OutOfRange, fmt.Sprintf(
+					"obs time too new: %v > %v (loTime: %v; settings: %s)",
+					obsTime.AsTime(), hiTime, loTime, common.GetValidTimeRangeSettings())
+			}
+
+			// Look up timeseries key.
+			// TODO: This feels inefficient, calling getTSColVals again...
+			tsMdata := obs.GetTsMdata()
+			_, colValsUnique, err := getTSColVals(tsMdata)
+			if err != nil {
+				return codes.Internal, fmt.Sprintf("getTSColVals() failed: %v", err)
+			}
+			key := fmt.Sprintf("%v", colValsUnique)
+			tsID := tsIDMap[key]
+
+			point := obs.GetObsMdata().GetGeoPoint()
+			gpID := gpIDMap[fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())]
+
+			var obsTimes []*timestamppb.Timestamp
+			var gpIDs []int64
+			var omds []*datastore.ObsMetadata
+			var tsInfo0 tsInfo
+			var found bool
+			if tsInfo0, found = tsInfos[tsID]; !found {
+				obsTimes = []*timestamppb.Timestamp{}
+				gpIDs = []int64{}
+				omds = []*datastore.ObsMetadata{}
+				tsInfos[tsID] = tsInfo{
+					obsTimes: &obsTimes,
+					gpIDs:    &gpIDs,
+					omds:     &omds,
+				}
+				tsInfo0, found = tsInfos[tsID]
+				// assert(found)
+				_ = found
+			}
+			*tsInfo0.obsTimes = append(*tsInfo0.obsTimes, obsTime)
+			*tsInfo0.gpIDs = append(*tsInfo0.gpIDs, gpID)
+			*tsInfo0.omds = append(*tsInfo0.omds, obs.GetObsMdata())
 		}
-		*tsInfo0.obsTimes = append(*tsInfo0.obsTimes, obsTime)
-		*tsInfo0.gpIDs = append(*tsInfo0.gpIDs, gpID)
-		*tsInfo0.omds = append(*tsInfo0.omds, obs.GetObsMdata())
+
+		log.Printf("Got tsInfo of size %v...", len(tsInfos))
+
+		// insert/update observations for all time series
+		if err := upsertObs(sbe.Db, tsInfos); err != nil {
+			return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
+		}
+		//for tsID, tsInfo := range tsInfos {
+		//	if err := upsertObs(
+		//		sbe.Db, tsID, tsInfo.obsTimes, tsInfo.gpIDs, tsInfo.omds); err != nil {
+		//		return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
+		//	}
+		//}
+
+		log.Printf("Inserted observations")
 	}
-
-	log.Printf("Got tsInfo of size %v...", len(tsInfos))
-
-	// insert/update observations for all time series
-	if err := upsertObs(sbe.Db, tsInfos); err != nil {
-		return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
-	}
-	//for tsID, tsInfo := range tsInfos {
-	//	if err := upsertObs(
-	//		sbe.Db, tsID, tsInfo.obsTimes, tsInfo.gpIDs, tsInfo.omds); err != nil {
-	//		return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
-	//	}
-	//}
-
-	log.Printf("Inserted observations")
 
 	return codes.OK, ""
 }
