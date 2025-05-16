@@ -5,7 +5,9 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
+	"log"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/lib/pq"
@@ -125,6 +127,62 @@ func getTSColValsUnique(colName2Val map[string]interface{}) ([]interface{}, erro
 	return result, nil
 }
 
+func getUpsertTSInsertCmd(nRows int) string {
+
+	cols := getTSColNames()
+
+	formats := make([]string, nRows)
+	index := 1
+	for i := 0; i < nRows; i++ {
+		oneRow := make([]string, len(cols))
+		for j := 0; j < len(cols); j++ {
+			oneRow[j] = fmt.Sprintf("$%d", index)
+			index += 1
+		}
+		formats[i] = "(" + strings.Join(oneRow, ",") + ")"
+	}
+
+	updateExpr := []string{}
+	for _, col := range getTSColNamesUniqueCompl() {
+		updateExpr = append(updateExpr, fmt.Sprintf("%s = EXCLUDED.%s", col, col))
+	}
+
+	insertCmd := fmt.Sprintf(`
+		INSERT INTO time_series (%s) VALUES %s
+		ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
+		`,
+		strings.Join(cols, ","),
+		strings.Join(formats, ","),
+		strings.Join(updateExpr, ","),
+	)
+	//log.Printf("Insert: %v", insertCmd)
+	return insertCmd
+}
+
+func getUpsertTSSelectCmd(nRows int) string {
+	cols := getTSColNamesUnique()
+	whereExpr := make([]string, nRows)
+	index := 1
+	for i := 0; i < nRows; i++ {
+		oneRow := make([]string, len(cols))
+		for j := range cols {
+			oneRow[j] = fmt.Sprintf("$%d", index)
+			index += 1
+		}
+		whereExpr[i] = "(" + strings.Join(oneRow, ",") + ")"
+	}
+
+	selectCmd := fmt.Sprintf(
+		`SELECT id,%s FROM time_series WHERE (%s) in (%s)`,
+		strings.Join(cols, ","),
+		strings.Join(cols, ","),
+		strings.Join(whereExpr, ","))
+	//log.Printf("Select: %v", selectCmd)
+
+	return selectCmd
+}
+
+// TODO: Update comments
 // upsertTS retrieves the ID of the row in table time_series that matches tsMdata wrt.
 // the fields - U - defined by constraint unique_main, inserting a new row if necessary.
 //
@@ -138,54 +196,93 @@ func getTSColValsUnique(colName2Val map[string]interface{}) ([]interface{}, erro
 // according to tsMdata.
 //
 // Returns (ID, nil) upon success, otherwise (..., error).
-func upsertTS(
-	db *sql.DB, tsMdata *datastore.TSMetadata, cache map[string]int64) (int64, error) {
+func upsertTSs(
+	db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
 
-	colVals, colValsUnique, err := getTSColVals(tsMdata)
-	if err != nil {
-		return -1, fmt.Errorf("getTSColVals() failed: %v", err)
+	mapTScolVals := map[string][]interface{}{}
+	mapTScolValsConstraint := map[string][]interface{}{}
+
+	// Collect all unique timeseries values by constraint.
+	// If there are observations that have the same unique constraint value, last one wins.
+	// This looks like premature optimisation... but it is not. Postgres will throw error on duplicates in the INSERT
+	for _, obs := range observations {
+		tsMdata := obs.GetTsMdata()
+		colVals, colValsUnique, err := getTSColVals(tsMdata)
+		if err != nil {
+			return nil, fmt.Errorf("getTSColVals() failed: %v", err)
+		}
+
+		cacheKey := fmt.Sprintf("%v", colValsUnique)
+		//log.Printf("cachkeKey: %v", cacheKey)
+		mapTScolVals[cacheKey] = colVals
+		mapTScolValsConstraint[cacheKey] = colValsUnique
 	}
 
-	// first try a cache lookup
-	cacheKey := fmt.Sprintf("%v", colVals)
-	if id, found := cache[cacheKey]; found {
-		return id, nil
+	phVals := []interface{}{}
+	phValsConstraint := []interface{}{}
+
+	for _, colVals := range mapTScolVals {
+		phVals = append(phVals, colVals...)
+
+	}
+	for _, colValsUnique := range mapTScolValsConstraint {
+		phValsConstraint = append(phValsConstraint, colValsUnique...)
 	}
 
-	// then access database ...
+	insertCmd := getUpsertTSInsertCmd(len(mapTScolVals))
 
 	// start transaction
+	// TODO: Do we need it?
 	tx, err := db.Begin()
 	if err != nil {
-		return -1, fmt.Errorf("db.Begin() failed: %v", err)
+		return nil, fmt.Errorf("db.Begin() failed: %v", err)
 	}
 	defer tx.Rollback()
 
+	log.Printf("Before row insert")
+
 	// STEP 1: upsert row
-
-	_, err = tx.Exec(upsertTSInsertCmd, colVals...)
+	_, err = tx.Exec(insertCmd, phVals...)
 	if err != nil {
-		return -1, fmt.Errorf("tx.Exec() failed: %v", err)
+		return nil, fmt.Errorf("tx.Exec() failed: %v", err)
 	}
 
-	// STEP 2: retrieve ID of upserted row
+	log.Printf("After row insert")
 
-	var id int64
-
-	err = tx.QueryRow(upsertTSSelectCmd, colValsUnique...).Scan(&id)
+	// STEP 2: retrieve id's
+	// TODO: This query is the bottleneck. I did get it faster once. Why? Index seems to work
+	selectCmd := getUpsertTSSelectCmd(len(mapTScolValsConstraint))
+	rows, err := tx.Query(selectCmd, phValsConstraint...)
 	if err != nil {
-		return -1, fmt.Errorf("tx.QueryRow() failed: %v", err)
+		return nil, fmt.Errorf("tx.Query() failed: %v", err)
 	}
+
+	log.Printf("After select query")
+
+	defer rows.Close()
+	colNamesUnique := getTSColNamesUnique()
+	var tsID int64
+	colValsStrings := make([]interface{}, len(colNamesUnique))
+	colValPtrs := []interface{}{&tsID}
+	for i := range colNamesUnique {
+		colValPtrs = append(colValPtrs, &colValsStrings[i])
+	}
+
+	tsIDmap := map[string]int64{}
+	for rows.Next() {
+		rows.Scan(colValPtrs...)
+		//log.Printf("%v %v", tsID, colValsStrings)
+		tsIDmap[fmt.Sprintf("%v", colValsStrings)] = tsID
+	}
+	//log.Printf("%v", tsIDmap)
+	log.Printf("After getting data from rows query")
 
 	// commit transaction
 	if err = tx.Commit(); err != nil {
-		return -1, fmt.Errorf("tx.Commit() failed: %v", err)
+		return nil, fmt.Errorf("tx.Commit() failed: %v", err)
 	}
 
-	// cache ID
-	cache[cacheKey] = id
-
-	return id, nil
+	return tsIDmap, nil
 }
 
 // getObsTime extracts the obs time from obsMdata.
@@ -214,56 +311,88 @@ func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error)
 */
 // --- END a variant of getObsTime that also supports intervals ---------------------------------
 
+// TODO: Update comments
 // getGeoPointID retrieves the ID of the row in table geo_point that matches point,
 // inserting a new row if necessary. The ID is first looked up in a cache in order to save
 // unnecessary database access.
 // Returns (ID, nil) upon success, otherwise (..., error).
-func getGeoPointID(db *sql.DB, point *datastore.Point, cache map[string]int64) (int64, error) {
+func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
 
-	var id int64 = -1
+	valsExpr := []string{}
+	phVals := []interface{}{}
 
-	// first try a cache lookup
-	cacheKey := fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())
-	if id, found := cache[cacheKey]; found {
-		return id, nil
+	// TODO: Clean up point handling in maps... struct versus string
+	type p struct {
+		lon float64
+		lat float64
+	}
+	// Collect all unique points
+	// This looks like premature optimisation... but it is not. Postgres will throw error on duplicates in the INSERT
+	points := map[p]bool{}
+	for _, obs := range observations {
+		point := obs.GetObsMdata().GetGeoPoint()
+		points[p{point.Lon, point.Lat}] = true
 	}
 
+	index := 0
+	// Loop over unique points
+	for point := range points {
+		// TODO: CLean this up
+		valsExpr0 := fmt.Sprintf(`(ST_MakePoint($%d, $%d)::geography)`,
+			index+1,
+			index+2,
+		)
+		phVals0 := []interface{}{point.lon, point.lat}
+
+		valsExpr = append(valsExpr, valsExpr0)
+		phVals = append(phVals, phVals0...)
+		index += len(phVals0)
+	}
+
+	// TODO: Do we need a transaction here?
 	// Get a Tx for making transaction requests.
 	tx, err := db.Begin()
 	if err != nil {
-		return -1, fmt.Errorf("db.Begin() failed: %v", err)
+		return nil, fmt.Errorf("db.Begin() failed: %v", err)
 	}
 	// Defer a rollback in case anything fails.
 	defer tx.Rollback()
 
-	// NOTE: the 'WHERE false' is a feature that ensures that another transaction cannot
-	// delete the row
-	insertCmd := `
-		INSERT INTO geo_point (point) VALUES (ST_MakePoint($1, $2)::geography)
+	cmd := fmt.Sprintf(`
+		INSERT INTO geo_point (point) VALUES %s
 		ON CONFLICT (point) DO UPDATE SET point = EXCLUDED.point WHERE false
-	`
+	`, strings.Join(valsExpr, ","))
 
-	_, err = tx.Exec(insertCmd, point.GetLon(), point.GetLat())
+	_, err = tx.Exec(cmd, phVals...)
 	if err != nil {
-		return -1, fmt.Errorf("tx.Exec() failed: %v", err)
+		return nil, fmt.Errorf("db.Exec() failed: %v", err)
 	}
 
-	selectCmd := "SELECT id FROM geo_point WHERE point = ST_MakePoint($1, $2)::geography"
+	cmd = fmt.Sprintf(`
+		SELECT id, ST_X(point::geometry), ST_Y(point::geometry) FROM geo_point WHERE point in (%s)
+	`, strings.Join(valsExpr, ","))
 
-	err = tx.QueryRow(selectCmd, point.GetLon(), point.GetLat()).Scan(&id)
+	rows, err := tx.Query(cmd, phVals...)
 	if err != nil {
-		return -1, fmt.Errorf("tx.QueryRow() failed: %v", err)
+		return nil, fmt.Errorf("tx.QueryRow() failed: %v", err)
+	}
+	defer rows.Close()
+
+	gpIDmap := map[string]int64{}
+	var id int64
+	var x, y float64
+	for rows.Next() {
+		rows.Scan(&id, &x, &y)
+		//log.Printf("%v %v %v", id, x, y)
+		gpIDmap[fmt.Sprintf("%v %v", x, y)] = id
 	}
 
 	// Commit the transaction.
 	if err = tx.Commit(); err != nil {
-		return -1, fmt.Errorf("tx.Commit() failed: %v", err)
+		return nil, fmt.Errorf("tx.Commit() failed: %v", err)
 	}
 
-	// cache ID
-	cache[cacheKey] = id
-
-	return id, nil
+	return gpIDmap, nil
 }
 
 // createInsertVals generates from (tsID, obsTimes, gpIDs, and omds) two arrays:
@@ -271,14 +400,15 @@ func getGeoPointID(db *sql.DB, point *datastore.Point, cache map[string]int64) (
 //     statement, and
 //   - in phVals: the total, flat list of all placeholder values.
 func createInsertVals(
-	tsID int64, obsTimes *[]*timestamppb.Timestamp, gpIDs *[]int64,
-	omds *[]*datastore.ObsMetadata, valsExpr *[]string, phVals *[]interface{}) {
-	// assert(len(*obsTimes) > 0)
-	// assert(len(*obsTimes) == len(*gpIDs) == len(*omds))
+	tsInfos map[int64]tsInfo, valsExpr *[]string, phVals *[]interface{}) {
 
 	index := 0
-	for i := 0; i < len(*obsTimes); i++ {
-		valsExpr0 := fmt.Sprintf(`(
+	for tsID, tsInfo := range tsInfos {
+		obsTimes := tsInfo.obsTimes
+		omds := tsInfo.omds
+		gpIDs := tsInfo.gpIDs
+		for i := 0; i < len(*obsTimes); i++ {
+			valsExpr0 := fmt.Sprintf(`(
 			$%d,
 			to_timestamp($%d),
 			$%d,
@@ -289,32 +419,33 @@ func createInsertVals(
 			$%d,
 			$%d
 			)`,
-			index+1,
-			index+2,
-			index+3,
-			index+4,
-			index+5,
-			index+6,
-			index+7,
-			index+8,
-			index+9,
-		)
+				index+1,
+				index+2,
+				index+3,
+				index+4,
+				index+5,
+				index+6,
+				index+7,
+				index+8,
+				index+9,
+			)
 
-		phVals0 := []interface{}{
-			tsID,
-			common.Tstamp2float64Secs((*obsTimes)[i]),
-			(*omds)[i].GetId(),
-			(*gpIDs)[i],
-			common.Tstamp2float64Secs((*omds)[i].GetPubtime()),
-			(*omds)[i].GetDataId(),
-			(*omds)[i].GetHistory(),
-			(*omds)[i].GetProcessingLevel(),
-			(*omds)[i].GetValue(),
+			phVals0 := []interface{}{
+				tsID,
+				common.Tstamp2float64Secs((*obsTimes)[i]),
+				(*omds)[i].GetId(),
+				(*gpIDs)[i],
+				common.Tstamp2float64Secs((*omds)[i].GetPubtime()),
+				(*omds)[i].GetDataId(),
+				(*omds)[i].GetHistory(),
+				(*omds)[i].GetProcessingLevel(),
+				(*omds)[i].GetValue(),
+			}
+
+			*valsExpr = append(*valsExpr, valsExpr0)
+			*phVals = append(*phVals, phVals0...)
+			index += len(phVals0)
 		}
-
-		*valsExpr = append(*valsExpr, valsExpr0)
-		*phVals = append(*phVals, phVals0...)
-		index += len(phVals0)
 	}
 }
 
@@ -322,25 +453,29 @@ func createInsertVals(
 //
 // Returns nil upon success, otherwise error.
 func upsertObs(
-	db *sql.DB, tsID int64, obsTimes *[]*timestamppb.Timestamp, gpIDs *[]int64,
-	omds *[]*datastore.ObsMetadata) error {
+	db *sql.DB, tsInfos map[int64]tsInfo) error {
+	//db *sql.DB, tsID int64, obsTimes *[]*timestamppb.Timestamp, gpIDs *[]int64,
+	//omds *[]*datastore.ObsMetadata) error {
 
-	// assert(obsTimes != nil)
-	if obsTimes == nil {
-		return fmt.Errorf("precondition failed: obsTimes == nil")
+	for _, tsInfo := range tsInfos {
+		obsTimes := tsInfo.obsTimes
+		// assert(obsTimes != nil)
+		if obsTimes == nil {
+			return fmt.Errorf("precondition failed: obsTimes == nil")
+		}
+
+		// assert(len(*obsTimes) > 0)
+		if len(*obsTimes) == 0 {
+			return fmt.Errorf("precondition failed: len(*obsTimes) == 0")
+		}
+
+		// assert(len(*obsTimes) == len(*gpIDs) == len(*omds))
+		// for now don't check explicitly for this precondition
 	}
-
-	// assert(len(*obsTimes) > 0)
-	if len(*obsTimes) == 0 {
-		return fmt.Errorf("precondition failed: len(*obsTimes) == 0")
-	}
-
-	// assert(len(*obsTimes) == len(*gpIDs) == len(*omds))
-	// for now don't check explicitly for this precondition
 
 	valsExpr := []string{}
 	phVals := []interface{}{}
-	createInsertVals(tsID, obsTimes, gpIDs, omds, &valsExpr, &phVals)
+	createInsertVals(tsInfos, &valsExpr, &phVals)
 
 	cmd := fmt.Sprintf(`
 		INSERT INTO observation (
@@ -372,88 +507,108 @@ func upsertObs(
 	return nil
 }
 
+type tsInfo struct {
+	obsTimes *[]*timestamppb.Timestamp
+	gpIDs    *[]int64 // geo point IDs
+	omds     *[]*datastore.ObsMetadata
+}
+
 // PutObservations ... (see documentation in StorageBackend interface)
 func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.Code, string) {
 
-	type tsInfo struct {
-		obsTimes *[]*timestamppb.Timestamp
-		gpIDs    *[]int64 // geo point IDs
-		omds     *[]*datastore.ObsMetadata
-	}
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	log.Printf("Entered PutObservations with %v observations...", len(request.Observations))
 
-	tsInfos := map[int64]tsInfo{}
+	// Chunk observations by 2000, as otherwise the SQL queries have to many parameters
+	for observations := range slices.Chunk(request.Observations, 1000) {
+		tsInfos := map[int64]tsInfo{}
 
-	tsIDCache := map[string]int64{}
-	gpIDCache := map[string]int64{}
+		loTime, hiTime := common.GetValidTimeRange()
 
-	loTime, hiTime := common.GetValidTimeRange()
-
-	// reject call if # of observations exceeds limit
-	if len(request.Observations) > putObsLimit {
-		return codes.OutOfRange, fmt.Sprintf(
-			"too many observations in a single call: %d > %d",
-			len(request.Observations), putObsLimit)
-	}
-
-	// populate tsInfos
-	for _, obs := range request.Observations {
-
-		obsTime, err := getObsTime(obs.GetObsMdata())
-		if err != nil {
-			return codes.Internal, fmt.Sprintf("getObsTime() failed: %v", err)
-		}
-
-		if obsTime.AsTime().Before(loTime) {
+		// reject call if # of observations exceeds limit
+		if len(observations) > putObsLimit {
 			return codes.OutOfRange, fmt.Sprintf(
-				"obs time too old: %v < %v (hiTime: %v; settings: %s)",
-				obsTime.AsTime(), loTime, hiTime, common.GetValidTimeRangeSettings())
+				"too many observations in a single call: %d > %d",
+				len(observations), putObsLimit)
 		}
 
-		if obsTime.AsTime().After(hiTime) {
-			return codes.OutOfRange, fmt.Sprintf(
-				"obs time too new: %v > %v (loTime: %v; settings: %s)",
-				obsTime.AsTime(), hiTime, loTime, common.GetValidTimeRangeSettings())
-		}
-
-		tsID, err := upsertTS(sbe.Db, obs.GetTsMdata(), tsIDCache)
+		gpIDMap, err := getGeoPointIDs(sbe.Db, observations)
 		if err != nil {
-			return codes.Internal, fmt.Sprintf("upsertTS() failed: %v", err)
+			return codes.Internal, fmt.Sprintf("getGeoPointIDs() failed: %v", err)
 		}
 
-		gpID, err := getGeoPointID(sbe.Db, obs.GetObsMdata().GetGeoPoint(), gpIDCache)
+		log.Printf("Returned %v unique points", len(gpIDMap))
+
+		tsIDMap, err := upsertTSs(sbe.Db, observations)
 		if err != nil {
-			return codes.Internal, fmt.Sprintf("getGeoPointID() failed: %v", err)
+			return codes.Internal, fmt.Sprintf("upsertTSs() failed: %v", err)
 		}
+		log.Printf("Returned %v unique timseries", len(tsIDMap))
 
-		var obsTimes []*timestamppb.Timestamp
-		var gpIDs []int64
-		var omds []*datastore.ObsMetadata
-		var tsInfo0 tsInfo
-		var found bool
-		if tsInfo0, found = tsInfos[tsID]; !found {
-			obsTimes = []*timestamppb.Timestamp{}
-			gpIDs = []int64{}
-			omds = []*datastore.ObsMetadata{}
-			tsInfos[tsID] = tsInfo{
-				obsTimes: &obsTimes,
-				gpIDs:    &gpIDs,
-				omds:     &omds,
+		// populate tsInfos
+		for _, obs := range observations {
+
+			obsTime, err := getObsTime(obs.GetObsMdata())
+			if err != nil {
+				return codes.Internal, fmt.Sprintf("getObsTime() failed: %v", err)
 			}
-			tsInfo0, found = tsInfos[tsID]
-			// assert(found)
-			_ = found
-		}
-		*tsInfo0.obsTimes = append(*tsInfo0.obsTimes, obsTime)
-		*tsInfo0.gpIDs = append(*tsInfo0.gpIDs, gpID)
-		*tsInfo0.omds = append(*tsInfo0.omds, obs.GetObsMdata())
-	}
 
-	// insert/update observations for each time series
-	for tsID, tsInfo := range tsInfos {
-		if err := upsertObs(
-			sbe.Db, tsID, tsInfo.obsTimes, tsInfo.gpIDs, tsInfo.omds); err != nil {
+			if obsTime.AsTime().Before(loTime) {
+				return codes.OutOfRange, fmt.Sprintf(
+					"obs time too old: %v < %v (hiTime: %v; settings: %s)",
+					obsTime.AsTime(), loTime, hiTime, common.GetValidTimeRangeSettings())
+			}
+
+			if obsTime.AsTime().After(hiTime) {
+				return codes.OutOfRange, fmt.Sprintf(
+					"obs time too new: %v > %v (loTime: %v; settings: %s)",
+					obsTime.AsTime(), hiTime, loTime, common.GetValidTimeRangeSettings())
+			}
+
+			// Look up timeseries key.
+			// TODO: This feels inefficient, calling getTSColVals again...
+			tsMdata := obs.GetTsMdata()
+			_, colValsUnique, err := getTSColVals(tsMdata)
+			if err != nil {
+				return codes.Internal, fmt.Sprintf("getTSColVals() failed: %v", err)
+			}
+			key := fmt.Sprintf("%v", colValsUnique)
+			tsID := tsIDMap[key]
+
+			point := obs.GetObsMdata().GetGeoPoint()
+			gpID := gpIDMap[fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())]
+
+			var obsTimes []*timestamppb.Timestamp
+			var gpIDs []int64
+			var omds []*datastore.ObsMetadata
+			var tsInfo0 tsInfo
+			var found bool
+			if tsInfo0, found = tsInfos[tsID]; !found {
+				obsTimes = []*timestamppb.Timestamp{}
+				gpIDs = []int64{}
+				omds = []*datastore.ObsMetadata{}
+				tsInfos[tsID] = tsInfo{
+					obsTimes: &obsTimes,
+					gpIDs:    &gpIDs,
+					omds:     &omds,
+				}
+				tsInfo0, found = tsInfos[tsID]
+				// assert(found)
+				_ = found
+			}
+			*tsInfo0.obsTimes = append(*tsInfo0.obsTimes, obsTime)
+			*tsInfo0.gpIDs = append(*tsInfo0.gpIDs, gpID)
+			*tsInfo0.omds = append(*tsInfo0.omds, obs.GetObsMdata())
+		}
+
+		log.Printf("Got tsInfo of size %v...", len(tsInfos))
+
+		// insert/update observations for all time series in this chunck
+		if err := upsertObs(sbe.Db, tsInfos); err != nil {
 			return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
 		}
+
+		log.Printf("Inserted observations")
 	}
 
 	return codes.OK, ""
