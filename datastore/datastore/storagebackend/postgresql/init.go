@@ -78,6 +78,7 @@ var (
 	// - Protobuf names are snake case (aaa_bbb) whereas Go names are camel case (aaaBbb or AaaBbb).
 
 	// used by upsertTS
+	// TODO: Remove these
 	upsertTSInsertCmd, upsertTSSelectCmd string
 
 	// fields allowable in included_response_fields
