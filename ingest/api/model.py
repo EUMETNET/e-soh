@@ -289,6 +289,14 @@ class Properties(BaseModel):
         None,
         description="A textual description of the processing (or quality control) level of the data.",
     )
+    quality_code: Optional[int] = Field(
+        None,
+        description=("The quality of the data. " "Indicate controlled vocabulary used in quality_code_vocabulary."),
+    )
+    quality_code_vocabulary: Optional[str] = Field(
+        None,
+        description="Controlled vocabulary for the values used in the 'quality_code' attribute.",
+    )
     content: Content = Field(..., description="Actual data content")
     integrity: Optional[Integrity] = Field(
         None,

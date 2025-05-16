@@ -14,7 +14,7 @@ E-SOH is part of the RODEO project. The goal for this project is to make near re
 The E-SOH service consist of three parts.
 
 * Ingestion API
-  * The ingest API handles incoming observation from partners. It will verify the inncomming data and publish them to the MQTT queue and submit the observations to the datastore.
+  * The ingest API handles incoming observation from partners. It will verify the incoming data and publish them to the MQTT queue and submit the observations to the datastore.
 * Datastore
   * Datastore stores all observations for 24h and is the backend storage for EDR and Records APIs.
 * EDR API
