@@ -165,7 +165,7 @@ func getUpsertTSSelectCmd(nRows int) string {
 	index := 1
 	for i := 0; i < nRows; i++ {
 		oneRow := make([]string, len(cols))
-		for j, _ := range cols {
+		for j := range cols {
 			oneRow[j] = fmt.Sprintf("$%d", index)
 			index += 1
 		}
@@ -311,6 +311,11 @@ func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error)
 */
 // --- END a variant of getObsTime that also supports intervals ---------------------------------
 
+// TODO: Update comments
+// getGeoPointID retrieves the ID of the row in table geo_point that matches point,
+// inserting a new row if necessary. The ID is first looked up in a cache in order to save
+// unnecessary database access.
+// Returns (ID, nil) upon success, otherwise (..., error).
 func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
 
 	valsExpr := []string{}
