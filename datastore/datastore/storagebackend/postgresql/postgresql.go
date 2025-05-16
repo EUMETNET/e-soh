@@ -78,63 +78,6 @@ func (sbe *PostgreSQL) setTSUniqueMainCols() error {
 	return nil
 }
 
-// TODO: Move to putobservations.go?
-func getUpsertTSInsertCmd(nRows int) string {
-
-	cols := getTSColNames()
-
-	formats := make([]string, nRows)
-	index := 1
-	for i := 0; i < nRows; i++ {
-		oneRow := make([]string, len(cols))
-		for j := 0; j < len(cols); j++ {
-			oneRow[j] = fmt.Sprintf("$%d", index)
-			index += 1
-		}
-		formats[i] = "(" + strings.Join(oneRow, ",") + ")"
-	}
-
-	updateExpr := []string{}
-	for _, col := range getTSColNamesUniqueCompl() {
-		updateExpr = append(updateExpr, fmt.Sprintf("%s = EXCLUDED.%s", col, col))
-	}
-
-	insertCmd := fmt.Sprintf(`
-		INSERT INTO time_series (%s) VALUES %s
-		ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
-		`,
-		strings.Join(cols, ","),
-		strings.Join(formats, ","),
-		strings.Join(updateExpr, ","),
-	)
-	//log.Printf("Insert: %v", insertCmd)
-	return insertCmd
-}
-
-// TODO: Move to putobservations.go?
-func getUpsertTSSelectCmd(nRows int) string {
-	cols := getTSColNamesUnique()
-	whereExpr := make([]string, nRows)
-	index := 1
-	for i := 0; i < nRows; i++ {
-		oneRow := make([]string, len(cols))
-		for j, _ := range cols {
-			oneRow[j] = fmt.Sprintf("$%d", index)
-			index += 1
-		}
-		whereExpr[i] = "(" + strings.Join(oneRow, ",") + ")"
-	}
-
-	selectCmd := fmt.Sprintf(
-		`SELECT id,%s FROM time_series WHERE (%s) in (%s)`,
-		strings.Join(cols, ","),
-		strings.Join(cols, ","),
-		strings.Join(whereExpr, ","))
-	//log.Printf("Select: %v", selectCmd)
-
-	return selectCmd
-}
-
 // openDB opens database identified by host/port/user/password/dbname.
 // Returns (DB, nil) upon success, otherwise (..., error).
 func openDB(host, port, user, password, dbname, enable_ssl string) (*sql.DB, error) {
