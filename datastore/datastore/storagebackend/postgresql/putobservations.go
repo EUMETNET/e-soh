@@ -127,6 +127,7 @@ func getTSColValsUnique(colName2Val map[string]interface{}) ([]interface{}, erro
 	return result, nil
 }
 
+// TODO: Update comments
 // upsertTS retrieves the ID of the row in table time_series that matches tsMdata wrt.
 // the fields - U - defined by constraint unique_main, inserting a new row if necessary.
 //
@@ -140,56 +141,6 @@ func getTSColValsUnique(colName2Val map[string]interface{}) ([]interface{}, erro
 // according to tsMdata.
 //
 // Returns (ID, nil) upon success, otherwise (..., error).
-func upsertTS(
-	db *sql.DB, tsMdata *datastore.TSMetadata, cache map[string]int64) (int64, error) {
-
-	colVals, colValsUnique, err := getTSColVals(tsMdata)
-	if err != nil {
-		return -1, fmt.Errorf("getTSColVals() failed: %v", err)
-	}
-
-	// first try a cache lookup
-	cacheKey := fmt.Sprintf("%v", colVals)
-	if id, found := cache[cacheKey]; found {
-		return id, nil
-	}
-
-	// then access database ...
-
-	// start transaction
-	tx, err := db.Begin()
-	if err != nil {
-		return -1, fmt.Errorf("db.Begin() failed: %v", err)
-	}
-	defer tx.Rollback()
-
-	// STEP 1: upsert row
-
-	_, err = tx.Exec(upsertTSInsertCmd, colVals...)
-	if err != nil {
-		return -1, fmt.Errorf("tx.Exec() failed: %v", err)
-	}
-
-	// STEP 2: retrieve ID of upserted row
-
-	var id int64
-
-	err = tx.QueryRow(upsertTSSelectCmd, colValsUnique...).Scan(&id)
-	if err != nil {
-		return -1, fmt.Errorf("tx.QueryRow() failed: %v", err)
-	}
-
-	// commit transaction
-	if err = tx.Commit(); err != nil {
-		return -1, fmt.Errorf("tx.Commit() failed: %v", err)
-	}
-
-	// cache ID
-	cache[cacheKey] = id
-
-	return id, nil
-}
-
 func upsertTSs(
 	db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
 
@@ -304,58 +255,6 @@ func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error)
 }
 */
 // --- END a variant of getObsTime that also supports intervals ---------------------------------
-
-//// getGeoPointID retrieves the ID of the row in table geo_point that matches point,
-//// inserting a new row if necessary. The ID is first looked up in a cache in order to save
-//// unnecessary database access.
-//// Returns (ID, nil) upon success, otherwise (..., error).
-//func getGeoPointID(db *sql.DB, point *datastore.Point, cache map[string]int64) (int64, error) {
-//
-//	var id int64 = -1
-//
-//	// first try a cache lookup
-//	cacheKey := fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())
-//	if id, found := cache[cacheKey]; found {
-//		return id, nil
-//	}
-//
-//	// Get a Tx for making transaction requests.
-//	tx, err := db.Begin()
-//	if err != nil {
-//		return -1, fmt.Errorf("db.Begin() failed: %v", err)
-//	}
-//	// Defer a rollback in case anything fails.
-//	defer tx.Rollback()
-//
-//	// NOTE: the 'WHERE false' is a feature that ensures that another transaction cannot
-//	// delete the row
-//	insertCmd := `
-//		INSERT INTO geo_point (point) VALUES (ST_MakePoint($1, $2)::geography)
-//		ON CONFLICT (point) DO UPDATE SET point = EXCLUDED.point WHERE false
-//	`
-//
-//	_, err = tx.Exec(insertCmd, point.GetLon(), point.GetLat())
-//	if err != nil {
-//		return -1, fmt.Errorf("tx.Exec() failed: %v", err)
-//	}
-//
-//	selectCmd := "SELECT id FROM geo_point WHERE point = ST_MakePoint($1, $2)::geography"
-//
-//	err = tx.QueryRow(selectCmd, point.GetLon(), point.GetLat()).Scan(&id)
-//	if err != nil {
-//		return -1, fmt.Errorf("tx.QueryRow() failed: %v", err)
-//	}
-//
-//	// Commit the transaction.
-//	if err = tx.Commit(); err != nil {
-//		return -1, fmt.Errorf("tx.Commit() failed: %v", err)
-//	}
-//
-//	// cache ID
-//	cache[cacheKey] = id
-//
-//	return id, nil
-//}
 
 func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
 
@@ -654,16 +553,10 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 
 		log.Printf("Got tsInfo of size %v...", len(tsInfos))
 
-		// insert/update observations for all time series
+		// insert/update observations for all time series in this chunck
 		if err := upsertObs(sbe.Db, tsInfos); err != nil {
 			return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
 		}
-		//for tsID, tsInfo := range tsInfos {
-		//	if err := upsertObs(
-		//		sbe.Db, tsID, tsInfo.obsTimes, tsInfo.gpIDs, tsInfo.omds); err != nil {
-		//		return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
-		//	}
-		//}
 
 		log.Printf("Inserted observations")
 	}

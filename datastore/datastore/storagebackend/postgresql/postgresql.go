@@ -78,32 +78,6 @@ func (sbe *PostgreSQL) setTSUniqueMainCols() error {
 	return nil
 }
 
-// setUpsertTSInsertCmd sets upsertTSInsertCmd to be used by upsertTS.
-func setUpsertTSInsertCmd() {
-
-	cols := getTSColNames()
-
-	formats := make([]string, len(cols))
-	for i := 0; i < len(cols); i++ {
-		formats[i] = "$%d"
-	}
-
-	updateExpr := []string{}
-	for _, col := range getTSColNamesUniqueCompl() {
-		updateExpr = append(updateExpr, fmt.Sprintf("%s = EXCLUDED.%s", col, col))
-	}
-
-	upsertTSInsertCmd = fmt.Sprintf(`
-		INSERT INTO time_series (%s) VALUES (%s)
-		ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
-		`,
-		strings.Join(cols, ","),
-		strings.Join(createPlaceholders(formats), ","),
-		strings.Join(updateExpr, ","),
-	)
-	log.Printf("Insert: %v", upsertTSInsertCmd)
-}
-
 // TODO: Move to putobservations.go?
 func getUpsertTSInsertCmd(nRows int) string {
 
@@ -135,19 +109,6 @@ func getUpsertTSInsertCmd(nRows int) string {
 	)
 	//log.Printf("Insert: %v", insertCmd)
 	return insertCmd
-}
-
-// setUpsertTSSelectCmd sets upsertTSSelectCmd to be used by upsertTS.
-func setUpsertTSSelectCmd() {
-
-	whereExpr := []string{}
-	for i, col := range getTSColNamesUnique() {
-		whereExpr = append(whereExpr, fmt.Sprintf("%s=$%d", col, i+1))
-	}
-
-	upsertTSSelectCmd = fmt.Sprintf(
-		`SELECT id FROM time_series WHERE %s`, strings.Join(whereExpr, " AND "))
-	log.Printf("Update: %v", upsertTSInsertCmd)
 }
 
 // TODO: Move to putobservations.go?
@@ -221,9 +182,6 @@ func NewPostgreSQL() (*PostgreSQL, error) {
 	if err != nil {
 		return nil, fmt.Errorf("sbe.setTSUniqueMainCols() failed: %v", err)
 	}
-
-	setUpsertTSInsertCmd()
-	setUpsertTSSelectCmd()
 
 	// cleanup the database at regular intervals
 	ticker := time.NewTicker(cleanupInterval)
