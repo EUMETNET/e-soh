@@ -157,17 +157,18 @@ func getUpsertTSSelectCmd(nRows int) string {
 	index := 1
 	for i := 0; i < nRows; i++ {
 		oneRow := make([]string, len(cols))
-		for j, col := range cols {
-			oneRow[j] = fmt.Sprintf("%s=$%d", col, index)
+		for j, _ := range cols {
+			oneRow[j] = fmt.Sprintf("$%d", index)
 			index += 1
 		}
-		whereExpr[i] = "(" + strings.Join(oneRow, " AND ") + ")"
+		whereExpr[i] = "(" + strings.Join(oneRow, ",") + ")"
 	}
 
 	selectCmd := fmt.Sprintf(
-		`SELECT id,%s FROM time_series WHERE %s`,
+		`SELECT id,%s FROM time_series WHERE (%s) in (%s)`,
 		strings.Join(cols, ","),
-		strings.Join(whereExpr, " OR "))
+		strings.Join(cols, ","),
+		strings.Join(whereExpr, ","))
 	//log.Printf("Select: %v", selectCmd)
 
 	return selectCmd
