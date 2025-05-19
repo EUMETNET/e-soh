@@ -46,6 +46,9 @@ service Datastore {
 
   // get temporal and spatial extents of current storage contents
   rpc GetExtents(GetExtentsRequest) returns (GetExtentsResponse);
+
+  // get distinct locations
+  rpc GetLocations(GetLocationsRequest) returns (GetLocationsResponse);
 }
 
 //---------------------------------------------------------------------------
@@ -313,4 +316,23 @@ message GetExtentsResponse {
   string error = 2; // any error description (empty on success)
   TimeInterval temporal_extent = 3 [json_name = "temporal_extent"];
   BoundingBox spatial_extent = 4 [json_name = "spatial_extent"];
+}
+
+//---------------------------------------------------------------------------
+
+message GetLocationsRequest {
+  // No parameters
+}
+
+message LocMetadata {
+  Point geo_point = 1;
+  string platform = 2;
+  string platform_name = 3 [json_name = "platform_name"];
+  repeated string parameter_names = 4 [json_name = "parameter_names"];
+}
+
+message GetLocationsResponse {
+  int32 status = 1;
+  string error = 2; // any error description (empty on success)
+  repeated LocMetadata locations = 3;
 }
