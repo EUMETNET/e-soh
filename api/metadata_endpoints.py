@@ -21,6 +21,7 @@ from edr_pydantic.observed_property import ObservedProperty
 from edr_pydantic.parameter import MeasurementType
 from edr_pydantic.parameter import Parameter
 from edr_pydantic.unit import Unit
+from edr_pydantic.unit import Symbol
 from edr_pydantic.variables import Variables
 from grpc_getter import get_extents_request
 from grpc_getter import get_ts_ag_request
@@ -32,6 +33,7 @@ from utilities import convert_cm_to_m
 
 from openapi.openapi_metadata import openapi_metadata
 from openapi.collections_metadata import collections_metadata
+from constants.qudt_unit_dict import qudt_unit_dict
 
 
 logger = logging.getLogger(__name__)
@@ -95,7 +97,7 @@ def get_landing_page(request):
                 href=f"{request.url}openapi.json",
                 rel="service-desc",
                 title="API description in JSON",
-                type="application/json",
+                type="application/vnd.oai.openapi+json;version=3.1",
             ),
             Link(
                 href=f"{request.url}conformance",
@@ -145,12 +147,13 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
         label = " ".join(ts.standard_name.capitalize().split("_"))
 
         custom_fields = {
-            "rodeo:standard_name": ts.standard_name,
-            "rodeo:level": level,
+            "metocean:standard_name": ts.standard_name,
+            "metocean:level": level,
         }
 
         parameter = Parameter(
             description=f"{label} at {level}m, aggregated over {period} with method '{ts.function}'",
+            label=label,
             observedProperty=ObservedProperty(
                 id=f"https://vocab.nerc.ac.uk/standard_name/{ts.standard_name}",
                 label=label,
@@ -159,7 +162,13 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
                 method=ts.function,
                 period=period,
             ),
-            unit=Unit(label=ts.unit),
+            unit=Unit(
+                symbol=Symbol(
+                    value=qudt_unit_dict[ts.unit]["value"],
+                    type=qudt_unit_dict[ts.unit]["type"],
+                ),
+                label=ts.unit,
+            ),
             **custom_fields,
         )
         # There might be parameter inconsistencies (e.g one station is reporting in Pa, and another in hPa)
