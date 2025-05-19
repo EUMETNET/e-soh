@@ -289,6 +289,14 @@ class Properties(BaseModel):
         None,
         description="A textual description of the processing (or quality control) level of the data.",
     )
+    camsl: Optional[int] = Field(
+        None,
+        description=(
+            "The number of centimeters above mean sea level. "
+            "The reference point is the ground position of the station for stationary data, or "
+            "the sensor itself for mobile data."
+        ),
+    )
     content: Content = Field(..., description="Actual data content")
     integrity: Optional[Integrity] = Field(
         None,
