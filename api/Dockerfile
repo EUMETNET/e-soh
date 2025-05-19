@@ -33,4 +33,5 @@ ENV PROMETHEUS_MULTIPROC_DIR=/tmp/metrics
 RUN mkdir -p /tmp/metrics
 
 WORKDIR "${DOCKER_PATH}"
+RUN python "generate_qudt_units.py"
 CMD ["gunicorn", "main:app", "--worker-class=uvicorn.workers.UvicornWorker"]
