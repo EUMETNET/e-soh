@@ -18,10 +18,12 @@ from covjson_pydantic.reference_system import ReferenceSystem
 from covjson_pydantic.reference_system import ReferenceSystemConnectionObject
 from edr_pydantic.parameter import MeasurementType
 from covjson_pydantic.unit import Unit
+from covjson_pydantic.unit import Symbol
 from fastapi import HTTPException
 from pydantic import AwareDatetime
 
 from utilities import seconds_to_iso_8601_duration, convert_cm_to_m
+from constants.qudt_unit_dict import qudt_unit_dict
 
 # mime_type = "application/prs.coverage+json"
 
@@ -35,8 +37,8 @@ def make_parameter(ts_mdata):
     label = " ".join(ts_mdata.standard_name.capitalize().split("_"))
 
     custom_fields = {
-        "rodeo:standard_name": ts_mdata.standard_name,
-        "rodeo:level": level,
+        "metocean:standard_name": ts_mdata.standard_name,
+        "metocean:level": level,
     }
 
     return Parameter(
@@ -47,11 +49,19 @@ def make_parameter(ts_mdata):
             id=f"https://vocab.nerc.ac.uk/standard_name/{ts_mdata.standard_name}",
             label={"en": label},
         ),
-        measurementType=MeasurementType(
-            method=ts_mdata.function,
-            period=period,
+        **{
+            "metocean:MeasurementType": MeasurementType(
+                method=ts_mdata.function,
+                period=period,
+            )
+        },
+        unit=Unit(
+            symbol=Symbol(
+                value=qudt_unit_dict[ts_mdata.unit]["value"],
+                type=qudt_unit_dict[ts_mdata.unit]["type"],
+            ),
+            label={"en": ts_mdata.unit},
         ),
-        unit=Unit(label={"en": ts_mdata.unit}),
         **custom_fields,
     )
 
