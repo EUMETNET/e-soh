@@ -62,15 +62,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "m s-1"
+                    "en": "m/s"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                    "value": "m/s"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
                 "period": "PT10M"
             },
-            "rodeo:standard_name": "wind_speed",
-            "rodeo:level": 10.0
+            "metocean:standard_name": "wind_speed",
+            "metocean:level": 10.0
         }
     },
     "ranges": {
@@ -98,5 +102,5 @@
             ]
         }
     },
-    "rodeo:wigosId": "0-20000-0-06280"
+    "metocean:wigosId": "0-20000-0-06280"
 }

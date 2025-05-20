@@ -59,15 +59,19 @@
                     },
                     "unit": {
                         "label": {
-                            "en": "degrees Celsius"
+                            "en": "Cel"
+                        },
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
                         }
                     },
-                    "measurementType": {
+                    "metocean:measurementType": {
                         "method": "mean",
                         "period": "PT1M"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 }
             },
             "ranges": {
@@ -89,7 +93,7 @@
                     ]
                 }
             },
-            "rodeo:wigosId": "0-20000-0-06269"
+            "metocean:wigosId": "0-20000-0-06269"
         },
         {
             "type": "Coverage",
@@ -149,15 +153,19 @@
                     },
                     "unit": {
                         "label": {
-                            "en": "degrees Celsius"
+                            "en": "Cel"
+                        },
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
                         }
                     },
-                    "measurementType": {
+                    "metocean:measurementType": {
                         "method": "mean",
                         "period": "PT1M"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 }
             },
             "ranges": {
@@ -179,7 +187,7 @@
                     ]
                 }
             },
-            "rodeo:wigosId": "0-20000-0-06257"
+            "metocean:wigosId": "0-20000-0-06257"
         }
     ],
     "parameters": {
@@ -196,15 +204,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degrees Celsius"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
                 "period": "PT1M"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         }
     }
 }
