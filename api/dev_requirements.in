@@ -3,7 +3,11 @@
 # Install normal+dev dependencies using:
 # pip-sync dev_requirements.txt
 
+# Note that his now returns absolute paths in dev_requirements.txt, see:
+# https://github.com/jazzband/pip-tools/issues/2131
+# For now, I reverted this by hand
 -r requirements.txt
+
 deepdiff~=7.0
 httpx~=0.27.0
 pytest~=8.1

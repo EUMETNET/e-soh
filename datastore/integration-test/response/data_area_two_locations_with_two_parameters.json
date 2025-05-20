@@ -74,7 +74,7 @@
                     },
                     "metocean:measurementType": {
                         "method": "mean",
-                        "period": "PT1M"
+                        "duration": "PT1M"
                     },
                     "metocean:standard_name": "relative_humidity",
                     "metocean:level": 2.0
@@ -101,7 +101,7 @@
                     },
                     "metocean:measurementType": {
                         "method": "mean",
-                        "period": "PT10M"
+                        "duration": "PT10M"
                     },
                     "metocean:standard_name": "wind_speed",
                     "metocean:level": 10.0
@@ -230,7 +230,7 @@
                     },
                     "metocean:measurementType": {
                         "method": "mean",
-                        "period": "PT1M"
+                        "duration": "PT1M"
                     },
                     "metocean:standard_name": "relative_humidity",
                     "metocean:level": 2.0
@@ -257,7 +257,7 @@
                     },
                     "metocean:measurementType": {
                         "method": "mean",
-                        "period": "PT10M"
+                        "duration": "PT10M"
                     },
                     "metocean:standard_name": "wind_speed",
                     "metocean:level": 10.0
@@ -337,7 +337,7 @@
             },
             "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
             "metocean:standard_name": "relative_humidity",
             "metocean:level": 2.0
@@ -364,7 +364,7 @@
             },
             "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
             "metocean:standard_name": "wind_speed",
             "metocean:level": 10.0

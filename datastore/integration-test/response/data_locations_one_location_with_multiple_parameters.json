@@ -65,7 +65,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 0.0
@@ -92,7 +92,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT14H"
+                "duration": "PT14H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 0.0
@@ -119,7 +119,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 0.0
@@ -146,7 +146,7 @@
             },
             "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0
@@ -173,7 +173,7 @@
             },
             "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT24H"
+                "duration": "PT24H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0
@@ -200,7 +200,7 @@
             },
             "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0
@@ -227,7 +227,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0
@@ -254,7 +254,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT14H"
+                "duration": "PT14H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0
@@ -281,7 +281,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0
@@ -308,7 +308,7 @@
             },
             "metocean:measurementType": {
                 "method": "point",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
             "metocean:standard_name": "rainfall_amount",
             "metocean:level": 2.0
@@ -335,7 +335,7 @@
             },
             "metocean:measurementType": {
                 "method": "point",
-                "period": "PT24H"
+                "duration": "PT24H"
             },
             "metocean:standard_name": "rainfall_amount",
             "metocean:level": 2.0
@@ -362,7 +362,7 @@
             },
             "metocean:measurementType": {
                 "method": "point",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "metocean:standard_name": "rainfall_amount",
             "metocean:level": 2.0

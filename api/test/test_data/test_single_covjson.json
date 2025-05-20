@@ -71,7 +71,7 @@
             },
             "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
             "metocean:standard_name": "wind_speed",
             "metocean:level": 10.0

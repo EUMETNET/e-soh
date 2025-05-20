@@ -65,7 +65,7 @@
             },
             "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0
@@ -92,7 +92,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 2.0

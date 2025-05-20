@@ -16,9 +16,9 @@ brotli-asgi==1.4.0
     # via -r requirements.in
 click==8.2.0
     # via uvicorn
-covjson-pydantic==0.5.0
+covjson-pydantic==0.7.0
     # via -r requirements.in
-edr-pydantic==0.5.0
+edr-pydantic==0.7.0
     # via -r requirements.in
 fastapi==0.115.12
     # via -r requirements.in
@@ -80,6 +80,7 @@ starlette==0.46.2
 typing-extensions==4.13.2
     # via
     #   anyio
+    #   edr-pydantic
     #   fastapi
     #   pydantic
     #   pydantic-core

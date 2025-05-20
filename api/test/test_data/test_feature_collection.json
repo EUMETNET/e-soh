@@ -63,7 +63,7 @@
             },
             "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
             "metocean:standard_name": "air_pressure_at_sea_level",
             "metocean:level": 1.0
@@ -90,7 +90,7 @@
             },
             "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 0.1

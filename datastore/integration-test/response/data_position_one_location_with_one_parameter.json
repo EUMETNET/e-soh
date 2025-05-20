@@ -73,7 +73,7 @@
             },
             "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
             "metocean:standard_name": "air_temperature",
             "metocean:level": 1.5

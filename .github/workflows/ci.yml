@@ -76,15 +76,19 @@ jobs:
       - name: Run the client test
         run: just client
 
-      - name: Archive test artifacts
-        uses: actions/upload-artifact@v4
+      - name: Save PR number and coverage results
+        run: |
+          mkdir -p ./test-results-artifact
+          mkdir -p ./test-results-artifact/load-test
+          echo ${{ github.event.number }} > ./test-results-artifact/PR-number.txt
+          cp api/test/output/pytest-coverage.txt ./test-results-artifact/datastore-pytest-coverage.txt
+          cp api/test/output/pytest.xml ./test-results-artifact/datastore-pytest.xml
+          cp datastore/load-test/output/store_read_*.csv ./test-results-artifact/load-test
+          cp datastore/load-test/output/store_rw_*.csv ./test-results-artifact/load-test
+      - uses: actions/upload-artifact@v4
         with:
           name: test-results-artifact
-          path: |
-            api/test/output/pytest-coverage.txt
-            api/test/output/pytest.xml
-            datastore/load-test/output/store_read_*.csv
-            datastore/load-test/output/store_rw_*.csv
+          path: test-results-artifact/
 
       - name: Print results
         run: |
@@ -127,46 +131,17 @@ jobs:
       - name: Run the unit test
         run: just ingest-unit
 
-      - name: Archive test artifacts
-        uses: actions/upload-artifact@v4
+      - name: Save PR number and coverage results
+        run: |
+          mkdir -p ./ingest-test-results-artifact
+          mkdir -p ./ingest-test-results-artifact/load_test
+          cp ingest/test/output/pytest-coverage.txt ./ingest-test-results-artifact/ingest-pytest-coverage.txt
+          cp ingest/test/output/pytest.xml ./ingest-test-results-artifact/ingest-pytest.xml
+      - uses: actions/upload-artifact@v4
         with:
           name: ingest-test-results-artifact
-          path: |
-            ingest/test/output/pytest-coverage.txt
-            ingest/test/output/pytest.xml
+          path: ingest-test-results-artifact/
 
       - name: Cleanup
         if: always()
         run: just destroy
-
-  publish-test-results:
-    needs:
-      - test-datastore
-      - test-ingest
-    runs-on: ubuntu-latest
-    if: github.event_name != 'push' || github.event.ref_type != 'tag'
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Download test-datastore results so that they can be published
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-artifact
-          path: ./artifacts/test-results
-
-      - name: Download test-ingest results so that they can be published
-        uses: actions/download-artifact@v4
-        with:
-          name: ingest-test-results-artifact
-          path: ./artifacts/ingest-results
-
-      - name: Comment coverage
-        uses: MishaKav/pytest-coverage-comment@main
-        with:
-          title: Unit Test Coverage Report
-          pytest-coverage-path: ./artifacts/test-results/api/test/output/pytest-coverage.txt
-          multiple-files: |
-            API Unit Tests, ./artifacts/test-results/api/test/output/pytest-coverage.txt, ./artifacts/test-results/api/test/output/pytest.xml
-            Ingest Unit Tests, ./artifacts/ingest-results/pytest-coverage.txt, ./artifacts/ingest-results/pytest.xml
