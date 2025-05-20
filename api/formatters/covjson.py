@@ -50,7 +50,7 @@ def make_parameter(ts_mdata):
             label={"en": label},
         ),
         **{
-            "metocean:MeasurementType": MeasurementType(
+            "metocean:measurementType": MeasurementType(
                 method=ts_mdata.function,
                 period=period,
             )
@@ -109,7 +109,7 @@ def convert_to_covjson(observations):
                 values=values_no_nan, axisNames=["t", "x", "y"], shape=[len(values_no_nan), 1, 1]
             )
 
-        custom_fields = {"rodeo:wigosId": data.ts_mdata.platform}
+        custom_fields = {"metocean:wigosId": data.ts_mdata.platform}
         coverages.append(Coverage(domain=domain, parameters=parameters, ranges=ranges, **custom_fields))
 
     if len(coverages) == 0:
