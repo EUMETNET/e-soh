@@ -161,9 +161,9 @@
                     "type": "string",
                     "description": "A textual description of the processing (or quality control) level of the data."
                 },
-                "camsl": {
+                "hamsl": {
                     "type": "integer",
-                    "description": "The number of centimeters above mean sea level. The reference point is the ground position of the station for stationary data, or the sensor itself for mobile data."
+                    "description": "The number of meters above mean sea level. The reference point is the ground position of the station for stationary data, or the sensor itself for mobile data."
                 },
                 "creator_name": {
                     "type": "string",
