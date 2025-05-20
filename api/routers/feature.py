@@ -6,6 +6,7 @@ import formatters
 from openapi import openapi_examples
 from fastapi import APIRouter
 from fastapi import HTTPException
+from fastapi import Request
 from fastapi import Path
 from fastapi import Query
 from geojson_pydantic import Feature
@@ -154,7 +155,9 @@ async def get_time_series_by_id(
 
 
 @router.get("/dataset", tags=["E-SOH dataset"], include_in_schema=False)
-async def get_dataset_metadata():
+async def get_dataset_metadata(request: Request):
+    base_url = request.url.scheme + "://" + request.url.netloc
+
     # need to get spatial extent.
     spatial_request = dstore.GetExtentsRequest()
     extent = await get_extents_request(spatial_request)
@@ -174,6 +177,47 @@ async def get_dataset_metadata():
                 f"{extent.temporal_extent.end.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}",
             ],
         ],
+        "links": json.dumps(
+            [
+                {
+                    "rel": "items",
+                    "href": "E-SOH dataset mqtt stream",
+                    "title": "E-SOH dataset data notifications",
+                    "type": "application/json",
+                },
+                {
+                    "rel": "items",
+                    "href": "E-SOH time series mqtt stream",
+                    "title": "E-SOH time series data notifications",
+                    "type": "application/json",
+                },
+                {"rel": "data", "href": base_url, "title": "E-SOH EDR API landing page", "type": "application/json"},
+                {
+                    "rel": "related",
+                    "href": base_url + "/docs",
+                    "title": "E-SOH API documentation",
+                    "type": "application/json",
+                },
+                {
+                    "href": base_url + "/conformance",
+                    "rel": "conformance",
+                    "title": "E-SOH Conformance Declaration",
+                    "type": "application/json",
+                },
+                {
+                    "rel": "about",
+                    "href": "https://www.eumetnet.eu/wp-content/uploads/2018/03/List-of-current-Members-as-pdf.pdf",
+                    "title": "EUMETNET Members",
+                    "type": "text/html",
+                },
+                {
+                    "rel": "license",
+                    "href": "https://creativecommons.org/licenses/by/4.0/",
+                    "title": "Creative Commons BY 4.0 licence",
+                    "type": "text/html",
+                },
+            ]
+        ),
     }
 
     template = env.get_template("dataset_metadata_template.j2")
