@@ -177,47 +177,9 @@ async def get_dataset_metadata(request: Request):
                 f"{extent.temporal_extent.end.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}",
             ],
         ],
-        "links": json.dumps(
-            [
-                {
-                    "rel": "items",
-                    "href": "E-SOH dataset mqtt stream",
-                    "title": "E-SOH dataset data notifications",
-                    "type": "application/json",
-                },
-                {
-                    "rel": "items",
-                    "href": "E-SOH time series mqtt stream",
-                    "title": "E-SOH time series data notifications",
-                    "type": "application/json",
-                },
-                {"rel": "data", "href": base_url, "title": "E-SOH EDR API landing page", "type": "application/json"},
-                {
-                    "rel": "related",
-                    "href": base_url + "/docs",
-                    "title": "E-SOH API documentation",
-                    "type": "application/json",
-                },
-                {
-                    "href": base_url + "/conformance",
-                    "rel": "conformance",
-                    "title": "E-SOH Conformance Declaration",
-                    "type": "application/json",
-                },
-                {
-                    "rel": "about",
-                    "href": "https://www.eumetnet.eu/wp-content/uploads/2018/03/List-of-current-Members-as-pdf.pdf",
-                    "title": "EUMETNET Members",
-                    "type": "text/html",
-                },
-                {
-                    "rel": "license",
-                    "href": "https://creativecommons.org/licenses/by/4.0/",
-                    "title": "Creative Commons BY 4.0 licence",
-                    "type": "text/html",
-                },
-            ]
-        ),
+        "url_base": base_url,
+        "url_conformance": base_url + "/conformance",
+        "url_docs": base_url + "/docs",
     }
 
     template = env.get_template("dataset_metadata_template.j2")

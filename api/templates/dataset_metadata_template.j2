@@ -6,10 +6,10 @@
     "type": "Feature",
     "geometry": {
         "type": "Polygon",
-        "coordinates": {{ spatial_extents }}
+        "coordinates": "{{ spatial_extents }}"
     },
     "time": {
-        "interval": {{ temporal_extents|tojson }},
+        "interval": "{{ temporal_extents|tojson }}",
         "resolution": "PT10M"
     },
     "properties": {
@@ -69,5 +69,48 @@
         ],
         "wmo:dataPolicy": "core"
     },
-    "links": {{ links }}
+    "links": [
+        {
+            "rel": "items",
+            "href": "E-SOH dataset mqtt stream",
+            "title": "E-SOH dataset data notifications",
+            "type": "application/json"
+        },
+        {
+            "rel": "items",
+            "href": "E-SOH time series mqtt stream",
+            "title": "E-SOH time series data notifications",
+            "type": "application/json"
+        },
+        {
+            "rel": "data",
+            "href": {{ url_base }},
+            "title": "E-SOH EDR API landing page",
+            "type": "application/json"
+        },
+        {
+            "rel": "related",
+            "href": {{ url_docs }},
+            "title": "E-SOH API documentation",
+            "type": "application/json"
+        },
+        {
+            "href": {{ url_conformance }},
+            "rel": "conformance",
+            "title": "E-SOH Conformance Declaration",
+            "type": "application/json"
+        },
+        {
+            "rel": "about",
+            "href": "https://www.eumetnet.eu/wp-content/uploads/2018/03/List-of-current-Members-as-pdf.pdf",
+            "title": "EUMETNET Members",
+            "type": "text/html"
+        },
+        {
+            "rel": "license",
+            "href": "https://creativecommons.org/licenses/by/4.0/",
+            "title": "Creative Commons BY 4.0 licence",
+            "type": "text/html"
+        }
+    ]
 }
