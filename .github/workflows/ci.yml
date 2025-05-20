@@ -72,6 +72,10 @@ jobs:
       - name: Run the client test
         run: just client
 
+      - name: Run the rodeo profile test
+        continue-on-error: true
+        run: just profile-test
+
       - name: Archive test artifacts
         uses: actions/upload-artifact@v4
         with:

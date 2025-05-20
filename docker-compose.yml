@@ -210,6 +210,14 @@ services:
       store:
         condition: service_healthy
 
+  rodeo-profile-test:
+    profiles: ["test"]
+    image: ghcr.io/metno/sedr
+    depends_on:
+      api:
+        condition: service_healthy
+    command: --url http://api:8000
+
   prometheus:
     profiles: ["monitoring"]
     image: prom/prometheus
