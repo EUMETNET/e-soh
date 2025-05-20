@@ -144,8 +144,14 @@ message ObsMetadata {
   string id = 6;
   string data_id = 7 [json_name = "data_id"];
   string history = 8;
-  string processing_level = 10 [json_name = "processing_level"];
-  int64 quality_code = 11 [json_name = "quality_code"];
+  string processing_level = 9 [json_name = "processing_level"];
+  int64 quality_code = 10 [json_name = "quality_code"];
+  int64 camsl = 11; // centimeters above mean sea level
+  // Case 1 - stationary data: camsl of the station ground position
+  // Case 2 - mobile data: camsl of the sensor itself
+  // NOTE: in Case 1, the absolute vertical location of the sensor would be camsl + level where
+  //   level is the height above ground (hag) of the sensor. (Typical values for level are the WMO
+  //   standard 2m for temperature and 10m for wind.)
   // --- END reflectable metadata -----------------
 
   string value = 12; // obs value (not metadata in a strict sense)

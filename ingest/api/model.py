@@ -297,11 +297,24 @@ class Properties(BaseModel):
         None,
         description="Controlled vocabulary for the values used in the 'quality_code' attribute.",
     )
+    hamsl: Optional[int | float] = Field(
+        None,
+        description=(
+            "The number of meters above mean sea level. "
+            "The reference point is the ground position of the station for stationary data, or "
+            "the sensor itself for mobile data."
+        ),
+    )
     content: Content = Field(..., description="Actual data content")
     integrity: Optional[Integrity] = Field(
         None,
         description="Specifies a checksum to be applied to the data to ensure that the download is accurate.",
     )
+
+    @field_validator("hamsl", mode="before")
+    @classmethod
+    def convert_hamsl_to_centimeters(cls, hamsl: float):
+        return int(hamsl * 100)
 
     @field_validator("period", mode="before")
     @classmethod

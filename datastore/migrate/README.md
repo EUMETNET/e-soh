@@ -35,10 +35,11 @@ The other path: `./migrate/data/not_supported_yet`, contains an example migratio
 
 There are a few environment variables needed to run the migrate script.
 
-| Name  | Requiered | Explenation  |
-|------------|------|--------------|
-| DB_USER    | Yes  | The username for the database  |
-| DB_PASS    | Yes  | The password for the user  |
-| DB_URL     | Yes  | URL or IP to the postgis database  |
-| DB_PORT    | No   | Database port, default `5432` |
-| ENABLE_SSL | No   | Wether to use ssl for connection, defailt `disable`|
+| Name       | Requiered | Explenation                                          |
+|------------|-----------|------------------------------------------------------|
+| DB_USER    | Yes       | The username for the database                        |
+| DB_PASS    | Yes       | The password for the user                            |
+| DB_URL     | Yes       | URL or IP to the postgis database                    |
+| DB_NAME    | No        | PostgreSQL database name, default `data`             |
+| DB_PORT    | No        | Database port, default `5432`                        |
+| ENABLE_SSL | No        | Weather to use ssl for connection, default `disable` |
