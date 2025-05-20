@@ -130,6 +130,7 @@ func getTSColValsUnique(colName2Val map[string]interface{}) ([]interface{}, erro
 func getUpsertTSInsertCmd(nRows int) string {
 
 	cols := getTSColNames()
+	colsUnique := getTSColNamesUnique()
 
 	formats := make([]string, nRows)
 	index := 1
@@ -150,37 +151,39 @@ func getUpsertTSInsertCmd(nRows int) string {
 	insertCmd := fmt.Sprintf(`
 		INSERT INTO time_series (%s) VALUES %s
 		ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
+		RETURNING id,%s
 		`,
 		strings.Join(cols, ","),
 		strings.Join(formats, ","),
 		strings.Join(updateExpr, ","),
+		strings.Join(colsUnique, ","),
 	)
 	//log.Printf("Insert: %v", insertCmd)
 	return insertCmd
 }
 
-func getUpsertTSSelectCmd(nRows int) string {
-	cols := getTSColNamesUnique()
-	whereExpr := make([]string, nRows)
-	index := 1
-	for i := 0; i < nRows; i++ {
-		oneRow := make([]string, len(cols))
-		for j := range cols {
-			oneRow[j] = fmt.Sprintf("$%d", index)
-			index += 1
-		}
-		whereExpr[i] = "(" + strings.Join(oneRow, ",") + ")"
-	}
-
-	selectCmd := fmt.Sprintf(
-		`SELECT id,%s FROM time_series WHERE (%s) in (%s)`,
-		strings.Join(cols, ","),
-		strings.Join(cols, ","),
-		strings.Join(whereExpr, ","))
-	//log.Printf("Select: %v", selectCmd)
-
-	return selectCmd
-}
+//func getUpsertTSSelectCmd(nRows int) string {
+//	cols := getTSColNamesUnique()
+//	whereExpr := make([]string, nRows)
+//	index := 1
+//	for i := 0; i < nRows; i++ {
+//		oneRow := make([]string, len(cols))
+//		for j := range cols {
+//			oneRow[j] = fmt.Sprintf("$%d", index)
+//			index += 1
+//		}
+//		whereExpr[i] = "(" + strings.Join(oneRow, ",") + ")"
+//	}
+//
+//	selectCmd := fmt.Sprintf(
+//		`SELECT id,%s FROM time_series WHERE (%s) in (%s)`,
+//		strings.Join(cols, ","),
+//		strings.Join(cols, ","),
+//		strings.Join(whereExpr, ","))
+//	//log.Printf("Select: %v", selectCmd)
+//
+//	return selectCmd
+//}
 
 // TODO: Update comments
 // upsertTS retrieves the ID of the row in table time_series that matches tsMdata wrt.
@@ -241,18 +244,19 @@ func upsertTSs(
 
 	log.Printf("Before row insert")
 
-	// STEP 1: upsert row
-	_, err = tx.Exec(insertCmd, phVals...)
-	if err != nil {
-		return nil, fmt.Errorf("tx.Exec() failed: %v", err)
-	}
-
-	log.Printf("After row insert")
-
-	// STEP 2: retrieve id's
-	// TODO: This query is the bottleneck. I did get it faster once. Why? Index seems to work
-	selectCmd := getUpsertTSSelectCmd(len(mapTScolValsConstraint))
-	rows, err := tx.Query(selectCmd, phValsConstraint...)
+	//// STEP 1: upsert row
+	//_, err = tx.Exec(insertCmd, phVals...)
+	//if err != nil {
+	//	return nil, fmt.Errorf("tx.Exec() failed: %v", err)
+	//}
+	//
+	//log.Printf("After row insert")
+	//
+	//// STEP 2: retrieve id's
+	//// TODO: This query is the bottleneck. I did get it faster once. Why? Index seems to work
+	//selectCmd := getUpsertTSSelectCmd(len(mapTScolValsConstraint))
+	//rows, err := tx.Query(selectCmd, phValsConstraint...)
+	rows, err := tx.Query(insertCmd, phVals...)
 	if err != nil {
 		return nil, fmt.Errorf("tx.Query() failed: %v", err)
 	}
@@ -360,17 +364,18 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 
 	cmd := fmt.Sprintf(`
 		INSERT INTO geo_point (point) VALUES %s
-		ON CONFLICT (point) DO UPDATE SET point = EXCLUDED.point WHERE false
+		ON CONFLICT (point) DO UPDATE SET point = EXCLUDED.point
+		RETURNING id, ST_X(point::geometry), ST_Y(point::geometry)
 	`, strings.Join(valsExpr, ","))
 
-	_, err = tx.Exec(cmd, phVals...)
-	if err != nil {
-		return nil, fmt.Errorf("db.Exec() failed: %v", err)
-	}
-
-	cmd = fmt.Sprintf(`
-		SELECT id, ST_X(point::geometry), ST_Y(point::geometry) FROM geo_point WHERE point in (%s)
-	`, strings.Join(valsExpr, ","))
+	//_, err = tx.Exec(cmd, phVals...)
+	//if err != nil {
+	//	return nil, fmt.Errorf("db.Exec() failed: %v", err)
+	//}
+	//
+	//cmd = fmt.Sprintf(`
+	//	SELECT id, ST_X(point::geometry), ST_Y(point::geometry) FROM geo_point WHERE point in (%s)
+	//`, strings.Join(valsExpr, ","))
 
 	rows, err := tx.Query(cmd, phVals...)
 	if err != nil {
