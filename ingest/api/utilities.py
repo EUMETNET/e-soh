@@ -1,9 +1,17 @@
-from fastapi import Request
 import isodate
+from fastapi import Request
 
 
-def get_base_url_from_request(http_request: Request) -> str:
-    return f"{http_request.url.components.scheme}://{http_request.url.components.netloc}"
+def get_base_url_from_request(request: Request) -> str:
+    # The server root_path contains the path added by a reverse proxy
+    base_path = request.scope.get("root_path")
+
+    # The host will (should) be correctly set from X-Forwarded-Host and X-Forwarded-Scheme
+    # headers by any proxy in front of it
+    host = request.headers["host"]
+    scheme = request.url.scheme
+
+    return f"{scheme}://{host}{base_path}"
 
 
 def seconds_to_iso_8601_duration(seconds: int) -> str:
