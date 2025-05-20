@@ -532,7 +532,7 @@ func getObs(
 			point,
 			%s
 		FROM observation
-		JOIN time_series on time_series.id = observation.ts_id
+		JOIN time_series on observation.ts_id = time_series.id
 		JOIN geo_point ON observation.geo_point_id = geo_point.id
 		WHERE %s AND %s AND %s AND %s
 		ORDER BY ts_id, obstime_instant DESC
