@@ -32,69 +32,74 @@
         "symbol": "dB"
     },
     "integral_wrt_time_of_surface_downwelling_longwave_flux_in_air": {
-        "unit": "Ws/m2",
+        "unit": "w.s.m-2",
         "alias": [
             "W s m-2",
+            "Ws/m2",
             "Ws m-2",
             "Wsm-2",
             "J m-2",
             "Jm-2"
         ],
-        "symbol": "Ws/m2"
+        "symbol": "w.s.m-2"
     },
     "integral_wrt_time_of_surface_downwelling_shortwave_flux_in_air": {
-        "unit": "Ws/m2",
+        "unit": "w.s.m-2",
         "alias": [
             "W s m-2",
+            "Ws/m2",
             "Ws m-2",
             "Wsm-2",
             "J m-2",
             "Jm-2"
         ],
-        "symbol": "Ws/m2"
+        "symbol": "w.s.m-2"
     },
     "integral_wrt_time_of_surface_net_downward_longwave_flux": {
-        "unit": "Ws/m2",
+        "unit": "w.s.m-2",
         "alias": [
             "W s m-2",
+            "Ws/m2",
             "Ws m-2",
             "Wsm-2",
             "J m-2",
             "Jm-2"
         ],
-        "symbol": "Ws/m2"
+        "symbol": "w.s.m-2"
     },
     "integral_wrt_time_of_surface_net_downward_shortwave_flux": {
-        "unit": "Ws/m2",
+        "unit": "w.s.m-2",
         "alias": [
             "W s m-2",
+            "Ws/m2",
             "Ws m-2",
             "Wsm-2",
             "J m-2",
             "Jm-2"
         ],
-        "symbol": "Ws/m2"
+        "symbol": "w.s.m-2"
     },
     "latitude": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
     "longitude": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
     "low_type_cloud_area_fraction": {
-        "unit": "oktas",
-        "symbol": "oktas",
+        "unit": "okta",
+        "symbol": "okta",
         "alias": [
+            "oktas",
             "okta",
             "octa",
             "octas"
@@ -104,6 +109,7 @@
         "unit": "mm/h",
         "alias": [
             "mm h-1",
+            "mm.h-1",
             "mmh-1"
         ],
         "symbol": "mm/h"
@@ -131,14 +137,15 @@
         "symbol": "mm/h",
         "alias": [
             "mm h-1",
+            "mm.h-1",
             "mmh-1"
         ]
     },
     "relative_humidity": {
-        "unit": "percent",
+        "unit": "%",
         "symbol": "%",
         "alias": [
-            "%",
+            "percent",
             "1/100"
         ],
         "conversion": {
@@ -148,24 +155,27 @@
         }
     },
     "sea_surface_swell_wave_from_direction": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
     "sea_surface_swell_wave_mean_period_from_variance_spectral_density_second_frequency_moment": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_swell_wave_significant_height": {
         "unit": "m",
         "symbol": "m"
     },
     "sea_surface_temperature": {
-        "unit": "degC",
-        "symbol": "degC",
+        "unit": "Cel",
+        "symbol": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
@@ -173,34 +183,35 @@
         }
     },
     "sea_surface_wave_directional_spread": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
     "sea_surface_wave_energy_at_variance_spectral_density_maximum": {
-        "unit": "m2/Hz",
+        "unit": "m2.Hz",
         "alias": [
+            "m2/Hz",
             "m2 Hz-1",
             "m2Hz-1"
         ],
-        "symbol": "m2/Hz"
+        "symbol": "m2.Hz"
     },
     "sea_surface_wave_from_direction": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
     "sea_surface_wave_from_direction_at_variance_spectral_density_maximum": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
@@ -209,48 +220,48 @@
         "symbol": "m"
     },
     "sea_surface_wave_maximum_period": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wave_mean_period": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wave_period_at_variance_spectral_density_maximum": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wave_period_of_highest_wave": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wave_significant_height": {
         "unit": "m",
         "symbol": "m"
     },
     "sea_surface_wave_significant_period": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wind_wave_from_direction": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
     "sea_surface_wind_wave_mean_period_from_variance_spectral_density_second_frequency_moment": {
-        "unit": "seconds",
-        "symbol": "seconds"
+        "unit": "s",
+        "symbol": "s"
     },
     "sea_surface_wind_wave_significant_height": {
         "unit": "m",
@@ -265,8 +276,11 @@
         "symbol": "mS/cm"
     },
     "sea_water_salinity": {
-        "unit": "1/1000",
-        "symbol": "1/1000"
+        "unit": "per mil",
+        "symbol": "per mil",
+        "alias": [
+            "1/1000"
+        ]
     },
     "sea_water_speed": {
         "unit": "m/s",
@@ -277,8 +291,11 @@
         "symbol": "m/s"
     },
     "sea_water_temperature": {
-        "unit": "degC",
-        "symbol": "degC",
+        "unit": "Cel",
+        "symbol": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
@@ -286,8 +303,11 @@
         }
     },
     "soil_temperature": {
-        "unit": "degC",
-        "symbol": "degC",
+        "unit": "Cel",
+        "symbol": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
@@ -337,20 +357,23 @@
         "symbol": "W/m2"
     },
     "surface_downwelling_photosynthetic_photon_flux_in_air": {
-        "unit": "umol/sm2",
+        "unit": "umol.m-2.s-1",
         "alias": [
+            "umol/sm2",
             "umol sm-2",
             "umolsm-2"
         ],
-        "symbol": "umol/sm2"
+        "symbol": "umol/m2/s"
     },
     "surface_downwelling_photosynthetic_radiative_flux_in_air": {
-        "unit": "mE/m2",
+        "unit": "mmol.m-2",
         "alias": [
+            "mE/m2",
+            "mE/m2",
             "mE m-2",
             "mEm-2"
         ],
-        "symbol": "mE/m2"
+        "symbol": "mmol.m-2"
     },
     "surface_downwelling_shortwave_flux_in_air": {
         "unit": "W/m2",
@@ -373,8 +396,11 @@
         "symbol": "cm"
     },
     "surface_temperature": {
-        "unit": "degC",
-        "symbol": "degC",
+        "unit": "Cel",
+        "symbol": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
@@ -433,8 +459,11 @@
         "symbol": "index"
     },
     "virtual_temperature": {
-        "unit": "degC",
-        "symbol": "degC",
+        "unit": "Cel",
+        "symbol": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
@@ -446,8 +475,11 @@
         "symbol": "m"
     },
     "wet_bulb_temperature": {
-        "unit": "degC",
-        "symbol": "degC",
+        "unit": "Cel",
+        "symbol": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
@@ -455,10 +487,10 @@
         }
     },
     "wind_from_direction": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
@@ -479,10 +511,10 @@
         "symbol": "m/s"
     },
     "wind_gust_from_direction": {
-        "unit": "degrees",
-        "symbol": "degrees",
+        "unit": "deg",
+        "symbol": "deg",
         "alias": [
-            "deg",
+            "degrees",
             "degree"
         ]
     },
@@ -507,7 +539,10 @@
         }
     },
     "air_temperature": {
-        "unit": "degC",
+        "unit": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
@@ -515,9 +550,10 @@
         }
     },
     "cloud_area_fraction": {
-        "unit": "oktas",
-        "symbol": "oktas",
+        "unit": "okta",
+        "symbol": "okta",
         "alias": [
+            "oktas",
             "okta",
             "octa",
             "octas"
@@ -527,7 +563,10 @@
         "unit": "m"
     },
     "dew_point_temperature": {
-        "unit": "degC",
+        "unit": "Cel",
+        "alias": [
+            "degC"
+        ],
         "conversion": {
             "K": {
                 "add": -273.15
