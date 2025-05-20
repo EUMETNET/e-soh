@@ -64,15 +64,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "maximum",
                 "period": "PT10M"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 1.5
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 1.5
         }
     },
     "ranges": {
@@ -102,5 +106,5 @@
             ]
         }
     },
-    "rodeo:wigosId": "0-20000-0-06260"
+    "metocean:wigosId": "0-20000-0-06260"
 }

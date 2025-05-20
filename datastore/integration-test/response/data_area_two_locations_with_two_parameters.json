@@ -65,15 +65,19 @@
                     },
                     "unit": {
                         "label": {
-                            "en": "percent"
+                            "en": "%"
+                        },
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/PERCENT",
+                            "value": "%"
                         }
                     },
-                    "measurementType": {
+                    "metocean:measurementType": {
                         "method": "mean",
                         "period": "PT1M"
                     },
-                    "rodeo:standard_name": "relative_humidity",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "relative_humidity",
+                    "metocean:level": 2.0
                 },
                 "wind_speed:10.0:mean:PT10M": {
                     "type": "Parameter",
@@ -89,14 +93,18 @@
                     "unit": {
                         "label": {
                             "en": "m/s"
+                        },
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                            "value": "m/s"
                         }
                     },
-                    "measurementType": {
+                    "metocean:measurementType": {
                         "method": "mean",
                         "period": "PT10M"
                     },
-                    "rodeo:standard_name": "wind_speed",
-                    "rodeo:level": 10.0
+                    "metocean:standard_name": "wind_speed",
+                    "metocean:level": 10.0
                 }
             },
             "ranges": {
@@ -147,7 +155,7 @@
                     ]
                 }
             },
-            "rodeo:wigosId": "0-20000-0-06275"
+            "metocean:wigosId": "0-20000-0-06275"
         },
         {
             "type": "Coverage",
@@ -213,15 +221,19 @@
                     },
                     "unit": {
                         "label": {
-                            "en": "percent"
+                            "en": "%"
+                        },
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/PERCENT",
+                            "value": "%"
                         }
                     },
-                    "measurementType": {
+                    "metocean:measurementType": {
                         "method": "mean",
                         "period": "PT1M"
                     },
-                    "rodeo:standard_name": "relative_humidity",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "relative_humidity",
+                    "metocean:level": 2.0
                 },
                 "wind_speed:10.0:mean:PT10M": {
                     "type": "Parameter",
@@ -237,14 +249,18 @@
                     "unit": {
                         "label": {
                             "en": "m/s"
+                        },
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                            "value": "m/s"
                         }
                     },
-                    "measurementType": {
+                    "metocean:measurementType": {
                         "method": "mean",
                         "period": "PT10M"
                     },
-                    "rodeo:standard_name": "wind_speed",
-                    "rodeo:level": 10.0
+                    "metocean:standard_name": "wind_speed",
+                    "metocean:level": 10.0
                 }
             },
             "ranges": {
@@ -295,7 +311,7 @@
                     ]
                 }
             },
-            "rodeo:wigosId": "0-20000-0-06260"
+            "metocean:wigosId": "0-20000-0-06260"
         }
     ],
     "parameters": {
@@ -312,15 +328,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "percent"
+                    "en": "%"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/PERCENT",
+                    "value": "%"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
                 "period": "PT1M"
             },
-            "rodeo:standard_name": "relative_humidity",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "relative_humidity",
+            "metocean:level": 2.0
         },
         "wind_speed:10.0:mean:PT10M": {
             "type": "Parameter",
@@ -336,14 +356,18 @@
             "unit": {
                 "label": {
                     "en": "m/s"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                    "value": "m/s"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
                 "period": "PT10M"
             },
-            "rodeo:standard_name": "wind_speed",
-            "rodeo:level": 10.0
+            "metocean:standard_name": "wind_speed",
+            "metocean:level": 10.0
         }
     }
 }
