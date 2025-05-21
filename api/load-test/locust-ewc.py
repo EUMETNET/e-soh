@@ -14,6 +14,7 @@ common_standard_names = [
 
 polygon_size = [0.5, 1.0, 2.0, 4.0]
 hours_choice = [1, 3, 6, 12, 24]
+n_parameters_choice = [1, 3, 5]
 
 
 class ESohUser(HttpUser):
@@ -44,10 +45,11 @@ class ESohUser(HttpUser):
         date_time = datetime.now(UTC) - timedelta(hours=hours)
         dt_string = date_time.strftime("%Y-%m-%dT%H:%M:%SZ")
         station_id = random.choice(self.station_ids)
-        parameter = random.choice(self.stations[station_id])
+        n_parameters = random.choice(n_parameters_choice)
+        parameters = ",".join(random.sample(self.stations[station_id], n_parameters))
         self.client.get(
-            f"/collections/observations/locations/{station_id}?parameter-name={parameter}&datetime={dt_string}/..",
-            name=f"location {hours:02d} hours",
+            f"/collections/observations/locations/{station_id}?parameter-name={parameters}&datetime={dt_string}/..",
+            name=f"location, {hours:02d} hours, {n_parameters} parameters",
             headers=headers,
         )
 
