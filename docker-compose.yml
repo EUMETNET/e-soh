@@ -112,6 +112,7 @@ services:
       - MQTT_PASSWORD=${MQTT_PASSWORD}
       - MQTT_PORT=${MQTT_PORT:-1883}
       - MQTT_TLS=${MQTT_TLS:-False}
+      - MQTT_TOPIC_PREPEND=${MQTT_TOPIC_PREPEND:-'TEMP_TOPIC'}
       - WIS2_TOPIC=${WIS2_TOPIC:-'TEMP_TOPIC'}
       - WIS2_MQTT_HOST=${MQTT_HOST:-mqtt_wis2}
       - WIS2_MQTT_USERNAME=${MQTT_USERNAME:-}
@@ -210,6 +211,14 @@ services:
     depends_on:
       store:
         condition: service_healthy
+
+  rodeo-profile-test:
+    profiles: ["test"]
+    image: ghcr.io/metno/sedr
+    depends_on:
+      api:
+        condition: service_healthy
+    command: --url http://api:8000
 
   prometheus:
     profiles: ["monitoring"]

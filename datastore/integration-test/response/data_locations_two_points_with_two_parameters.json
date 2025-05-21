@@ -55,14 +55,18 @@
             "unit": {
                 "label": {
                     "en": "hPa"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/HectoPA",
+                    "value": "hPa"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
                 "duration": "PT1M"
             },
-            "rodeo:standard_name": "air_pressure_at_mean_sea_level",
-            "rodeo:level": 1.0
+            "metocean:standard_name": "air_pressure_at_mean_sea_level",
+            "metocean:level": 1.0
         },
         "air_temperature:0.1:minimum:PT10M": {
             "type": "Parameter",
@@ -77,15 +81,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
                 "duration": "PT10M"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 0.1
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 0.1
         }
     }
 }

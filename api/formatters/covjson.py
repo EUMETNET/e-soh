@@ -18,10 +18,12 @@ from covjson_pydantic.reference_system import ReferenceSystem
 from covjson_pydantic.reference_system import ReferenceSystemConnectionObject
 from edr_pydantic.parameter import MeasurementType
 from covjson_pydantic.unit import Unit
+from covjson_pydantic.unit import Symbol
 from fastapi import HTTPException
 from pydantic import AwareDatetime
 
 from utilities import seconds_to_iso_8601_duration, convert_cm_to_m
+from constants.qudt_unit_dict import qudt_unit_dict
 
 # mime_type = "application/prs.coverage+json"
 
@@ -35,8 +37,8 @@ def make_parameter(ts_mdata):
     label = " ".join(ts_mdata.standard_name.capitalize().split("_"))
 
     custom_fields = {
-        "rodeo:standard_name": ts_mdata.standard_name,
-        "rodeo:level": level,
+        "metocean:standard_name": ts_mdata.standard_name,
+        "metocean:level": level,
     }
 
     return Parameter(
@@ -47,11 +49,19 @@ def make_parameter(ts_mdata):
             id=f"https://vocab.nerc.ac.uk/standard_name/{ts_mdata.standard_name}",
             label={"en": label},
         ),
-        measurementType=MeasurementType(
-            method=ts_mdata.function,
-            duration=period,
+        **{
+            "metocean:measurementType": MeasurementType(
+                method=ts_mdata.function,
+                duration=period,
+            )
+        },
+        unit=Unit(
+            symbol=Symbol(
+                value=qudt_unit_dict[ts_mdata.unit]["value"],
+                type=qudt_unit_dict[ts_mdata.unit]["type"],
+            ),
+            label={"en": ts_mdata.unit},
         ),
-        unit=Unit(label={"en": ts_mdata.unit}),
         **custom_fields,
     )
 
@@ -66,8 +76,8 @@ def convert_to_covjson(observations):
     for (lat, lon, times), group in groupby(data, lambda x: x.dom):
         referencing = [
             ReferenceSystemConnectionObject(
-                coordinates=["y", "x"],
-                system=ReferenceSystem(type="GeographicCRS", id="http://www.opengis.net/def/crs/EPSG/0/4326"),
+                coordinates=["x", "y"],
+                system=ReferenceSystem(type="GeographicCRS", id="http://www.opengis.net/def/crs/OGC/1.3/CRS84"),
             ),
             ReferenceSystemConnectionObject(
                 coordinates=["t"],
@@ -96,10 +106,10 @@ def convert_to_covjson(observations):
             parameters[parameter_id] = make_parameter(data.ts_mdata)
 
             ranges[parameter_id] = NdArrayFloat(
-                values=values_no_nan, axisNames=["t", "y", "x"], shape=[len(values_no_nan), 1, 1]
+                values=values_no_nan, axisNames=["t", "x", "y"], shape=[len(values_no_nan), 1, 1]
             )
 
-        custom_fields = {"rodeo:wigosId": data.ts_mdata.platform}
+        custom_fields = {"metocean:wigosId": data.ts_mdata.platform}
         coverages.append(Coverage(domain=domain, parameters=parameters, ranges=ranges, **custom_fields))
 
     if len(coverages) == 0:

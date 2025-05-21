@@ -10,7 +10,7 @@
     "properties": {
         "platform": "0-20000-0-06280",
         "standard_name": "wind_speed",
-        "unit": "m s-1",
+        "unit": "m/s",
         "level": 10.0,
         "period": "PT10M",
         "parameter_name": "wind_speed:10.0:mean:PT10M",

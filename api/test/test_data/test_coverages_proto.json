@@ -4,7 +4,7 @@
             "ts_mdata": {
                 "platform": "0-20000-0-06257",
                 "standard_name": "air_temperature",
-                "unit": "degrees Celsius",
+                "unit": "Cel",
                 "level": 200,
                 "function": "mean",
                 "period": 60,
@@ -26,7 +26,7 @@
             "ts_mdata": {
                 "platform": "0-20000-0-06269",
                 "standard_name": "air_temperature",
-                "unit": "degrees Celsius",
+                "unit": "Cel",
                 "level": 200,
                 "function": "mean",
                 "period": 60,

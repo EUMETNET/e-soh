@@ -22,14 +22,14 @@ def convert_standard_names_to_cf(standard_name):
 # NOTE: Only units are converted currently, not values.
 def convert_unit_names(unit):
     unit_mapping = {
-        "degrees Celsius": "degC",
+        "degrees Celsius": "Cel",
         "ft": "m",
         "min": "s",
-        "degree": "degrees",
-        "%": "percent",
+        "degree": "deg",
+        "%": "%",
         "mm": "kg/m2",
         "m s-1": "m/s",
-        "octa": "oktas",
+        "octa": "okta",
         "W m-2": "W/m2",
     }
     return unit_mapping.get(unit, unit)
