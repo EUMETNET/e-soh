@@ -9,15 +9,14 @@ from edr_pydantic.capabilities import ConformanceModel
 from edr_pydantic.capabilities import LandingPageModel
 from edr_pydantic.collections import Collection
 from edr_pydantic.collections import Collections
+from export_metrics import add_metrics
 from fastapi import FastAPI
 from fastapi import Request
+from openapi.collections_metadata import collections_metadata
+from openapi.openapi_metadata import openapi_metadata
 from routers import edr
 from routers import feature
 from utilities import create_url_from_request
-
-from export_metrics import add_metrics
-from openapi.openapi_metadata import openapi_metadata
-from openapi.collections_metadata import collections_metadata
 
 
 all_collections = collections_metadata.keys()

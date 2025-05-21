@@ -1,30 +1,38 @@
 {
-        "id": "urn:wmo:md:eu-eumetnet-observations:swob-realtime",
-        "conformsTo": ["http://wis.wmo.int/spec/wcmp/2/conf/core"],
-        "type": "Feature",
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": {{ spatial_extents }}
-        },
-        "time": {
-            "interval": {{ temporal_extents|tojson }},
-            "resolution": "PT10M"
-        },
-        "properties": {
-            "title": "Land surface weather observations",
-            "description": "Land surface observations measured at automatic and manual stations of EUMETNET Members (last 24 hours)",
-            "themes": [
-                {
-                    "concepts": [{"id": "weather"}],
-                    "scheme": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline"
-                },
-                {
-                    "concepts": [
-                        {"id": "surface-based-observations"}
-                    ],
-                    "scheme": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline/_weather"
-                }
-            ],
+    "id": "urn:wmo:md:eu-eumetnet-observations:swob-realtime",
+    "conformsTo": [
+        "http://wis.wmo.int/spec/wcmp/2/conf/core"
+    ],
+    "type": "Feature",
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": {{ spatial_extents }}
+    },
+    "time": {
+        "interval": {{ temporal_extents|tojson }},
+        "resolution": "PT10M"
+    },
+    "properties": {
+        "title": "Land surface weather observations",
+        "description": "Land surface observations measured at automatic and manual stations of EUMETNET Members (last 24 hours)",
+        "themes": [
+            {
+                "concepts": [
+                    {
+                        "id": "weather"
+                    }
+                ],
+                "scheme": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline"
+            },
+            {
+                "concepts": [
+                    {
+                        "id": "surface-based-observations"
+                    }
+                ],
+                "scheme": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline/_weather"
+            }
+        ],
         "language": "en",
         "type": "dataset",
         "created": "2023-01-01T00:00:00Z",
@@ -44,13 +52,14 @@
                 ],
                 "links": [
                     {
+                        "href": "https://www.eumetnet.eu/about-us/",
                         "rel": "about",
-                        "type": "text/html",
-                        "href": "https://www.eumetnet.eu/about-us/"
-
+                        "type": "text/html"
                     }
                 ],
-                "roles": ["host"]
+                "roles": [
+                    "host"
+                ]
             }
         ],
         "keywords": [
@@ -59,43 +68,49 @@
             "meteorology"
         ],
         "wmo:dataPolicy": "core"
+    },
+    "links": [
+        {
+            "href": "E-SOH dataset mqtt stream",
+            "rel": "items",
+            "title": "E-SOH dataset data notifications",
+            "type": "application/json"
         },
-        "links": [
-            {
-                "rel": "items",
-                "href": "E-SOH dataset mqtt stream",
-                "title": "E-SOH dataset data notifications",
-                "type": "application/json"
-            },
-            {
-                "rel": "items",
-                "href": "E-SOH time series mqtt stream",
-                "title": "E-SOH time series data notifications",
-                "type": "application/json"
-            },
-            {
-                "rel": "data",
-                "href": "E-SOH API landing page",
-                "title": "E-SOH EDR API landing page",
-                "type": "application/json"
-            },
-            {
-                "rel": "related",
-                "href": "E-SOH API documentation",
-                "title": "E-SOH API documentation",
-                "type": "application/json"
-            },
-            {
-                "rel": "about",
-                "href": "https://www.eumetnet.eu/wp-content/uploads/2018/03/List-of-current-Members-as-pdf.pdf",
-                "title": "EUMETNET Members",
-                "type": "text/html"
-            },
-            {
-                "rel": "license",
-                "href": "https://creativecommons.org/licenses/by/4.0/",
-                "title": "Creative Commons BY 4.0 licence",
-                "type": "text/html"
-            }
-        ]
-    }
+        {
+            "href": "E-SOH time series mqtt stream",
+            "rel": "items",
+            "title": "E-SOH time series data notifications",
+            "type": "application/json"
+        },
+        {
+            "href": {{ url_base|tojson }},
+            "rel": "data",
+            "title": "E-SOH EDR API landing page",
+            "type": "application/json"
+        },
+        {
+            "href": {{ url_docs|tojson }},
+            "rel": "related",
+            "title": "E-SOH API documentation",
+            "type": "application/json"
+        },
+        {
+            "href": {{ url_conformance|tojson }},
+            "rel": "conformance",
+            "title": "E-SOH Conformance Declaration",
+            "type": "application/json"
+        },
+        {
+            "href": "https://www.eumetnet.eu/wp-content/uploads/2018/03/List-of-current-Members-as-pdf.pdf",
+            "rel": "about",
+            "title": "EUMETNET Members",
+            "type": "text/html"
+        },
+        {
+            "href": "https://creativecommons.org/licenses/by/4.0/",
+            "rel": "license",
+            "title": "Creative Commons BY 4.0 licence",
+            "type": "text/html"
+        }
+    ]
+}

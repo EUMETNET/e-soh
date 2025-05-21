@@ -3,11 +3,11 @@ from typing import Annotated
 
 import datastore_pb2 as dstore
 import formatters
-from openapi import openapi_examples
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import Path
 from fastapi import Query
+from fastapi import Request
 from geojson_pydantic import Feature
 from geojson_pydantic import FeatureCollection
 from grpc_getter import get_extents_request
@@ -15,6 +15,7 @@ from grpc_getter import get_obs_request
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import select_autoescape
+from openapi import openapi_examples
 from response_classes import GeoJsonResponse
 from shapely import geometry
 from utilities import get_datetime_range
@@ -154,7 +155,9 @@ async def get_time_series_by_id(
 
 
 @router.get("/dataset", tags=["E-SOH dataset"], include_in_schema=False)
-async def get_dataset_metadata():
+async def get_dataset_metadata(request: Request):
+    base_url = str(request.base_url)
+
     # need to get spatial extent.
     spatial_request = dstore.GetExtentsRequest()
     extent = await get_extents_request(spatial_request)
@@ -174,6 +177,9 @@ async def get_dataset_metadata():
                 f"{extent.temporal_extent.end.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}",
             ],
         ],
+        "url_base": base_url,
+        "url_conformance": base_url + "conformance",
+        "url_docs": base_url + "docs",
     }
 
     template = env.get_template("dataset_metadata_template.j2")

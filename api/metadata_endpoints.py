@@ -3,6 +3,8 @@ from datetime import datetime
 from datetime import timezone
 from typing import Dict
 
+import datastore_pb2 as dstore
+from constants.qudt_unit_dict import qudt_unit_dict
 from edr_pydantic.capabilities import ConformanceModel
 from edr_pydantic.capabilities import Contact
 from edr_pydantic.capabilities import LandingPageModel
@@ -20,21 +22,16 @@ from edr_pydantic.link import Link
 from edr_pydantic.observed_property import ObservedProperty
 from edr_pydantic.parameter import MeasurementType
 from edr_pydantic.parameter import Parameter
-from edr_pydantic.unit import Unit
 from edr_pydantic.unit import Symbol
+from edr_pydantic.unit import Unit
 from edr_pydantic.variables import Variables
 from grpc_getter import get_extents_request
 from grpc_getter import get_ts_ag_request
-
-import datastore_pb2 as dstore
+from openapi.collections_metadata import collections_metadata
+from openapi.openapi_metadata import openapi_metadata
+from utilities import convert_cm_to_m
 from utilities import get_unique_values_for_metadata
 from utilities import seconds_to_iso_8601_duration
-from utilities import convert_cm_to_m
-
-from openapi.openapi_metadata import openapi_metadata
-from openapi.collections_metadata import collections_metadata
-from constants.qudt_unit_dict import qudt_unit_dict
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -63,6 +60,8 @@ def datetime_to_iso_string(value: datetime) -> str:
 
 
 def get_landing_page(request):
+    base_url = str(request.base_url)
+
     return LandingPageModel(
         title=openapi_metadata["title"],
         description=openapi_metadata["description"],
@@ -82,31 +81,31 @@ def get_landing_page(request):
         contact=Contact(email=openapi_metadata["contact"]["email"]),
         links=[
             Link(
-                href=f"{request.url}",
+                href=base_url,
                 rel="self",
                 title="Landing Page in JSON",
                 type="application/json",
             ),
             Link(
-                href=f"{request.url}docs",
+                href=base_url + "docs",
                 rel="service-doc",
                 title="API description in HTML",
                 type="text/html",
             ),
             Link(
-                href=f"{request.url}openapi.json",
+                href=base_url + "openapi.json",
                 rel="service-desc",
                 title="API description in JSON",
                 type="application/vnd.oai.openapi+json;version=3.1",
             ),
             Link(
-                href=f"{request.url}conformance",
+                href=base_url + "conformance",
                 rel="conformance",
                 title="Conformance Declaration in JSON",
                 type="application/json",
             ),
             Link(
-                href=f"{request.url}collections",
+                href=base_url + "collections",
                 rel="data",
                 title="Collections metadata in JSON",
             ),
