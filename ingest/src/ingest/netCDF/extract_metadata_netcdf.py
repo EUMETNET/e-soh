@@ -173,9 +173,9 @@ def build_all_json_payloads_from_netcdf(
     ```
     "name_of_field_in_the_mqtt_message": {
         "fields": [ a list of metadata fields to get from current variable ]
-        "inpt_type": "str" #This inpt_type will procude a string from all varibales
+        "inpt_type": "str" #This inpt_type will procure a string from all variables
                             listet in fields, separated by sep
-        "sep": "the seperator between each variable in fields
+        "sep": "the separator between each variable in fields
     }
 
     "name_of_field_in_the_mqtt_message": {
