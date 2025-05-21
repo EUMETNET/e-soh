@@ -455,7 +455,10 @@
         "symbol": "cm"
     },
     "ultraviolet_index": {
-        "unit": "index",
+        "unit": "unitless",
+        "alias": [
+            "index"
+        ],
         "symbol": "index"
     },
     "virtual_temperature": {
