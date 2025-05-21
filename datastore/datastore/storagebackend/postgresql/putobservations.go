@@ -250,41 +250,51 @@ func upsertTSs(
 
 	insertCmd := getUpsertStatement(len(mapTScolVals))
 
-	log.Printf("Before row insert")
-	rows, err := db.Query(insertCmd, phVals...)
-	if err != nil {
-		// TODO: Put this in a helper function... but we still need to see the line number of the calling function!
-		log.Printf("db.Query() failed: %v", err)
-		if e, ok := err.(*pq.Error); ok {
-			if len(e.Detail) > 0 {
-				log.Printf("db.Query() failed: DETAIL: %v", e.Detail)
+	//log.Printf("Before row insert")
+	for range 3 { // try at most 3 times
+		rows, err := db.Query(insertCmd, phVals...)
+		if err != nil {
+			// TODO: Put this in a helper function... but we still need to see the line number of the calling function!
+			log.Printf("db.Query() failed: %v", err)
+			if e, ok := err.(*pq.Error); ok {
+				if len(e.Detail) > 0 {
+					log.Printf("db.Query() failed: DETAIL: %v", e.Detail)
+				}
+				if len(e.Hint) > 0 {
+					log.Printf("db.Query() failed: HINT: %v", e.Hint)
+				}
 			}
-			if len(e.Hint) > 0 {
-				log.Printf("db.Query() failed: HINT: %v", e.Hint)
-			}
+			return nil, fmt.Errorf("tx.Query() failed: %v", err)
 		}
-		return nil, fmt.Errorf("tx.Query() failed: %v", err)
+
+		//log.Printf("After select query")
+
+		defer rows.Close()
+		colNamesUnique := getTSColNamesUnique()
+		var tsID int64
+		colValsStrings := make([]interface{}, len(colNamesUnique))
+		colValPtrs := []interface{}{&tsID}
+		for i := range colNamesUnique {
+			colValPtrs = append(colValPtrs, &colValsStrings[i])
+		}
+
+		tsIDmap := map[string]int64{}
+		for rows.Next() {
+			rows.Scan(colValPtrs...)
+			tsIDmap[fmt.Sprintf("%v", colValsStrings)] = tsID
+		}
+		//log.Printf("After getting data from rows query")
+
+		// Under concurrent load, if another process is adding the same entry, it might not be returned
+		// by this query. A simple solution is just to do the query again.
+		// See under "Concurrency issue 1" here: https://stackoverflow.com/a/42217872
+		if len(tsIDmap) == len(mapTScolVals) {
+			return tsIDmap, nil
+		}
+		log.Printf("In upsertTSs(): concurrency issue detected: 'len(tsIDmap)=%v', 'len(mapTScolVals)=%v', "+
+			"retrying db query...", len(tsIDmap), len(mapTScolVals))
 	}
-
-	log.Printf("After select query")
-
-	defer rows.Close()
-	colNamesUnique := getTSColNamesUnique()
-	var tsID int64
-	colValsStrings := make([]interface{}, len(colNamesUnique))
-	colValPtrs := []interface{}{&tsID}
-	for i := range colNamesUnique {
-		colValPtrs = append(colValPtrs, &colValsStrings[i])
-	}
-
-	tsIDmap := map[string]int64{}
-	for rows.Next() {
-		rows.Scan(colValPtrs...)
-		tsIDmap[fmt.Sprintf("%v", colValsStrings)] = tsID
-	}
-	log.Printf("After getting data from rows query")
-
-	return tsIDmap, nil
+	return nil, fmt.Errorf("upsertTSs() failed: still concurrency issues afer 3 retries")
 }
 
 // getObsTime extracts the obs time from obsMdata.
@@ -369,29 +379,39 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 	JOIN geo_point c USING (point)
 	`, strings.Join(valsExpr, ","))
 
-	rows, err := db.Query(cmd, phVals...)
-	if err != nil {
-		log.Printf("db.Query() failed: %v", err)
-		if e, ok := err.(*pq.Error); ok {
-			if len(e.Detail) > 0 {
-				log.Printf("db.Query() failed: DETAIL: %v", e.Detail)
+	for range 3 { // try at most 3 times
+		rows, err := db.Query(cmd, phVals...)
+		if err != nil {
+			log.Printf("db.Query() failed: %v", err)
+			if e, ok := err.(*pq.Error); ok {
+				if len(e.Detail) > 0 {
+					log.Printf("db.Query() failed: DETAIL: %v", e.Detail)
+				}
+				if len(e.Hint) > 0 {
+					log.Printf("db.Query() failed: HINT: %v", e.Hint)
+				}
 			}
-			if len(e.Hint) > 0 {
-				log.Printf("db.Query() failed: HINT: %v", e.Hint)
-			}
+			return nil, fmt.Errorf("tx.Query() failed: %v", err)
 		}
-		return nil, fmt.Errorf("tx.Query() failed: %v", err)
-	}
 
-	gpIDmap := map[string]int64{}
-	var id int64
-	var x, y float64
-	for rows.Next() {
-		rows.Scan(&id, &x, &y)
-		gpIDmap[fmt.Sprintf("%v %v", x, y)] = id
-	}
+		gpIDmap := map[string]int64{}
+		var id int64
+		var x, y float64
+		for rows.Next() {
+			rows.Scan(&id, &x, &y)
+			gpIDmap[fmt.Sprintf("%v %v", x, y)] = id
+		}
 
-	return gpIDmap, nil
+		// Under concurrent load, if another process is adding the same entry, it might not be returned
+		// by this query. A simple solution is just to do the query again.
+		// See under "Concurrency issue 1" here: https://stackoverflow.com/a/42217872
+		if len(gpIDmap) == len(points) {
+			return gpIDmap, nil
+		}
+		log.Printf("In getGeoPointIDs(): concurrency issue detected: 'len(gpIDmap)=%v', 'len(points)=%v', "+
+			"retrying db query...", len(gpIDmap), len(points))
+	}
+	return nil, fmt.Errorf("getGeoPointIDs() failed: still concurrency issues afer 3 retries")
 }
 
 // createInsertVals generates from (tsID, obsTimes, gpIDs, and omds) two arrays:
@@ -567,13 +587,13 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			return codes.Internal, fmt.Sprintf("getGeoPointIDs() failed: %v", err)
 		}
 
-		log.Printf("Returned %v unique points", len(gpIDMap))
+		//log.Printf("Returned %v unique points", len(gpIDMap))
 
 		tsIDMap, err := upsertTSs(sbe.Db, observations)
 		if err != nil {
 			return codes.Internal, fmt.Sprintf("upsertTSs() failed: %v", err)
 		}
-		log.Printf("Returned %v unique timseries", len(tsIDMap))
+		//log.Printf("Returned %v unique timseries", len(tsIDMap))
 
 		// populate tsInfos
 		for _, obs := range observations {
@@ -631,14 +651,14 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			*tsInfo0.omds = append(*tsInfo0.omds, obs.GetObsMdata())
 		}
 
-		log.Printf("Got tsInfo of size %v...", len(tsInfos))
+		//log.Printf("Got tsInfo of size %v...", len(tsInfos))
 
 		// insert/update observations for all time series in this chunck
 		if err := upsertObs(sbe.Db, tsInfos); err != nil {
 			return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
 		}
 
-		log.Printf("Inserted observations")
+		//log.Printf("Inserted observations")
 	}
 
 	return codes.OK, ""
