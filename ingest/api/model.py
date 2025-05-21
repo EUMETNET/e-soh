@@ -240,6 +240,7 @@ class Properties(BaseModel):
         ),
     )
     period_int: int = Field(None, exclude_from_schema=True)
+    camsl: int = Field(None, exclude_from_schema=True)
     function: Literal[
         "point",
         "sum",
@@ -289,6 +290,14 @@ class Properties(BaseModel):
         None,
         description="A textual description of the processing (or quality control) level of the data.",
     )
+    quality_code: Optional[int] = Field(
+        None,
+        description=("The quality of the data. " "Indicate controlled vocabulary used in quality_code_vocabulary."),
+    )
+    quality_code_vocabulary: Optional[str] = Field(
+        None,
+        description="Controlled vocabulary for the values used in the 'quality_code' attribute.",
+    )
     hamsl: Optional[int | float] = Field(
         None,
         description=(
@@ -303,17 +312,24 @@ class Properties(BaseModel):
         description="Specifies a checksum to be applied to the data to ensure that the download is accurate.",
     )
 
-    @field_validator("hamsl", mode="before")
-    @classmethod
-    def convert_hamsl_to_centimeters(cls, hamsl: float):
-        return int(hamsl * 100)
-
     @field_validator("period", mode="before")
     @classmethod
     def capitalize_period(cls, period: str):
         if isinstance(period, str):
             return period.upper()
         return period
+
+    @model_validator(mode="after")
+    def demand_qc_vocab(self):
+        if self.quality_code:
+            assert self.quality_code_vocabulary, "Quality code vocabulary is required if quality code is provided"
+        return self
+
+    @model_validator(mode="after")
+    def convert_hamsl_to_centimeters(self):
+        if self.hamsl:
+            self.camsl = int(self.hamsl * 100)
+        return self
 
     @model_validator(mode="after")
     def convert_to_cm(self):
