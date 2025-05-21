@@ -176,9 +176,8 @@ func getUpsertStatement(nRows int) string {
 			INSERT INTO time_series (%s)
 				SELECT * FROM input_rows
 				ON CONFLICT ON CONSTRAINT unique_main
-					DO UPDATE SET
-						%s        -- do update of fields not in unique constraint
-						WHERE %s  -- only if at least one values is actually different
+					DO UPDATE SET %s  -- do update of fields not in unique constraint
+						WHERE %s      -- only if at least one values is actually different
 				RETURNING id, %s  -- RETURNING only gives back rows that were actually inserterd or modified
 		)
 		SELECT id, %s  -- magic to get the id's for all rows'
@@ -254,6 +253,16 @@ func upsertTSs(
 	log.Printf("Before row insert")
 	rows, err := db.Query(insertCmd, phVals...)
 	if err != nil {
+		// TODO: Put this in a helper function... but we still need to see the line number of the calling function!
+		log.Printf("db.Query() failed: %v", err)
+		if e, ok := err.(*pq.Error); ok {
+			if len(e.Detail) > 0 {
+				log.Printf("db.Query() failed: DETAIL: %v", e.Detail)
+			}
+			if len(e.Hint) > 0 {
+				log.Printf("db.Query() failed: HINT: %v", e.Hint)
+			}
+		}
 		return nil, fmt.Errorf("tx.Query() failed: %v", err)
 	}
 
@@ -362,7 +371,16 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 
 	rows, err := db.Query(cmd, phVals...)
 	if err != nil {
-		return nil, fmt.Errorf("tx.QueryRow() failed: %v", err)
+		log.Printf("db.Query() failed: %v", err)
+		if e, ok := err.(*pq.Error); ok {
+			if len(e.Detail) > 0 {
+				log.Printf("db.Query() failed: DETAIL: %v", e.Detail)
+			}
+			if len(e.Hint) > 0 {
+				log.Printf("db.Query() failed: HINT: %v", e.Hint)
+			}
+		}
+		return nil, fmt.Errorf("tx.Query() failed: %v", err)
 	}
 
 	gpIDmap := map[string]int64{}
@@ -479,7 +497,8 @@ func upsertObs(
 			camsl,
 			value)
 		VALUES %s
-		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE SET
+		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE 
+		SET
 	    	id = EXCLUDED.id,
 	 		geo_point_id = EXCLUDED.geo_point_id,
 	 		pubtime = EXCLUDED.pubtime,
@@ -489,10 +508,28 @@ func upsertObs(
 			quality_code = EXCLUDED.quality_code,
 			camsl = EXCLUDED.camsl,
 	 		value = EXCLUDED.value
+		WHERE 
+		    observation.id IS DISTINCT FROM EXCLUDED.id OR
+			observation.geo_point_id IS DISTINCT FROM EXCLUDED.geo_point_id OR
+			observation.pubtime IS DISTINCT FROM EXCLUDED.pubtime OR
+			observation.data_id IS DISTINCT FROM EXCLUDED.data_id OR
+			observation.history IS DISTINCT FROM EXCLUDED.history OR
+			observation.processing_level IS DISTINCT FROM EXCLUDED.processing_level OR
+			observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code OR
+			observation.camsl IS DISTINCT FROM EXCLUDED.camsl
 	`, strings.Join(valsExpr, ","))
 
 	_, err := db.Exec(cmd, phVals...)
 	if err != nil {
+		log.Printf("db.Exec() failed: %v", err)
+		if e, ok := err.(*pq.Error); ok {
+			if len(e.Detail) > 0 {
+				log.Printf("db.Exec() failed: DETAIL: %v", e.Detail)
+			}
+			if len(e.Hint) > 0 {
+				log.Printf("db.Exec() failed: HINT: %v", e.Hint)
+			}
+		}
 		return fmt.Errorf("db.Exec() failed: %v", err)
 	}
 
@@ -508,7 +545,8 @@ type tsInfo struct {
 // PutObservations ... (see documentation in StorageBackend interface)
 func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.Code, string) {
 
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	// TODO: Move this to init
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
 	log.Printf("Entered PutObservations with %v observations...", len(request.Observations))
 
 	// Chunk observations by 2000, as otherwise the SQL queries have to many parameters
