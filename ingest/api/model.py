@@ -240,6 +240,7 @@ class Properties(BaseModel):
         ),
     )
     period_int: int = Field(None, exclude_from_schema=True)
+    camsl: int = Field(None, exclude_from_schema=True)
     function: Literal[
         "point",
         "sum",
@@ -311,17 +312,18 @@ class Properties(BaseModel):
         description="Specifies a checksum to be applied to the data to ensure that the download is accurate.",
     )
 
-    @field_validator("hamsl", mode="before")
-    @classmethod
-    def convert_hamsl_to_centimeters(cls, hamsl: float):
-        return int(hamsl * 100)
-
     @field_validator("period", mode="before")
     @classmethod
     def capitalize_period(cls, period: str):
         if isinstance(period, str):
             return period.upper()
         return period
+
+    @model_validator(mode="after")
+    def convert_hamsl_to_centimeters(self):
+        if self.hamsl:
+            self.camsl = int(self.hamsl * 100)
+        return self
 
     @model_validator(mode="after")
     def convert_to_cm(self):
