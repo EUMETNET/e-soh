@@ -48,7 +48,7 @@ service Datastore {
   rpc GetExtents(GetExtentsRequest) returns (GetExtentsResponse);
 
   // get distinct locations
-  rpc GetLocations(GetLocationsRequest) returns (GetLocationsResponse);
+  rpc GetLocations(GetLocsRequest) returns (GetLocsResponse);
 }
 
 //---------------------------------------------------------------------------
@@ -320,8 +320,13 @@ message GetExtentsResponse {
 
 //---------------------------------------------------------------------------
 
-message GetLocationsRequest {
-  // No parameters
+message GetLocsRequest {
+  // NOTE: the below fields have the same meaning as in GetObsRequest
+  bool temporal_latest = 1;
+  TimeInterval temporal_interval = 2;
+  Polygon spatial_polygon = 3;
+  Circle spatial_circle = 4;
+  map<string, Strings> filter = 5;
 }
 
 message LocMetadata {
@@ -331,7 +336,7 @@ message LocMetadata {
   repeated string parameter_names = 4 [json_name = "parameter_names"];
 }
 
-message GetLocationsResponse {
+message GetLocsResponse {
   int32 status = 1;
   string error = 2; // any error description (empty on success)
   repeated LocMetadata locations = 3;

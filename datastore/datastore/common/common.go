@@ -177,6 +177,28 @@ type TemporalSpec struct {
 	Interval *datastore.TimeInterval
 }
 
+// GetTemporalSpec derives and validates a temporal specification from 'latest' and 'interval'.
+//
+// Returns (spec, nil) upon success, otherwise (..., error).
+func GetTemporalSpec(latest bool, interval *datastore.TimeInterval) (TemporalSpec, error) {
+
+	tspec := TemporalSpec{
+		Latest:   latest,
+		Interval: interval,
+	}
+
+	ti := tspec.Interval
+	if ti != nil { // validate
+		if ti.Start != nil && ti.End != nil {
+			if ti.End.AsTime().Before(ti.Start.AsTime()) {
+				return TemporalSpec{}, fmt.Errorf("end(%v) < start(%v)", ti.End, ti.Start)
+			}
+		}
+	}
+
+	return tspec, nil
+}
+
 type StringSet map[string]struct{}
 
 // Contains returns true iff sset contains val.

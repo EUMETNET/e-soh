@@ -37,6 +37,6 @@ type StorageBackend interface {
 
 	// GetLocations gets the locations of the most recent observation of the distinct platforms
 	// currently represented in the storage.
-	GetLocations(*datastore.GetLocationsRequest) (
-		*datastore.GetLocationsResponse, codes.Code, string)
+	GetLocations(*datastore.GetLocsRequest, common.TemporalSpec) (
+		*datastore.GetLocsResponse, codes.Code, string)
 }
