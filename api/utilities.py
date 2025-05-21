@@ -8,7 +8,6 @@ from typing import Tuple
 import datastore_pb2 as dstore
 import isodate
 from fastapi import HTTPException
-from fastapi import Request
 from google.protobuf.timestamp_pb2 import Timestamp
 from grpc_getter import get_ts_ag_request
 from isodate import ISO8601Error
