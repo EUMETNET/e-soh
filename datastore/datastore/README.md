@@ -529,7 +529,6 @@ $ grpcurl -d '{"spatial_polygon": {"points": [{"lat": 52.0, "lon": 3.0}, {"lat":
 ...
 ```
 
-
 ## Testing the datastore service with a Python client
 
 ### Compiling the protobuf file
