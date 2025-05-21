@@ -79,6 +79,7 @@ async def get_collections(request: Request) -> Collections:
     base_url = create_url_from_request(request)
     return await metadata_endpoints.get_collections(base_url, all_collections)
 
+
 def create_collection_metadata_endpoint(collection_id: str):
     async def collection_metadata(request: Request) -> Collection:
         base_url = create_url_from_request(request)

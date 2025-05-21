@@ -1,16 +1,16 @@
 import logging
 import os
+from typing import List
 
 from fastapi import FastAPI
-from fastapi import UploadFile
 from fastapi import Request
+from fastapi import UploadFile
 from pydantic import BaseModel
 
-from typing import List
-from api.ingest import IngestToPipeline
-from api.model import JsonMessageSchema
-from api.messages import build_json_payload
 from api.api_metrics import add_metrics
+from api.ingest import IngestToPipeline
+from api.messages import build_json_payload
+from api.model import JsonMessageSchema
 
 log_level = os.environ.get("INGEST_LOGLEVEL", "INFO")
 

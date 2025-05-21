@@ -4,6 +4,7 @@ from datetime import timezone
 from typing import Dict
 
 import datastore_pb2 as dstore
+from constants.qudt_unit_dict import qudt_unit_dict
 from edr_pydantic.capabilities import ConformanceModel
 from edr_pydantic.capabilities import Contact
 from edr_pydantic.capabilities import LandingPageModel
@@ -21,14 +22,13 @@ from edr_pydantic.link import Link
 from edr_pydantic.observed_property import ObservedProperty
 from edr_pydantic.parameter import MeasurementType
 from edr_pydantic.parameter import Parameter
-from edr_pydantic.unit import Unit
 from edr_pydantic.unit import Symbol
+from edr_pydantic.unit import Unit
 from edr_pydantic.variables import Variables
 from grpc_getter import get_extents_request
 from grpc_getter import get_ts_ag_request
-from openapi.openapi_metadata import openapi_metadata
 from openapi.collections_metadata import collections_metadata
-from constants.qudt_unit_dict import qudt_unit_dict
+from openapi.openapi_metadata import openapi_metadata
 from utilities import convert_cm_to_m
 from utilities import get_unique_values_for_metadata
 from utilities import seconds_to_iso_8601_duration
