@@ -5,6 +5,7 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
+	"sort"
 
 	"github.com/cridenour/go-postgis"
 	_ "github.com/lib/pq"
@@ -69,15 +70,24 @@ func getLocs(
 
 	var (
 		point            postgis.PointS
-		currPoint        postgis.PointS
+		currPoints       []postgis.PointS
 		platform         string
 		currPlatform     string
 		platformName     sql.NullString
 		currPlatformName sql.NullString
 		paramName        string
-		currParamName    string
 		currParamNames   []string
 	)
+
+	getRepresentativePoint := func(points *[]postgis.PointS) postgis.PointS {
+		sort.Slice(*points, func(i, j int) bool {
+			if (*points)[i].Y != (*points)[j].Y { // sort primarily on latitude ...
+				return (*points)[i].Y < (*points)[j].Y
+			}
+			return (*points)[i].X < (*points)[j].X // ... and secondarily on longitude
+		})
+		return (*points)[0]
+	}
 
 	for rows.Next() {
 
@@ -88,25 +98,32 @@ func getLocs(
 
 		if platform != currPlatform { // next platform, possibly the first one!
 			if currPlatform != "" { // add for previous platform
-				addResultItem(currPoint, currPlatform, currPlatformName.String, currParamNames)
+				if len(currPoints) == 0 {
+					return fmt.Errorf("programming error [1]: len(currPoints) == 0")
+				}
+				addResultItem(
+					getRepresentativePoint(&currPoints), currPlatform, currPlatformName.String,
+					currParamNames)
 			}
 
 			// start new result item
 			currPlatform = platform
+			currPoints = []postgis.PointS{}
 			currParamNames = []string{}
 		}
 
-		// update what's now current
-		currPoint = point
+		currPoints = append(currPoints, point)
 		currPlatformName = platformName
-		currParamName = paramName
-
-		// add param name for current result item
-		currParamNames = append(currParamNames, currParamName)
+		currParamNames = append(currParamNames, paramName)
 	}
 
 	if len(currParamNames) > 0 { // add for current platform
-		addResultItem(currPoint, currPlatform, currPlatformName.String, currParamNames)
+		if len(currPoints) == 0 {
+			return fmt.Errorf("programming error [2]: len(currPoints) == 0")
+		}
+		addResultItem(
+			getRepresentativePoint(&currPoints), currPlatform, currPlatformName.String,
+			currParamNames)
 	}
 
 	return nil
