@@ -148,17 +148,54 @@ func getUpsertTSInsertCmd(nRows int) string {
 		updateExpr = append(updateExpr, fmt.Sprintf("%s = EXCLUDED.%s", col, col))
 	}
 
+	updateWhereExpr := []string{}
+	for _, col := range getTSColNamesUniqueCompl() {
+		updateWhereExpr = append(updateWhereExpr, fmt.Sprintf("time_series.%s IS DISTINCT FROM EXCLUDED.%s", col, col))
+	}
+
 	insertCmd := fmt.Sprintf(`
-		INSERT INTO time_series (%s) VALUES %s
-		ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
-		RETURNING id,%s
+		WITH input_rows AS (
+			(SELECT %s FROM time_series LIMIT 0)  -- only copies column names and types
+			UNION ALL
+			VALUES %s
+		)
+		, ins AS (
+			INSERT INTO time_series (%s)
+				SELECT * FROM input_rows
+				ON CONFLICT ON CONSTRAINT unique_main
+					DO UPDATE SET
+						%s
+						WHERE %s
+				RETURNING id, %s
+		)
+		SELECT id, %s
+		FROM   ins
+		UNION
+		SELECT ts.id, %s
+		FROM   input_rows
+		JOIN   time_series ts USING (%s);
 		`,
 		strings.Join(cols, ","),
 		strings.Join(formats, ","),
+		strings.Join(cols, ","),
 		strings.Join(updateExpr, ","),
+		strings.Join(updateWhereExpr, " OR "),
+		strings.Join(colsUnique, ","),
+		strings.Join(colsUnique, ","),
+		strings.Join(colsUnique, ","),
 		strings.Join(colsUnique, ","),
 	)
-	//log.Printf("Insert: %v", insertCmd)
+	//insertCmd := fmt.Sprintf(`
+	//	INSERT INTO time_series (%s) VALUES %s
+	//	ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
+	//	RETURNING id,%s
+	//	`,
+	//	strings.Join(cols, ","),
+	//	strings.Join(formats, ","),
+	//	strings.Join(updateExpr, ","),
+	//	strings.Join(colsUnique, ","),
+	//)
+	log.Printf("Insert: %v", insertCmd)
 	return insertCmd
 }
 
@@ -243,6 +280,7 @@ func upsertTSs(
 	defer tx.Rollback()
 
 	log.Printf("Before row insert")
+	log.Printf("%t", phVals)
 
 	//// STEP 1: upsert row
 	//_, err = tx.Exec(insertCmd, phVals...)
@@ -353,7 +391,7 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 		index += len(phVals0)
 	}
 
-	// TODO: Do we need a transaction here?
+	// TODO: Do we need a transaction here? Definitely not anymore...
 	// Get a Tx for making transaction requests.
 	tx, err := db.Begin()
 	if err != nil {
@@ -363,9 +401,21 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 	defer tx.Rollback()
 
 	cmd := fmt.Sprintf(`
-		INSERT INTO geo_point (point) VALUES %s
-		ON CONFLICT (point) DO UPDATE SET point = EXCLUDED.point
-		RETURNING id, ST_X(point::geometry), ST_Y(point::geometry)
+	WITH input_rows AS (
+		(SELECT point FROM geo_point LIMIT 0)  -- only copies column names and types
+		UNION ALL
+		VALUES %s
+	)
+   , ins AS (
+		INSERT INTO geo_point (point)
+			SELECT * FROM input_rows
+			ON CONFLICT (point) DO NOTHING
+			RETURNING id, point
+	)
+	SELECT id, ST_X(point::geometry), ST_Y(point::geometry) FROM ins
+	UNION
+	SELECT c.id, ST_X(c.point::geometry), ST_Y(c.point::geometry) FROM input_rows
+	JOIN geo_point c USING (point)
 	`, strings.Join(valsExpr, ","))
 
 	//_, err = tx.Exec(cmd, phVals...)
