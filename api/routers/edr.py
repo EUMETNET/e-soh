@@ -16,6 +16,7 @@ from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import Path
 from fastapi import Query
+from fastapi import Request
 from formatters.covjson import make_parameter
 from geojson_pydantic import Feature
 from geojson_pydantic import Point
@@ -56,6 +57,7 @@ response_fields_needed_for_data_api = [
 # We can currently only query data, even if we only need metadata like for this endpoint
 # Maybe it would be better to only query a limited set of data instead of everything (meaning 24 hours)
 async def get_locations(
+    request: Request,
     bbox: Annotated[
         str | None,
         Query(
@@ -139,10 +141,11 @@ async def get_locations(
                     "name": loc.platform_name if loc.platform_name else f"platform-{loc.platform}",
                     "detail": f"https://oscar.wmo.int/surface/rest/api/search/station?wigosId={loc.platform}",
                     "parameter-name": sorted(loc.parameter_names),
-                },
-                geometry=Point(
-                    type="Point",
-                    coordinates=(loc.geo_point.lon, loc.geo_point.lat),
+                "item": str(request.base_url) + "collections/observations/items?platform=" + station_id,
+            },
+            geometry=Point(
+                type="Point",
+                coordinates=(loc.geo_point.lon, loc.geo_point.lat),
                 ),
             )
         )
