@@ -26,7 +26,6 @@ def build_grpc_messages(msg: str) -> None:
     """
     ts_metadata = dstore.TSMetadata()
     field_list_ts = ts_metadata.DESCRIPTOR.fields_by_name.keys()
-
     for i in field_list_ts:
         if i in msg["properties"]:
             setattr(ts_metadata, i, msg["properties"][i])
@@ -49,6 +48,7 @@ def build_grpc_messages(msg: str) -> None:
 
     observation_data = dstore.ObsMetadata()
     field_list_obs = observation_data.DESCRIPTOR.fields_by_name.keys()
+
     for i in field_list_obs:
         if i == "obstime_instant":
             if "datetime" in msg["properties"]:
