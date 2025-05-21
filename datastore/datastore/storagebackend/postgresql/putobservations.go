@@ -132,6 +132,11 @@ func getUpsertTSInsertCmd(nRows int) string {
 	cols := getTSColNames()
 	colsUnique := getTSColNamesUnique()
 
+	valuesColumns := []string{}
+	for _, col := range getTSColNames() {
+		valuesColumns = append(valuesColumns, fmt.Sprintf("(NULL::time_series).%s", col))
+	}
+
 	formats := make([]string, nRows)
 	index := 1
 	for i := 0; i < nRows; i++ {
@@ -153,11 +158,19 @@ func getUpsertTSInsertCmd(nRows int) string {
 		updateWhereExpr = append(updateWhereExpr, fmt.Sprintf("time_series.%s IS DISTINCT FROM EXCLUDED.%s", col, col))
 	}
 
+	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load".
+	// with the following modificaitons:
+	// 1. Using ON CONFLICT UPDATE (instead of NOTHING), but only doing an update if at least one of the values
+	//    actually changed (to avoid table trashing).
+	// 2. Use approach 5 of https://stackoverflow.com/a/12427434 to avoid having to provide types for the input VALUES
+	// TODO: Check if we need the "With concurrent write load solution"
 	insertCmd := fmt.Sprintf(`
 		WITH input_rows AS (
-			(SELECT %s FROM time_series LIMIT 0)  -- only copies column names and types
-			UNION ALL
-			VALUES %s
+			SELECT * FROM (
+				VALUES
+					(%s),
+					%s
+			) t (%s) OFFSET 1
 		)
 		, ins AS (
 			INSERT INTO time_series (%s)
@@ -175,8 +188,9 @@ func getUpsertTSInsertCmd(nRows int) string {
 		FROM   input_rows
 		JOIN   time_series ts USING (%s);
 		`,
-		strings.Join(cols, ","),
+		strings.Join(valuesColumns, ","),
 		strings.Join(formats, ","),
+		strings.Join(cols, ","),
 		strings.Join(cols, ","),
 		strings.Join(updateExpr, ","),
 		strings.Join(updateWhereExpr, " OR "),
@@ -195,7 +209,7 @@ func getUpsertTSInsertCmd(nRows int) string {
 	//	strings.Join(updateExpr, ","),
 	//	strings.Join(colsUnique, ","),
 	//)
-	log.Printf("Insert: %v", insertCmd)
+	//log.Printf("Insert: %v", insertCmd)
 	return insertCmd
 }
 
@@ -280,7 +294,7 @@ func upsertTSs(
 	defer tx.Rollback()
 
 	log.Printf("Before row insert")
-	log.Printf("%t", phVals)
+	//log.Printf("%t", phVals)
 
 	//// STEP 1: upsert row
 	//_, err = tx.Exec(insertCmd, phVals...)
@@ -296,6 +310,7 @@ func upsertTSs(
 	//rows, err := tx.Query(selectCmd, phValsConstraint...)
 	rows, err := tx.Query(insertCmd, phVals...)
 	if err != nil {
+		//log.Printf("%v", err)
 		return nil, fmt.Errorf("tx.Query() failed: %v", err)
 	}
 
@@ -538,6 +553,7 @@ func upsertObs(
 	phVals := []interface{}{}
 	createInsertVals(tsInfos, &valsExpr, &phVals)
 
+	// TODO?: This also trashes the table if we overwrite an observation. But how often does that happen?
 	cmd := fmt.Sprintf(`
 		INSERT INTO observation (
 			ts_id,
