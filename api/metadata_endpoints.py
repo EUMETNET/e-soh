@@ -30,7 +30,6 @@ from openapi.openapi_metadata import openapi_metadata
 from openapi.collections_metadata import collections_metadata
 from constants.qudt_unit_dict import qudt_unit_dict
 from utilities import convert_cm_to_m
-from utilities import get_base_url_from_request
 from utilities import get_unique_values_for_metadata
 from utilities import seconds_to_iso_8601_duration
 
@@ -61,7 +60,7 @@ def datetime_to_iso_string(value: datetime) -> str:
 
 
 def get_landing_page(request):
-    base_url = get_base_url_from_request(request)
+    base_url = str(request.base_url)
 
     return LandingPageModel(
         title=openapi_metadata["title"],
@@ -88,25 +87,25 @@ def get_landing_page(request):
                 type="application/json",
             ),
             Link(
-                href=base_url + "/docs",
+                href=base_url + "docs",
                 rel="service-doc",
                 title="API description in HTML",
                 type="text/html",
             ),
             Link(
-                href=base_url + "/openapi.json",
+                href=base_url + "openapi.json",
                 rel="service-desc",
                 title="API description in JSON",
                 type="application/vnd.oai.openapi+json;version=3.1",
             ),
             Link(
-                href=base_url + "/conformance",
+                href=base_url + "conformance",
                 rel="conformance",
                 title="Conformance Declaration in JSON",
                 type="application/json",
             ),
             Link(
-                href=base_url + "/collections",
+                href=base_url + "collections",
                 rel="data",
                 title="Collections metadata in JSON",
             ),

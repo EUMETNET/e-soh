@@ -18,7 +18,6 @@ from jinja2 import select_autoescape
 from openapi import openapi_examples
 from response_classes import GeoJsonResponse
 from shapely import geometry
-from utilities import get_base_url_from_request
 from utilities import get_datetime_range
 from utilities import split_and_strip
 
@@ -157,7 +156,7 @@ async def get_time_series_by_id(
 
 @router.get("/dataset", tags=["E-SOH dataset"], include_in_schema=False)
 async def get_dataset_metadata(request: Request):
-    base_url = get_base_url_from_request(request)
+    base_url = str(request.base_url)
 
     # need to get spatial extent.
     spatial_request = dstore.GetExtentsRequest()
@@ -179,8 +178,8 @@ async def get_dataset_metadata(request: Request):
             ],
         ],
         "url_base": base_url,
-        "url_conformance": base_url + "/conformance",
-        "url_docs": base_url + "/docs",
+        "url_conformance": base_url + "conformance",
+        "url_docs": base_url + "docs",
     }
 
     template = env.get_template("dataset_metadata_template.j2")

@@ -1,7 +1,6 @@
 import logging
 import os
 
-from api.utilities import get_base_url_from_request
 from fastapi import FastAPI
 from fastapi import UploadFile
 from fastapi import Request
@@ -90,6 +89,6 @@ async def post_json(
     else:
         json_data = [request.model_dump(exclude_none=True)]
 
-    await ingester.ingest(json_data, publishWIS2, get_base_url_from_request(http_request))
+    await ingester.ingest(json_data, publishWIS2, str(http_request.base_url))
 
     return Response(status_message=status, status_code=200)
