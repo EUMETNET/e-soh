@@ -3,6 +3,7 @@
 import math
 import os
 import requests
+import random
 import json
 from multiprocessing import cpu_count, Pool
 from pathlib import Path
@@ -69,6 +70,7 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
                     "creator_url": file["iso_dataset"].attrs["url_metadata"],
                     "creator_type": "institution",
                     "institution": file.attrs["institution"],
+                    "hamsl": random.choice([1, 2, 3]),
                 }
 
                 geometry = {

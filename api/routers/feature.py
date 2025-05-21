@@ -92,6 +92,12 @@ async def search_timeseries(
             description="Aggregation method used to sample observed property", openapi_examples=openapi_examples.method
         ),
     ] = None,
+    hamsl: Annotated[
+        str | None,
+        Query(
+            description="Height above mean sea level, in meters",
+        ),
+    ] = None,
     f: Annotated[
         formatters.Metadata_Formats, Query(description="Specify return format")
     ] = formatters.Metadata_Formats.geojson,
@@ -117,6 +123,7 @@ async def search_timeseries(
             level=dstore.Strings(values=split_and_strip(level) if level else None),
             period=dstore.Strings(values=split_and_strip(period) if period else None),
             function=dstore.Strings(values=split_and_strip(method) if method else None),
+            camsl=dstore.Strings(values=split_and_strip(hamsl) if hamsl else None),
         ),
         spatial_polygon=(
             dstore.Polygon(points=[dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords])
