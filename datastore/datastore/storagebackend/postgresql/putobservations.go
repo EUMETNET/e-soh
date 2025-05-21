@@ -497,7 +497,7 @@ func upsertObs(
 			camsl,
 			value)
 		VALUES %s
-		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE 
+		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE
 		SET
 	    	id = EXCLUDED.id,
 	 		geo_point_id = EXCLUDED.geo_point_id,
@@ -508,7 +508,7 @@ func upsertObs(
 			quality_code = EXCLUDED.quality_code,
 			camsl = EXCLUDED.camsl,
 	 		value = EXCLUDED.value
-		WHERE 
+		WHERE
 		    observation.id IS DISTINCT FROM EXCLUDED.id OR
 			observation.geo_point_id IS DISTINCT FROM EXCLUDED.geo_point_id OR
 			observation.pubtime IS DISTINCT FROM EXCLUDED.pubtime OR
