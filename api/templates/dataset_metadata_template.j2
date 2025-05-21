@@ -83,19 +83,19 @@
             "type": "application/json"
         },
         {
-            "href": "{{ url_base }}",
+            "href": {{ url_base|tojson }},
             "rel": "data",
             "title": "E-SOH EDR API landing page",
             "type": "application/json"
         },
         {
-            "href": "{{ url_docs }}",
+            "href": {{ url_docs|tojson }},
             "rel": "related",
             "title": "E-SOH API documentation",
             "type": "application/json"
         },
         {
-            "href": "{{ url_conformance }}",
+            "href": {{ url_conformance|tojson }},
             "rel": "conformance",
             "title": "E-SOH Conformance Declaration",
             "type": "application/json"
