@@ -320,6 +320,12 @@ class Properties(BaseModel):
         return period
 
     @model_validator(mode="after")
+    def demand_qc_vocab(self):
+        if self.quality_code:
+            assert self.quality_code_vocabulary, "Quality code vocabulary is required if quality code is provided"
+        return self
+
+    @model_validator(mode="after")
     def convert_hamsl_to_centimeters(self):
         if self.hamsl:
             self.camsl = int(self.hamsl * 100)
