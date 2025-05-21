@@ -240,6 +240,7 @@ class Properties(BaseModel):
         ),
     )
     period_int: int = Field(None, exclude_from_schema=True)
+    camsl: int = Field(None, exclude_from_schema=True)
     function: Literal[
         "point",
         "sum",
@@ -289,6 +290,22 @@ class Properties(BaseModel):
         None,
         description="A textual description of the processing (or quality control) level of the data.",
     )
+    quality_code: Optional[int] = Field(
+        None,
+        description=("The quality of the data. " "Indicate controlled vocabulary used in quality_code_vocabulary."),
+    )
+    quality_code_vocabulary: Optional[str] = Field(
+        None,
+        description="Controlled vocabulary for the values used in the 'quality_code' attribute.",
+    )
+    hamsl: Optional[int | float] = Field(
+        None,
+        description=(
+            "The number of meters above mean sea level. "
+            "The reference point is the ground position of the station for stationary data, or "
+            "the sensor itself for mobile data."
+        ),
+    )
     content: Content = Field(..., description="Actual data content")
     integrity: Optional[Integrity] = Field(
         None,
@@ -301,6 +318,18 @@ class Properties(BaseModel):
         if isinstance(period, str):
             return period.upper()
         return period
+
+    @model_validator(mode="after")
+    def demand_qc_vocab(self):
+        if self.quality_code:
+            assert self.quality_code_vocabulary, "Quality code vocabulary is required if quality code is provided"
+        return self
+
+    @model_validator(mode="after")
+    def convert_hamsl_to_centimeters(self):
+        if self.hamsl:
+            self.camsl = int(self.hamsl * 100)
+        return self
 
     @model_validator(mode="after")
     def convert_to_cm(self):

@@ -8,10 +8,16 @@
     "collections": [
         {
             "id": "observations",
+            "title": "Meteorological Observations in Europe",
             "links": [
                 {
                     "href": "http://localhost:8008/collections/observations",
                     "rel": "data"
+                },
+                {
+                    "href": "https://creativecommons.org/licenses/by/4.0/",
+                    "rel": "license",
+                    "type": "text/html"
                 }
             ],
             "extent": {
@@ -24,7 +30,7 @@
                             55.399166666667
                         ]
                     ],
-                    "crs": "EPSG:4326"
+                    "crs": "OGC:CRS84"
                 },
                 "temporal": {
                     "interval": [
@@ -36,7 +42,7 @@
                     "values": [
                         "2022-12-31T00:00:00Z/2022-12-31T23:50:00Z"
                     ],
-                    "trs": "datetime"
+                    "trs": "Gregorian"
                 },
                 "custom": [
                     {
@@ -162,7 +168,7 @@
                 }
             },
             "crs": [
-                "WGS84"
+                "OGC:CRS84"
             ],
             "output_formats": [
                 "CoverageJSON"
@@ -170,9 +176,14 @@
             "parameter_names": {
                 "air_pressure_at_mean_sea_level:1.0:mean:PT1M": {
                     "type": "Parameter",
+                    "label": "Air pressure at mean sea level",
                     "description": "Air pressure at mean sea level at 1.0m, aggregated over PT1M with method 'mean'",
                     "unit": {
-                        "label": "hPa"
+                        "label": "hPa",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/HectoPA",
+                            "value": "hPa"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_pressure_at_mean_sea_level",
@@ -182,14 +193,19 @@
                         "method": "mean",
                         "duration": "PT1M"
                     },
-                    "rodeo:standard_name": "air_pressure_at_mean_sea_level",
-                    "rodeo:level": 1.0
+                    "metocean:standard_name": "air_pressure_at_mean_sea_level",
+                    "metocean:level": 1.0
                 },
                 "air_temperature:0.1:minimum:PT10M": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 0.1m, aggregated over PT10M with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -199,14 +215,19 @@
                         "method": "minimum",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 0.1
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 0.1
                 },
                 "air_temperature:0.0:minimum:PT12H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 0.0m, aggregated over PT12H with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -216,14 +237,19 @@
                         "method": "minimum",
                         "duration": "PT12H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 0.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 0.0
                 },
                 "air_temperature:0.0:minimum:PT14H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 0.0m, aggregated over PT14H with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -233,14 +259,19 @@
                         "method": "minimum",
                         "duration": "PT14H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 0.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 0.0
                 },
                 "air_temperature:0.0:minimum:PT6H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 0.0m, aggregated over PT6H with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -250,14 +281,19 @@
                         "method": "minimum",
                         "duration": "PT6H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 0.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 0.0
                 },
                 "air_temperature:1.5:maximum:PT10M": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 1.5m, aggregated over PT10M with method 'maximum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -267,14 +303,19 @@
                         "method": "maximum",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 1.5
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 1.5
                 },
                 "air_temperature:1.5:minimum:PT10M": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 1.5m, aggregated over PT10M with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -284,14 +325,19 @@
                         "method": "minimum",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 1.5
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 1.5
                 },
                 "air_temperature:2.0:maximum:PT12H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 2.0m, aggregated over PT12H with method 'maximum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -301,14 +347,19 @@
                         "method": "maximum",
                         "duration": "PT12H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 },
                 "air_temperature:2.0:maximum:PT24H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 2.0m, aggregated over PT24H with method 'maximum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -318,14 +369,19 @@
                         "method": "maximum",
                         "duration": "PT24H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 },
                 "air_temperature:2.0:maximum:PT6H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 2.0m, aggregated over PT6H with method 'maximum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -335,14 +391,19 @@
                         "method": "maximum",
                         "duration": "PT6H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 },
                 "air_temperature:2.0:mean:PT1M": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 2.0m, aggregated over PT1M with method 'mean'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -352,14 +413,19 @@
                         "method": "mean",
                         "duration": "PT1M"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 },
                 "air_temperature:2.0:minimum:PT12H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 2.0m, aggregated over PT12H with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -369,14 +435,19 @@
                         "method": "minimum",
                         "duration": "PT12H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 },
                 "air_temperature:2.0:minimum:PT14H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 2.0m, aggregated over PT14H with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -386,14 +457,19 @@
                         "method": "minimum",
                         "duration": "PT14H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 },
                 "air_temperature:2.0:minimum:PT6H": {
                     "type": "Parameter",
+                    "label": "Air temperature",
                     "description": "Air temperature at 2.0m, aggregated over PT6H with method 'minimum'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
@@ -403,14 +479,19 @@
                         "method": "minimum",
                         "duration": "PT6H"
                     },
-                    "rodeo:standard_name": "air_temperature",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 2.0
                 },
                 "cloud_area_fraction:2.0:point:PT0S": {
                     "type": "Parameter",
+                    "label": "Cloud area fraction",
                     "description": "Cloud area fraction at 2.0m, aggregated over PT0S with method 'point'",
                     "unit": {
-                        "label": "oktas"
+                        "label": "okta",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/OKTA",
+                            "value": "okta"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/cloud_area_fraction",
@@ -420,14 +501,19 @@
                         "method": "point",
                         "duration": "PT0S"
                     },
-                    "rodeo:standard_name": "cloud_area_fraction",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "cloud_area_fraction",
+                    "metocean:level": 2.0
                 },
                 "cloud_base_altitude:2.0:point:PT0S": {
                     "type": "Parameter",
+                    "label": "Cloud base altitude",
                     "description": "Cloud base altitude at 2.0m, aggregated over PT0S with method 'point'",
                     "unit": {
-                        "label": "m"
+                        "label": "m",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/M",
+                            "value": "m"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/cloud_base_altitude",
@@ -437,14 +523,19 @@
                         "method": "point",
                         "duration": "PT0S"
                     },
-                    "rodeo:standard_name": "cloud_base_altitude",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "cloud_base_altitude",
+                    "metocean:level": 2.0
                 },
                 "dew_point_temperature:1.5:mean:PT1M": {
                     "type": "Parameter",
+                    "label": "Dew point temperature",
                     "description": "Dew point temperature at 1.5m, aggregated over PT1M with method 'mean'",
                     "unit": {
-                        "label": "degC"
+                        "label": "Cel",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG_C",
+                            "value": "°C"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/dew_point_temperature",
@@ -454,14 +545,19 @@
                         "method": "mean",
                         "duration": "PT1M"
                     },
-                    "rodeo:standard_name": "dew_point_temperature",
-                    "rodeo:level": 1.5
+                    "metocean:standard_name": "dew_point_temperature",
+                    "metocean:level": 1.5
                 },
                 "duration_of_sunshine:2.0:point:PT0S": {
                     "type": "Parameter",
+                    "label": "Duration of sunshine",
                     "description": "Duration of sunshine at 2.0m, aggregated over PT0S with method 'point'",
                     "unit": {
-                        "label": "s"
+                        "label": "s",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/SEC",
+                            "value": "s"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/duration_of_sunshine",
@@ -471,14 +567,19 @@
                         "method": "point",
                         "duration": "PT0S"
                     },
-                    "rodeo:standard_name": "duration_of_sunshine",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "duration_of_sunshine",
+                    "metocean:level": 2.0
                 },
                 "lwe_precipitation_rate:1.8:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Lwe precipitation rate",
                     "description": "Lwe precipitation rate at 1.8m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "mm/h"
+                        "label": "mm/h",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/MilliM-PER-HR",
+                            "value": "mm/h"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/lwe_precipitation_rate",
@@ -488,14 +589,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "lwe_precipitation_rate",
-                    "rodeo:level": 1.8
+                    "metocean:standard_name": "lwe_precipitation_rate",
+                    "metocean:level": 1.8
                 },
                 "lwe_precipitation_rate:2.5:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Lwe precipitation rate",
                     "description": "Lwe precipitation rate at 2.5m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "mm/h"
+                        "label": "mm/h",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/MilliM-PER-HR",
+                            "value": "mm/h"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/lwe_precipitation_rate",
@@ -505,14 +611,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "lwe_precipitation_rate",
-                    "rodeo:level": 2.5
+                    "metocean:standard_name": "lwe_precipitation_rate",
+                    "metocean:level": 2.5
                 },
                 "rainfall_amount:2.0:point:PT0S": {
                     "type": "Parameter",
+                    "label": "Rainfall amount",
                     "description": "Rainfall amount at 2.0m, aggregated over PT0S with method 'point'",
                     "unit": {
-                        "label": "kg/m2"
+                        "label": "kg/m2",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                            "value": "kg/m²"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/rainfall_amount",
@@ -522,14 +633,19 @@
                         "method": "point",
                         "duration": "PT0S"
                     },
-                    "rodeo:standard_name": "rainfall_amount",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "rainfall_amount",
+                    "metocean:level": 2.0
                 },
                 "rainfall_amount:2.0:point:PT12H": {
                     "type": "Parameter",
+                    "label": "Rainfall amount",
                     "description": "Rainfall amount at 2.0m, aggregated over PT12H with method 'point'",
                     "unit": {
-                        "label": "kg/m2"
+                        "label": "kg/m2",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                            "value": "kg/m²"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/rainfall_amount",
@@ -539,14 +655,19 @@
                         "method": "point",
                         "duration": "PT12H"
                     },
-                    "rodeo:standard_name": "rainfall_amount",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "rainfall_amount",
+                    "metocean:level": 2.0
                 },
                 "rainfall_amount:2.0:point:PT24H": {
                     "type": "Parameter",
+                    "label": "Rainfall amount",
                     "description": "Rainfall amount at 2.0m, aggregated over PT24H with method 'point'",
                     "unit": {
-                        "label": "kg/m2"
+                        "label": "kg/m2",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                            "value": "kg/m²"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/rainfall_amount",
@@ -556,14 +677,19 @@
                         "method": "point",
                         "duration": "PT24H"
                     },
-                    "rodeo:standard_name": "rainfall_amount",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "rainfall_amount",
+                    "metocean:level": 2.0
                 },
                 "rainfall_amount:2.0:point:PT6H": {
                     "type": "Parameter",
+                    "label": "Rainfall amount",
                     "description": "Rainfall amount at 2.0m, aggregated over PT6H with method 'point'",
                     "unit": {
-                        "label": "kg/m2"
+                        "label": "kg/m2",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                            "value": "kg/m²"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/rainfall_amount",
@@ -573,14 +699,19 @@
                         "method": "point",
                         "duration": "PT6H"
                     },
-                    "rodeo:standard_name": "rainfall_amount",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "rainfall_amount",
+                    "metocean:level": 2.0
                 },
                 "rainfall_rate:2.0:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Rainfall rate",
                     "description": "Rainfall rate at 2.0m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "mm/h"
+                        "label": "mm/h",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/MilliM-PER-HR",
+                            "value": "mm/h"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/rainfall_rate",
@@ -590,14 +721,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "rainfall_rate",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "rainfall_rate",
+                    "metocean:level": 2.0
                 },
                 "relative_humidity:2.0:mean:PT1M": {
                     "type": "Parameter",
+                    "label": "Relative humidity",
                     "description": "Relative humidity at 2.0m, aggregated over PT1M with method 'mean'",
                     "unit": {
-                        "label": "percent"
+                        "label": "%",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/PERCENT",
+                            "value": "%"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/relative_humidity",
@@ -607,14 +743,19 @@
                         "method": "mean",
                         "duration": "PT1M"
                     },
-                    "rodeo:standard_name": "relative_humidity",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "relative_humidity",
+                    "metocean:level": 2.0
                 },
                 "surface_downwelling_shortwave_flux_in_air:2.0:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Surface downwelling shortwave flux in air",
                     "description": "Surface downwelling shortwave flux in air at 2.0m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "W/m2"
+                        "label": "W/m2",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/W-PER-M2",
+                            "value": "W/m²"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/surface_downwelling_shortwave_flux_in_air",
@@ -624,14 +765,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "surface_downwelling_shortwave_flux_in_air",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "surface_downwelling_shortwave_flux_in_air",
+                    "metocean:level": 2.0
                 },
                 "visibility_in_air:1.8:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Visibility in air",
                     "description": "Visibility in air at 1.8m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "m"
+                        "label": "m",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/M",
+                            "value": "m"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/visibility_in_air",
@@ -641,14 +787,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "visibility_in_air",
-                    "rodeo:level": 1.8
+                    "metocean:standard_name": "visibility_in_air",
+                    "metocean:level": 1.8
                 },
                 "visibility_in_air:2.5:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Visibility in air",
                     "description": "Visibility in air at 2.5m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "m"
+                        "label": "m",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/M",
+                            "value": "m"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/visibility_in_air",
@@ -658,14 +809,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "visibility_in_air",
-                    "rodeo:level": 2.5
+                    "metocean:standard_name": "visibility_in_air",
+                    "metocean:level": 2.5
                 },
                 "wind_from_direction:2.0:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Wind from direction",
                     "description": "Wind from direction at 2.0m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "degrees"
+                        "label": "deg",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/DEG",
+                            "value": "°"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/wind_from_direction",
@@ -675,14 +831,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "wind_from_direction",
-                    "rodeo:level": 2.0
+                    "metocean:standard_name": "wind_from_direction",
+                    "metocean:level": 2.0
                 },
                 "wind_speed:10.0:mean:PT10M": {
                     "type": "Parameter",
+                    "label": "Wind speed",
                     "description": "Wind speed at 10.0m, aggregated over PT10M with method 'mean'",
                     "unit": {
-                        "label": "m/s"
+                        "label": "m/s",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                            "value": "m/s"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/wind_speed",
@@ -692,14 +853,19 @@
                         "method": "mean",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "wind_speed",
-                    "rodeo:level": 10.0
+                    "metocean:standard_name": "wind_speed",
+                    "metocean:level": 10.0
                 },
                 "wind_speed_of_gust:10.0:maximum:PT10M": {
                     "type": "Parameter",
+                    "label": "Wind speed of gust",
                     "description": "Wind speed of gust at 10.0m, aggregated over PT10M with method 'maximum'",
                     "unit": {
-                        "label": "m/s"
+                        "label": "m/s",
+                        "symbol": {
+                            "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                            "value": "m/s"
+                        }
                     },
                     "observedProperty": {
                         "id": "https://vocab.nerc.ac.uk/standard_name/wind_speed_of_gust",
@@ -709,8 +875,8 @@
                         "method": "maximum",
                         "duration": "PT10M"
                     },
-                    "rodeo:standard_name": "wind_speed_of_gust",
-                    "rodeo:level": 10.0
+                    "metocean:standard_name": "wind_speed_of_gust",
+                    "metocean:level": 10.0
                 }
             }
         }

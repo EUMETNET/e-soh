@@ -22,7 +22,7 @@
         "source": "Royal Netherlands Meteorological Institute (KNMI)",
         "platform": "0-20000-0-06275",
         "standard_name": "air_temperature",
-        "unit": "degC",
+        "unit": "Cel",
         "level": 2.0,
         "period": "PT12H",
         "instrument": "Tn12",

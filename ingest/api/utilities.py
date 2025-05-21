@@ -1,9 +1,4 @@
-from fastapi import Request
 import isodate
-
-
-def get_base_url_from_request(http_request: Request) -> str:
-    return f"{http_request.url.components.scheme}://{http_request.url.components.netloc}"
 
 
 def seconds_to_iso_8601_duration(seconds: int) -> str:

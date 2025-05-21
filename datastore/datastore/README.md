@@ -362,8 +362,8 @@ $ grpcurl -d '{"attrs": ["standard_name"], "include_instances": true}' -plaintex
         {
     ...
     "platform": "0-20000-0-06215",
-            "platform_name": "VOORSCHOTEN AWS",
-      "standard_name": "air_temperature",
+          "platform_name": "VOORSCHOTEN AWS",
+          "standard_name": "air_temperature",
     ...
         },
         {

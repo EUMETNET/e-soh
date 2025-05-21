@@ -287,6 +287,8 @@ func createInsertVals(
 			$%d,
 			$%d,
 			$%d,
+			$%d,
+			$%d,
 			$%d
 			)`,
 			index+1,
@@ -298,6 +300,8 @@ func createInsertVals(
 			index+7,
 			index+8,
 			index+9,
+			index+10,
+			index+11,
 		)
 
 		phVals0 := []interface{}{
@@ -309,6 +313,8 @@ func createInsertVals(
 			(*omds)[i].GetDataId(),
 			(*omds)[i].GetHistory(),
 			(*omds)[i].GetProcessingLevel(),
+			(*omds)[i].GetQualityCode(),
+			(*omds)[i].GetCamsl(),
 			(*omds)[i].GetValue(),
 		}
 
@@ -352,6 +358,8 @@ func upsertObs(
 			data_id,
 			history,
 			processing_level,
+			quality_code,
+			camsl,
 			value)
 		VALUES %s
 		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE SET
@@ -361,6 +369,8 @@ func upsertObs(
 	 		data_id = EXCLUDED.data_id,
 	 		history = EXCLUDED.history,
 	 		processing_level = EXCLUDED.processing_level,
+			quality_code = EXCLUDED.quality_code,
+			camsl = EXCLUDED.camsl,
 	 		value = EXCLUDED.value
 	`, strings.Join(valsExpr, ","))
 

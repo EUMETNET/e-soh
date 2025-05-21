@@ -66,6 +66,10 @@ jobs:
       - name: Run the integration test
         run: just integration
 
+      - name: Run the rodeo profile test
+        continue-on-error: true
+        run: just profile-test
+
       - name: Run the performance test
         run: just performance
 

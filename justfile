@@ -158,3 +158,7 @@ down:
 # Stop all E-SOH containers and remove their volumes
 destroy:
     docker compose --profile monitoring --profile test down --volumes
+
+# Run the rodeo profile test
+profile-test:
+    docker compose --env-file ./ci/config/env.list run --rm rodeo-profile-test

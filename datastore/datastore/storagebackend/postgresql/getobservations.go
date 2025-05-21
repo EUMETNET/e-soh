@@ -448,6 +448,12 @@ func getObs(
 		return fmt.Errorf("createObsQueryVals() failed: %v", err)
 	}
 
+	// convert obsInt64MdataCols according to incFields
+	convOI64MC := []string{}
+	for _, col := range obsInt64MdataCols {
+		convOI64MC = append(convOI64MC, convertSelectCol(incFields, col, "observation."))
+	}
+
 	// convert obsStringMdataCols according to incFields
 	convOSMC := []string{}
 	for _, col := range obsStringMdataCols {
@@ -462,6 +468,7 @@ func getObs(
 			%s,
 			%s,
 			point,
+			%s,
 			%s
 		FROM observation
 		JOIN time_series on observation.ts_id = time_series.id
@@ -472,6 +479,7 @@ func getObs(
 		distinctSpec,
 		convertSelectCol(incFields, "pubtime", "observation."),
 		convertSelectCol(incFields, "value", "observation."),
+		strings.Join(convOI64MC, ","),
 		strings.Join(convOSMC, ","),
 		timeFilter,
 		geoFilter,
