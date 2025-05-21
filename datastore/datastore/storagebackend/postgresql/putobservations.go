@@ -127,7 +127,7 @@ func getTSColValsUnique(colName2Val map[string]interface{}) ([]interface{}, erro
 	return result, nil
 }
 
-func getUpsertTSInsertCmd(nRows int) string {
+func getUpsertStatement(nRows int) string {
 
 	cols := getTSColNames()
 	colsUnique := getTSColNamesUnique()
@@ -168,8 +168,8 @@ func getUpsertTSInsertCmd(nRows int) string {
 		WITH input_rows AS (
 			SELECT * FROM (
 				VALUES
-					(%s),
-					%s
+					(%s), -- headaer column to get correct column types
+					%s    -- actual values
 			) t (%s) OFFSET 1
 		)
 		, ins AS (
@@ -177,11 +177,11 @@ func getUpsertTSInsertCmd(nRows int) string {
 				SELECT * FROM input_rows
 				ON CONFLICT ON CONSTRAINT unique_main
 					DO UPDATE SET
-						%s
-						WHERE %s
-				RETURNING id, %s
+						%s        -- do update of fields not in unique constraint
+						WHERE %s  -- only if at least one values is actually different
+				RETURNING id, %s  -- RETURNING only gives back rows that were actually inserterd or modified
 		)
-		SELECT id, %s
+		SELECT id, %s  -- magic to get the id's for all rows'
 		FROM   ins
 		UNION
 		SELECT ts.id, %s
@@ -199,42 +199,8 @@ func getUpsertTSInsertCmd(nRows int) string {
 		strings.Join(colsUnique, ","),
 		strings.Join(colsUnique, ","),
 	)
-	//insertCmd := fmt.Sprintf(`
-	//	INSERT INTO time_series (%s) VALUES %s
-	//	ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
-	//	RETURNING id,%s
-	//	`,
-	//	strings.Join(cols, ","),
-	//	strings.Join(formats, ","),
-	//	strings.Join(updateExpr, ","),
-	//	strings.Join(colsUnique, ","),
-	//)
-	//log.Printf("Insert: %v", insertCmd)
 	return insertCmd
 }
-
-//func getUpsertTSSelectCmd(nRows int) string {
-//	cols := getTSColNamesUnique()
-//	whereExpr := make([]string, nRows)
-//	index := 1
-//	for i := 0; i < nRows; i++ {
-//		oneRow := make([]string, len(cols))
-//		for j := range cols {
-//			oneRow[j] = fmt.Sprintf("$%d", index)
-//			index += 1
-//		}
-//		whereExpr[i] = "(" + strings.Join(oneRow, ",") + ")"
-//	}
-//
-//	selectCmd := fmt.Sprintf(
-//		`SELECT id,%s FROM time_series WHERE (%s) in (%s)`,
-//		strings.Join(cols, ","),
-//		strings.Join(cols, ","),
-//		strings.Join(whereExpr, ","))
-//	//log.Printf("Select: %v", selectCmd)
-//
-//	return selectCmd
-//}
 
 // TODO: Update comments
 // upsertTS retrieves the ID of the row in table time_series that matches tsMdata wrt.
@@ -283,34 +249,11 @@ func upsertTSs(
 		phValsConstraint = append(phValsConstraint, colValsUnique...)
 	}
 
-	insertCmd := getUpsertTSInsertCmd(len(mapTScolVals))
-
-	// start transaction
-	// TODO: Do we need it?
-	tx, err := db.Begin()
-	if err != nil {
-		return nil, fmt.Errorf("db.Begin() failed: %v", err)
-	}
-	defer tx.Rollback()
+	insertCmd := getUpsertStatement(len(mapTScolVals))
 
 	log.Printf("Before row insert")
-	//log.Printf("%t", phVals)
-
-	//// STEP 1: upsert row
-	//_, err = tx.Exec(insertCmd, phVals...)
-	//if err != nil {
-	//	return nil, fmt.Errorf("tx.Exec() failed: %v", err)
-	//}
-	//
-	//log.Printf("After row insert")
-	//
-	//// STEP 2: retrieve id's
-	//// TODO: This query is the bottleneck. I did get it faster once. Why? Index seems to work
-	//selectCmd := getUpsertTSSelectCmd(len(mapTScolValsConstraint))
-	//rows, err := tx.Query(selectCmd, phValsConstraint...)
-	rows, err := tx.Query(insertCmd, phVals...)
+	rows, err := db.Query(insertCmd, phVals...)
 	if err != nil {
-		//log.Printf("%v", err)
 		return nil, fmt.Errorf("tx.Query() failed: %v", err)
 	}
 
@@ -328,16 +271,9 @@ func upsertTSs(
 	tsIDmap := map[string]int64{}
 	for rows.Next() {
 		rows.Scan(colValPtrs...)
-		//log.Printf("%v %v", tsID, colValsStrings)
 		tsIDmap[fmt.Sprintf("%v", colValsStrings)] = tsID
 	}
-	//log.Printf("%v", tsIDmap)
 	log.Printf("After getting data from rows query")
-
-	// commit transaction
-	if err = tx.Commit(); err != nil {
-		return nil, fmt.Errorf("tx.Commit() failed: %v", err)
-	}
 
 	return tsIDmap, nil
 }
@@ -406,15 +342,6 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 		index += len(phVals0)
 	}
 
-	// TODO: Do we need a transaction here? Definitely not anymore...
-	// Get a Tx for making transaction requests.
-	tx, err := db.Begin()
-	if err != nil {
-		return nil, fmt.Errorf("db.Begin() failed: %v", err)
-	}
-	// Defer a rollback in case anything fails.
-	defer tx.Rollback()
-
 	cmd := fmt.Sprintf(`
 	WITH input_rows AS (
 		(SELECT point FROM geo_point LIMIT 0)  -- only copies column names and types
@@ -433,33 +360,17 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 	JOIN geo_point c USING (point)
 	`, strings.Join(valsExpr, ","))
 
-	//_, err = tx.Exec(cmd, phVals...)
-	//if err != nil {
-	//	return nil, fmt.Errorf("db.Exec() failed: %v", err)
-	//}
-	//
-	//cmd = fmt.Sprintf(`
-	//	SELECT id, ST_X(point::geometry), ST_Y(point::geometry) FROM geo_point WHERE point in (%s)
-	//`, strings.Join(valsExpr, ","))
-
-	rows, err := tx.Query(cmd, phVals...)
+	rows, err := db.Query(cmd, phVals...)
 	if err != nil {
 		return nil, fmt.Errorf("tx.QueryRow() failed: %v", err)
 	}
-	defer rows.Close()
 
 	gpIDmap := map[string]int64{}
 	var id int64
 	var x, y float64
 	for rows.Next() {
 		rows.Scan(&id, &x, &y)
-		//log.Printf("%v %v %v", id, x, y)
 		gpIDmap[fmt.Sprintf("%v %v", x, y)] = id
-	}
-
-	// Commit the transaction.
-	if err = tx.Commit(); err != nil {
-		return nil, fmt.Errorf("tx.Commit() failed: %v", err)
 	}
 
 	return gpIDmap, nil
