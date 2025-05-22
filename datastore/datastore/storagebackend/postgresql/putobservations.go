@@ -158,26 +158,27 @@ func getUpsertStatement(nRows int) string {
 		updateWhereExpr = append(updateWhereExpr, fmt.Sprintf("time_series.%s IS DISTINCT FROM EXCLUDED.%s", col, col))
 	}
 
-	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load".
-	// with the following modificaitons:
+	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load",
+	// with the following modifications:
 	// 1. Using ON CONFLICT UPDATE (instead of NOTHING), but only doing an update if at least one of the values
 	//    actually changed (to avoid table trashing).
 	// 2. Use approach 5 of https://stackoverflow.com/a/12427434 to avoid having to provide types for the input VALUES
-	// TODO: Check if we need the "With concurrent write load solution"
+	// 3. Deal with "Concurrency issue 1" by retrying the whole query is returned number of rows is wrong.
+	// 4. Deal with deadlocks by ordering the data
 	insertCmd := fmt.Sprintf(`
 		WITH input_rows AS (
-			SELECT * FROM (
+			SELECT * FROM (SELECT * FROM (
 				VALUES
 					(%s), -- headaer column to get correct column types
 					%s    -- actual values
-			) t (%s) OFFSET 1
+			) t (%s) OFFSET 1) t ORDER BY %s   -- ORDER BY for consistent order to avoid deadlocks
 		)
 		, ins AS (
 			INSERT INTO time_series (%s)
 				SELECT * FROM input_rows
 				ON CONFLICT ON CONSTRAINT unique_main
 					DO UPDATE SET %s  -- do update of fields not in unique constraint
-						WHERE %s      -- only if at least one values is actually different
+						WHERE %s      -- only if at least one value is actually different, to avoid table trashing
 				RETURNING id, %s  -- RETURNING only gives back rows that were actually inserterd or modified
 		)
 		SELECT id, %s  -- magic to get the id's for all rows'
@@ -190,6 +191,7 @@ func getUpsertStatement(nRows int) string {
 		strings.Join(valuesColumns, ","),
 		strings.Join(formats, ","),
 		strings.Join(cols, ","),
+		strings.Join(colsUnique, ","),
 		strings.Join(cols, ","),
 		strings.Join(updateExpr, ","),
 		strings.Join(updateWhereExpr, " OR "),
@@ -198,6 +200,7 @@ func getUpsertStatement(nRows int) string {
 		strings.Join(colsUnique, ","),
 		strings.Join(colsUnique, ","),
 	)
+	//log.Printf("%v", insertCmd)
 	return insertCmd
 }
 
@@ -285,9 +288,12 @@ func upsertTSs(
 		}
 		//log.Printf("After getting data from rows query")
 
-		// Under concurrent load, if another process is adding the same entry, it might not be returned
-		// by this query. A simple solution is just to do the query again.
-		// See under "Concurrency issue 1" here: https://stackoverflow.com/a/42217872
+		// Under concurrent load, if another process is adding the same entry, in which case this transaction
+		// waited for it to complete. Once completed, this transaction would not change it (because of the WHERE),
+		// and therefore not return the row. The SELECT would also not return it, because it see the snapshot
+		// at the start of this transaction.
+		// A simple solution is to just rerun the query.
+		// See under "Concurrency issue 1" for a similar case here: https://stackoverflow.com/a/42217872
 		if len(tsIDmap) == len(mapTScolVals) {
 			return tsIDmap, nil
 		}
@@ -361,12 +367,17 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 		index += len(phVals0)
 	}
 
+	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load",
+	// with the following modifications:
+	// 1. Deal with "Concurrency issue 1" by retrying the whole query is returned number of rows is wrong.
+	// 2. Deal with deadlocks by ordering the data
+	// TODO?: Look at "Concurrency issue 2"
 	cmd := fmt.Sprintf(`
-	WITH input_rows AS (
+	WITH input_rows AS (SELECT * FROM (
 		(SELECT point FROM geo_point LIMIT 0)  -- only copies column names and types
 		UNION ALL
 		VALUES %s
-	)
+	) t ORDER BY point)  -- ORDER BY for consistent order to avoid deadlocks
    , ins AS (
 		INSERT INTO geo_point (point)
 			SELECT * FROM input_rows
@@ -402,9 +413,12 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 			gpIDmap[fmt.Sprintf("%v %v", x, y)] = id
 		}
 
-		// Under concurrent load, if another process is adding the same entry, it might not be returned
-		// by this query. A simple solution is just to do the query again.
-		// See under "Concurrency issue 1" here: https://stackoverflow.com/a/42217872
+		// Under concurrent load, if another process is adding the same entry, in which case this transaction
+		// waited for it to complete. Once completed, this transaction would not change it (because of the WHERE),
+		// and therefore not return the row. The SELECT would also not return it, because it see the snapshot
+		// at the start of this transaction.
+		// A simple solution is to just rerun the query.
+		// See under "Concurrency issue 1" for a similar case here: https://stackoverflow.com/a/42217872
 		if len(gpIDmap) == len(points) {
 			return gpIDmap, nil
 		}
