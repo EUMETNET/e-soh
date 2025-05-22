@@ -165,13 +165,16 @@ func getUpsertStatement(nRows int) string {
 	// 2. Use approach 5 of https://stackoverflow.com/a/12427434 to avoid having to provide types for the input VALUES
 	// 3. Deal with "Concurrency issue 1" by retrying the whole query is returned number of rows is wrong.
 	// 4. Deal with deadlocks by ordering the data
+	// TODO?: Look at "Concurrency issue 2"
 	insertCmd := fmt.Sprintf(`
 		WITH input_rows AS (
-			SELECT * FROM (SELECT * FROM (
-				VALUES
-					(%s), -- headaer column to get correct column types
-					%s    -- actual values
-			) t (%s) OFFSET 1) t ORDER BY %s   -- ORDER BY for consistent order to avoid deadlocks
+			SELECT * FROM (
+				SELECT * FROM (
+					VALUES
+						(%s), -- header column to get correct column types
+						%s    -- actual values
+				) t (%s) OFFSET 1
+			) t ORDER BY %s   -- ORDER BY for consistent order to avoid deadlocks
 		)
 		, ins AS (
 			INSERT INTO time_series (%s)
@@ -204,20 +207,13 @@ func getUpsertStatement(nRows int) string {
 	return insertCmd
 }
 
-// TODO: Update comments
-// upsertTS retrieves the ID of the row in table time_series that matches tsMdata wrt.
-// the fields - U - defined by constraint unique_main, inserting a new row if necessary.
+// upsertTSs returns a map that can be used up to look up the timeseries ID for a timeseries.
+// The key is based on the values of the columns in the unique constraint of the table.
 //
-// If the row already existed, the function ensures that the row is updated with the tsMdata
-// fields - UC - that are not in U (i.e. the complement of U).
+// UpsertTSs inserts a new row if necessary.
+// If the row already existed, the function ensures that the row is updated with the tsMdata.
 //
-// The ID is first looked up in a cache (where the key consists of all fields (U + UC)) in order to
-// save unnecessary database access. In other words, a cache hit means that the row for
-// time series not only existed, but was also already fully updated according to tsMdata.
-// And vice versa: a cache miss means the row either didn't exist at all or wasn't fully updated
-// according to tsMdata.
-//
-// Returns (ID, nil) upon success, otherwise (..., error).
+// Returns (map, nil) upon success, otherwise (..., error).
 func upsertTSs(
 	db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
 
@@ -373,11 +369,13 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 	// 2. Deal with deadlocks by ordering the data
 	// TODO?: Look at "Concurrency issue 2"
 	cmd := fmt.Sprintf(`
-	WITH input_rows AS (SELECT * FROM (
-		(SELECT point FROM geo_point LIMIT 0)  -- only copies column names and types
-		UNION ALL
-		VALUES %s
-	) t ORDER BY point)  -- ORDER BY for consistent order to avoid deadlocks
+	WITH input_rows AS (
+		SELECT * FROM (
+			(SELECT point FROM geo_point LIMIT 0)  -- only copies column names and types
+			UNION ALL
+			VALUES %s
+		) t ORDER BY point  -- ORDER BY for consistent order to avoid deadlocks
+	)
    , ins AS (
 		INSERT INTO geo_point (point)
 			SELECT * FROM input_rows
@@ -516,7 +514,6 @@ func upsertObs(
 	phVals := []interface{}{}
 	createInsertVals(tsInfos, &valsExpr, &phVals)
 
-	// TODO?: This also trashes the table if we overwrite an observation. But how often does that happen?
 	cmd := fmt.Sprintf(`
 		INSERT INTO observation (
 			ts_id,
