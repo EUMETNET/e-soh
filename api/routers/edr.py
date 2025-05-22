@@ -141,7 +141,7 @@ async def get_locations(
                     "name": loc.platform_name if loc.platform_name else f"platform-{loc.platform}",
                     "detail": f"https://oscar.wmo.int/surface/rest/api/search/station?wigosId={loc.platform}",
                     "parameter-name": sorted(loc.parameter_names),
-                "item": str(request.base_url) + "collections/observations/items?platform=" + station_id,
+                "timeseries-link": str(request.base_url) + "collections/observations/items?platform=" + station_id,
             },
             geometry=Point(
                 type="Point",

@@ -33,7 +33,8 @@
                 "timeseries_id": "18cd5ffa1c8fbe2c7e4829bde1e66dcf",
                 "platform_vocabulary": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06225",
                 "platform_name": "IJMUIDEN WP",
-                "method": "mean"
+                "method": "mean",
+                "data": "http://localhost:8008/collections/observations/locations/0-20000-0-06225?=parameter-name=wind_from_direction:2.0:mean:PT10M"
             },
             "id": "18cd5ffa1c8fbe2c7e4829bde1e66dcf"
         },
@@ -69,7 +70,8 @@
                 "timeseries_id": "1d8f48bf77c47d0ffd36f857b945bb00",
                 "platform_vocabulary": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06225",
                 "platform_name": "IJMUIDEN WP",
-                "method": "maximum"
+                "method": "maximum",
+                "data": "http://localhost:8008/collections/observations/locations/0-20000-0-06225?=parameter-name=wind_speed_of_gust:10.0:maximum:PT10M"
             },
             "id": "1d8f48bf77c47d0ffd36f857b945bb00"
         },
@@ -105,7 +107,8 @@
                 "timeseries_id": "96cca44cbbd697fce89cc8fd8f75cf94",
                 "platform_vocabulary": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06225",
                 "platform_name": "IJMUIDEN WP",
-                "method": "mean"
+                "method": "mean",
+                "data": "http://localhost:8008/collections/observations/locations/0-20000-0-06225?=parameter-name=wind_speed:10.0:mean:PT10M"
             },
             "id": "96cca44cbbd697fce89cc8fd8f75cf94"
         }

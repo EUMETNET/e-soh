@@ -16,7 +16,8 @@
                 "parameter-name": [
                     "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                     "air_temperature:0.1:minimum:PT10M"
-                ]
+                ],
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260"
             },
             "id": "0-20000-0-06260"
         },
@@ -35,7 +36,8 @@
                 "parameter-name": [
                     "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                     "air_temperature:0.1:minimum:PT10M"
-                ]
+                ],
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275"
             },
             "id": "0-20000-0-06275"
         }

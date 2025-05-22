@@ -34,6 +34,7 @@ env = Environment(loader=FileSystemLoader("templates"), autoescape=select_autoes
     response_class=GeoJsonResponse,
 )
 async def search_timeseries(
+    request: Request,
     bbox: Annotated[
         str | None,
         Query(
@@ -130,7 +131,7 @@ async def search_timeseries(
 
     time_series = await get_obs_request(obs_request)
 
-    return formatters.metadata_formatters[f](time_series.observations)
+    return formatters.metadata_formatters[f](time_series.observations, str(request.base_url))
 
 
 @router.get(
@@ -141,6 +142,7 @@ async def search_timeseries(
     response_class=GeoJsonResponse,
 )
 async def get_time_series_by_id(
+    request: Request,
     item_id: Annotated[str, Path()],
     f: Annotated[
         formatters.Metadata_Formats, Query(description="Specify return format")
@@ -151,7 +153,7 @@ async def get_time_series_by_id(
     )
     time_series = await get_obs_request(obs_request)
 
-    return formatters.metadata_formatters[f](time_series.observations)
+    return formatters.metadata_formatters[f](time_series.observations, str(request.base_url))
 
 
 @router.get("/dataset", tags=["E-SOH dataset"], include_in_schema=False)
