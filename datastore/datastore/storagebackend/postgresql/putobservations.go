@@ -159,6 +159,9 @@ func getUpsertStatement(nRows int) string {
 		updateWhereExpr = append(updateWhereExpr, fmt.Sprintf("time_series.%s IS DISTINCT FROM EXCLUDED.%s", col, col))
 	}
 
+	colsUniqueString := strings.Join(colsUnique, ",")
+	colsString := strings.Join(cols, ",")
+
 	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load",
 	// with the following modifications:
 	// 1. Using ON CONFLICT UPDATE (instead of NOTHING), but only doing an update if at least one of the values
@@ -194,17 +197,16 @@ func getUpsertStatement(nRows int) string {
 		`,
 		strings.Join(valuesColumns, ","),
 		strings.Join(formats, ","),
-		strings.Join(cols, ","),
-		strings.Join(colsUnique, ","),
-		strings.Join(cols, ","),
+		colsString,
+		colsUniqueString,
+		colsString,
 		strings.Join(updateExpr, ","),
 		strings.Join(updateWhereExpr, " OR "),
-		strings.Join(colsUnique, ","),
-		strings.Join(colsUnique, ","),
-		strings.Join(colsUnique, ","),
-		strings.Join(colsUnique, ","),
+		colsUniqueString,
+		colsUniqueString,
+		colsUniqueString,
+		colsUniqueString,
 	)
-	//log.Printf("%v", insertCmd)
 	return insertCmd
 }
 
