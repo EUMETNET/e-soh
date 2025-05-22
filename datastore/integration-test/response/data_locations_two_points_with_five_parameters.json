@@ -19,7 +19,8 @@
                     "air_temperature:1.5:minimum:PT10M",
                     "air_temperature:2.0:mean:PT1M",
                     "wind_from_direction:2.0:mean:PT10M"
-                ]
+                ],
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260"
             },
             "id": "0-20000-0-06260"
         },
@@ -41,7 +42,8 @@
                     "air_temperature:1.5:minimum:PT10M",
                     "air_temperature:2.0:mean:PT1M",
                     "wind_from_direction:2.0:mean:PT10M"
-                ]
+                ],
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275"
             },
             "id": "0-20000-0-06275"
         }
