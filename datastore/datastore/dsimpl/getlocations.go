@@ -15,7 +15,8 @@ func (svcInfo *ServiceInfo) GetLocations(
 	ctx context.Context, request *datastore.GetLocsRequest) (
 	*datastore.GetLocsResponse, error) {
 
-	tspec, err := common.GetTemporalSpec(request.GetTemporalLatest(), request.GetTemporalInterval())
+	latest := false // n/a here!
+	tspec, err := common.GetTemporalSpec(latest, request.GetTemporalInterval())
 	if err != nil {
 		return nil, status.Error(
 			codes.Internal, fmt.Sprintf("common.GetTemporalSpec() failed: %v", err))

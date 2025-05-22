@@ -331,11 +331,10 @@ message GetExtentsResponse {
 
 message GetLocsRequest {
   // NOTE: the below fields have the same meaning as in GetObsRequest
-  bool temporal_latest = 1;
-  TimeInterval temporal_interval = 2;
-  Polygon spatial_polygon = 3;
-  Circle spatial_circle = 4;
-  map<string, Strings> filter = 5;
+  TimeInterval temporal_interval = 1;
+  Polygon spatial_polygon = 2;
+  Circle spatial_circle = 3;
+  map<string, Strings> filter = 4;
 }
 
 message LocMetadata {
