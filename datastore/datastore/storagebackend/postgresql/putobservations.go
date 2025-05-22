@@ -582,7 +582,7 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			len(request.Observations), putObsLimit)
 	}
 
-	// Chunk observations by 2000, as otherwise the SQL queries have to many parameters
+	// Chunk observations by 1000, as otherwise the SQL queries have to many parameters
 	for observations := range slices.Chunk(request.Observations, 1000) {
 		tsInfos := map[int64]tsInfo{}
 
