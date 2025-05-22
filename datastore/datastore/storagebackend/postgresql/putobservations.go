@@ -5,6 +5,7 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
+	"github.com/cridenour/go-postgis"
 	"log"
 	"reflect"
 	"slices"
@@ -379,9 +380,9 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 			ON CONFLICT (point) DO NOTHING
 			RETURNING id, point
 	)
-	SELECT id, ST_X(point::geometry), ST_Y(point::geometry) FROM ins
+	SELECT id, point FROM ins
 	UNION
-	SELECT c.id, ST_X(c.point::geometry), ST_Y(c.point::geometry) FROM input_rows
+	SELECT c.id, point FROM input_rows
 	JOIN geo_point c USING (point)
 	`, strings.Join(valsExpr, ","))
 
@@ -402,10 +403,10 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 
 		gpIDmap := map[GeoPoint]int64{}
 		var id int64
-		var x, y float64
+		var p postgis.PointS
 		for rows.Next() {
-			rows.Scan(&id, &x, &y)
-			gpIDmap[GeoPoint{x, y}] = id
+			rows.Scan(&id, &p)
+			gpIDmap[GeoPoint{p.X, p.Y}] = id
 		}
 
 		// Under concurrent load, if another process is adding the same entry, in which case this transaction
