@@ -332,14 +332,14 @@ def test_get_position_with_incorrect_geometry_type():
 
 
 def test_get_data_with_incorrect_duration_range_format():
-    response = client.get("/collections/observations/locations/0-20000-0-06260?durations=PT10M/PT1H/PT24H")
+    response = client.get("/collections/observations/locations/0-20000-0-06260?duration=PT10M/PT1H/PT24H")
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Invalid ISO 8601 range format: PT10M/PT1H/PT24H"}
 
 
 def test_get_data_with_range_parameter_empty():
-    response = client.get("/collections/observations/locations/0-20000-0-06260?durations=/PT10M")
+    response = client.get("/collections/observations/locations/0-20000-0-06260?duration=/PT10M")
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Invalid ISO 8601 period:  / PT10M"}
@@ -353,7 +353,7 @@ def test_get_data_with_incorrect_duration_range():
         mock_get_ts_aq_request.return_value = None
         mock_get_unique_values_for_metadata.return_value = ["PT1M", "PT10M", "PT1H"]
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?durations=PT1H/PT10M")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?duration=PT1H/PT10M")
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Invalid ISO 8601 range: PT1H > PT10M"}
@@ -367,7 +367,7 @@ def test_get_data_with_a_duration_not_found_in_datastore():
         mock_get_ts_aq_request.return_value = None
         mock_get_unique_values_for_metadata.return_value = ["PT1M", "PT10M", "PT1H"]
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?durations=XXXX/PT1M")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?duration=XXXX/PT1M")
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Invalid ISO 8601 duration: XXXX"}
@@ -380,7 +380,7 @@ def test_get_data_with_invalid_levels_value():
         test_data = load_json("test/test_data/test_coverages_proto.json")
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?levels=Z/10")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?level=Z/10")
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Invalid levels value: Z/10"}
@@ -393,7 +393,7 @@ def test_get_data_with_invalid_levels_repeating_interval():
         test_data = load_json("test/test_data/test_coverages_proto.json")
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?levels=R10/20/100/10")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?level=R10/20/100/10")
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Invalid levels repeating-interval: R10/20/100/10"}
@@ -406,7 +406,7 @@ def test_get_data_with_lowercase_duration_range_without_existing_data():
 
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/position?coords=POINT(5.179705 52.0988218)&durations=p1m/P1Y")
+        response = client.get("/collections/observations/position?coords=POINT(5.179705 52.0988218)&duration=p1m/P1Y")
 
         assert response.status_code == 404
         assert response.json() == {"detail": "Requested data not found."}
@@ -419,7 +419,7 @@ def test_get_data_with_combination_levels_filtering():
         test_data = load_json("test/test_data/test_coverages_proto.json")
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?levels=R6/0.0/0.1, 1.5/1.8, 10")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?level=R6/0.0/0.1, 1.5/1.8, 10")
 
         m_args = mock_get_obs_request.call_args[0][0]
 
@@ -434,7 +434,7 @@ def test_get_data_with_combination_durations_filtering():
         test_data = load_json("test/test_data/test_coverages_proto.json")
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/locations/0-20000-0-06260?durations=PT0S, PT1M/PT10M")
+        response = client.get("/collections/observations/locations/0-20000-0-06260?duration=PT0S, PT1M/PT10M")
 
         m_args = mock_get_obs_request.call_args[0][0]
 

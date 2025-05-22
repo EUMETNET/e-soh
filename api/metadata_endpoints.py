@@ -214,25 +214,25 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
             ),
             custom=[
                 Custom(
-                    id="standard_names",
+                    id="standard_name",
                     interval=[[standard_names[0], standard_names[-1]]],
                     values=standard_names,
                     reference="https://vocab.nerc.ac.uk/standard_name/",
                 ),
                 Custom(
-                    id="levels",
+                    id="level",
                     interval=[[levels[0], levels[-1]]],
                     values=levels,
                     reference="Height of measurement above ground level in meters",
                 ),
                 Custom(
-                    id="methods",
+                    id="method",
                     interval=[[methods[0], methods[-1]]],
                     values=methods,
                     reference="Time aggregation functions",
                 ),
                 Custom(
-                    id="durations",
+                    id="duration",
                     interval=[[durations[0], durations[-1]]],
                     values=durations,
                     reference="https://en.wikipedia.org/wiki/ISO_8601#Durations",

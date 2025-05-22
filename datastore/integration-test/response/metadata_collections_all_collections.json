@@ -46,7 +46,7 @@
                 },
                 "custom": [
                     {
-                        "id": "standard_names",
+                        "id": "standard_name",
                         "interval": [
                             [
                                 "air_pressure_at_mean_sea_level",
@@ -73,7 +73,7 @@
                         "reference": "https://vocab.nerc.ac.uk/standard_name/"
                     },
                     {
-                        "id": "levels",
+                        "id": "level",
                         "interval": [
                             [
                                 0.0,
@@ -93,7 +93,7 @@
                         "reference": "Height of measurement above ground level in meters"
                     },
                     {
-                        "id": "methods",
+                        "id": "method",
                         "interval": [
                             [
                                 "maximum",
@@ -109,7 +109,7 @@
                         "reference": "Time aggregation functions"
                     },
                     {
-                        "id": "durations",
+                        "id": "duration",
                         "interval": [
                             [
                                 "PT0S",
