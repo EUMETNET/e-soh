@@ -325,33 +325,30 @@ func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error)
 */
 // --- END a variant of getObsTime that also supports intervals ---------------------------------
 
-// TODO: Update comments
-// getGeoPointID retrieves the ID of the row in table geo_point that matches point,
-// inserting a new row if necessary. The ID is first looked up in a cache in order to save
-// unnecessary database access.
-// Returns (ID, nil) upon success, otherwise (..., error).
-func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string]int64, error) {
+type GeoPoint struct {
+	lon float64
+	lat float64
+}
+
+// getGeoPointIDs returns a map of GeoPoint to ID of the row in table geo_point that matches point,
+// inserting a new row if necessary.
+// Returns (map, nil) upon success, otherwise (..., error).
+func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoint]int64, error) {
 
 	valsExpr := []string{}
 	phVals := []interface{}{}
 
-	// TODO: Clean up point handling in maps... struct versus string
-	type p struct {
-		lon float64
-		lat float64
-	}
 	// Collect all unique points
 	// This looks like premature optimisation... but it is not. Postgres will throw error on duplicates in the INSERT
-	points := map[p]bool{}
+	uniquePoints := map[GeoPoint]bool{}
 	for _, obs := range observations {
 		point := obs.GetObsMdata().GetGeoPoint()
-		points[p{point.Lon, point.Lat}] = true
+		uniquePoints[GeoPoint{point.Lon, point.Lat}] = true
 	}
 
 	index := 0
 	// Loop over unique points
-	for point := range points {
-		// TODO: CLean this up
+	for point := range uniquePoints {
 		valsExpr0 := fmt.Sprintf(`(ST_MakePoint($%d, $%d)::geography)`,
 			index+1,
 			index+2,
@@ -403,12 +400,12 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 			return nil, fmt.Errorf("tx.Query() failed: %v", err)
 		}
 
-		gpIDmap := map[string]int64{}
+		gpIDmap := map[GeoPoint]int64{}
 		var id int64
 		var x, y float64
 		for rows.Next() {
 			rows.Scan(&id, &x, &y)
-			gpIDmap[fmt.Sprintf("%v %v", x, y)] = id
+			gpIDmap[GeoPoint{x, y}] = id
 		}
 
 		// Under concurrent load, if another process is adding the same entry, in which case this transaction
@@ -417,11 +414,11 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[string
 		// at the start of this transaction.
 		// A simple solution is to just rerun the query.
 		// See under "Concurrency issue 1" for a similar case here: https://stackoverflow.com/a/42217872
-		if len(gpIDmap) == len(points) {
+		if len(gpIDmap) == len(uniquePoints) {
 			return gpIDmap, nil
 		}
-		log.Printf("In getGeoPointIDs(): concurrency issue detected: 'len(gpIDmap)=%v', 'len(points)=%v', "+
-			"retrying db query...", len(gpIDmap), len(points))
+		log.Printf("In getGeoPointIDs(): concurrency issue detected: 'len(gpIDmap)=%v', 'len(uniquePoints)=%v', "+
+			"retrying db query...", len(gpIDmap), len(uniquePoints))
 	}
 	return nil, fmt.Errorf("getGeoPointIDs() failed: still concurrency issues afer 3 retries")
 }
@@ -576,22 +573,20 @@ type tsInfo struct {
 // PutObservations ... (see documentation in StorageBackend interface)
 func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.Code, string) {
 
-	// TODO: Move this to init
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
 	log.Printf("Entered PutObservations with %v observations...", len(request.Observations))
+
+	// reject call if # of observations exceeds limit
+	if len(request.Observations) > putObsLimit {
+		return codes.OutOfRange, fmt.Sprintf(
+			"too many observations in a single call: %d > %d",
+			len(request.Observations), putObsLimit)
+	}
 
 	// Chunk observations by 2000, as otherwise the SQL queries have to many parameters
 	for observations := range slices.Chunk(request.Observations, 1000) {
 		tsInfos := map[int64]tsInfo{}
 
 		loTime, hiTime := common.GetValidTimeRange()
-
-		// reject call if # of observations exceeds limit
-		if len(observations) > putObsLimit {
-			return codes.OutOfRange, fmt.Sprintf(
-				"too many observations in a single call: %d > %d",
-				len(observations), putObsLimit)
-		}
 
 		gpIDMap, err := getGeoPointIDs(sbe.Db, observations)
 		if err != nil {
@@ -627,7 +622,7 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			}
 
 			// Look up timeseries key.
-			// TODO: This feels inefficient, calling getTSColVals again...
+			// This feels inefficient, calling getTSColVals again...
 			tsMdata := obs.GetTsMdata()
 			_, colValsUnique, err := getTSColVals(tsMdata)
 			if err != nil {
@@ -637,7 +632,7 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			tsID := tsIDMap[key]
 
 			point := obs.GetObsMdata().GetGeoPoint()
-			gpID := gpIDMap[fmt.Sprintf("%v %v", point.GetLon(), point.GetLat())]
+			gpID := gpIDMap[GeoPoint{point.GetLon(), point.GetLat()}]
 
 			var obsTimes []*timestamppb.Timestamp
 			var gpIDs []int64
