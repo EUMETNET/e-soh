@@ -234,7 +234,6 @@ func upsertTSs(
 		}
 
 		cacheKey := fmt.Sprintf("%v", colValsUnique)
-		//log.Printf("cachkeKey: %v", cacheKey)
 		mapTScolVals[cacheKey] = colVals
 		mapTScolValsConstraint[cacheKey] = colValsUnique
 	}
@@ -252,7 +251,6 @@ func upsertTSs(
 
 	insertCmd := getUpsertStatement(len(mapTScolVals))
 
-	//log.Printf("Before row insert")
 	for range 3 { // try at most 3 times
 		rows, err := db.Query(insertCmd, phVals...)
 		if err != nil {
@@ -269,8 +267,6 @@ func upsertTSs(
 			return nil, fmt.Errorf("tx.Query() failed: %v", err)
 		}
 
-		//log.Printf("After select query")
-
 		defer rows.Close()
 		colNamesUnique := getTSColNamesUnique()
 		var tsID int64
@@ -285,7 +281,6 @@ func upsertTSs(
 			rows.Scan(colValPtrs...)
 			tsIDmap[fmt.Sprintf("%v", colValsStrings)] = tsID
 		}
-		//log.Printf("After getting data from rows query")
 
 		// Under concurrent load, if another process is adding the same entry, in which case this transaction
 		// waited for it to complete. Once completed, this transaction would not change it (because of the WHERE),
@@ -596,13 +591,10 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			return codes.Internal, fmt.Sprintf("getGeoPointIDs() failed: %v", err)
 		}
 
-		//log.Printf("Returned %v unique points", len(gpIDMap))
-
 		tsIDMap, err := upsertTSs(sbe.Db, observations)
 		if err != nil {
 			return codes.Internal, fmt.Sprintf("upsertTSs() failed: %v", err)
 		}
-		//log.Printf("Returned %v unique timseries", len(tsIDMap))
 
 		// populate tsInfos
 		for _, obs := range observations {
@@ -660,14 +652,10 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			*tsInfo0.omds = append(*tsInfo0.omds, obs.GetObsMdata())
 		}
 
-		//log.Printf("Got tsInfo of size %v...", len(tsInfos))
-
-		// insert/update observations for all time series in this chunck
+		// insert/update observations for all time series in this chunk
 		if err := upsertObs(sbe.Db, tsInfos); err != nil {
 			return codes.Internal, fmt.Sprintf("upsertObs() failed: %v", err)
 		}
-
-		//log.Printf("Inserted observations")
 	}
 
 	return codes.OK, ""
