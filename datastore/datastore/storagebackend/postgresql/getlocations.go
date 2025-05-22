@@ -5,6 +5,8 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
+	"maps"
+	"slices"
 	"sort"
 
 	"github.com/cridenour/go-postgis"
@@ -54,9 +56,9 @@ func getLocs(
 	}
 	defer rows.Close()
 
-	// scan rows
+	// process rows ...
 
-	addResultItem := func(point postgis.PointS, pform, pformName string, paramNames []string) {
+	addResultItem := func(point postgis.PointS, pform, pformName string, paramNames *[]string) {
 		*locs = append(*locs, &datastore.LocMetadata{
 			GeoPoint: &datastore.Point{
 				Lon: point.X,
@@ -64,20 +66,9 @@ func getLocs(
 			},
 			Platform:       pform,
 			PlatformName:   pformName,
-			ParameterNames: paramNames,
+			ParameterNames: *paramNames,
 		})
 	}
-
-	var (
-		point            postgis.PointS
-		currPoints       []postgis.PointS
-		platform         string
-		currPlatform     string
-		platformName     sql.NullString
-		currPlatformName sql.NullString
-		paramName        string
-		currParamNames   []string
-	)
 
 	getRepresentativePoint := func(points *[]postgis.PointS) postgis.PointS {
 		sort.Slice(*points, func(i, j int) bool {
@@ -89,41 +80,52 @@ func getLocs(
 		return (*points)[0]
 	}
 
+	// per platform info
+	type pformInfo struct {
+		platformName string
+		points       *[]postgis.PointS
+		paramNames   *[]string
+	}
+
+	pformInfos := map[string]*pformInfo{}
+
+	// populate pformInfos from rows
 	for rows.Next() {
+
+		var (
+			point        postgis.PointS
+			platform     string
+			platformName sql.NullString
+			paramName    string
+		)
 
 		err = rows.Scan(&point, &platform, &platformName, &paramName)
 		if err != nil {
 			return fmt.Errorf("rows.Scan() failed: %v", err)
 		}
 
-		if platform != currPlatform { // next platform, possibly the first one!
-			if currPlatform != "" { // add for previous platform
-				if len(currPoints) == 0 {
-					return fmt.Errorf("programming error [1]: len(currPoints) == 0")
-				}
-				addResultItem(
-					getRepresentativePoint(&currPoints), currPlatform, currPlatformName.String,
-					currParamNames)
+		var pi *pformInfo
+		pi, found := pformInfos[platform]
+		if !found { // create the first one for this platform
+			pi = &pformInfo{
+				points:     &[]postgis.PointS{},
+				paramNames: &[]string{},
 			}
-
-			// start new result item
-			currPlatform = platform
-			currPoints = []postgis.PointS{}
-			currParamNames = []string{}
+			pformInfos[platform] = pi
 		}
 
-		currPoints = append(currPoints, point)
-		currPlatformName = platformName
-		currParamNames = append(currParamNames, paramName)
+		// aggregate info for this platform
+		pi.platformName = platformName.String
+		*pi.points = append(*(pi.points), point)
+		*pi.paramNames = append(*(pi.paramNames), paramName)
 	}
 
-	if len(currParamNames) > 0 { // add for current platform
-		if len(currPoints) == 0 {
-			return fmt.Errorf("programming error [2]: len(currPoints) == 0")
-		}
+	// add result items sorted on platform
+	for _, platform := range slices.Sorted(maps.Keys(pformInfos)) {
+		pformInfo := pformInfos[platform]
 		addResultItem(
-			getRepresentativePoint(&currPoints), currPlatform, currPlatformName.String,
-			currParamNames)
+			getRepresentativePoint(pformInfo.points), platform, pformInfo.platformName,
+			pformInfo.paramNames)
 	}
 
 	return nil
