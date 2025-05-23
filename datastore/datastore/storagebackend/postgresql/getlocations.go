@@ -14,13 +14,15 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-// getLocs gets into locs the locations of the most recent observation of the distinct platforms
-// that match request and tspec.
+// getLocs gets the locations of the most recent observation of the distinct platforms that match
+// request and tspec.
 //
-// Returns nil upon success, otherwise error.
+// Returns (locations, nil) upon success, otherwise (..., error).
 func getLocs(
-	db *sql.DB, request *datastore.GetLocsRequest, tspec common.TemporalSpec,
-	locs *[]*datastore.LocMetadata) error {
+	db *sql.DB, request *datastore.GetLocsRequest, tspec common.TemporalSpec) (
+	*[]*datastore.LocMetadata, error) {
+
+	locs := []*datastore.LocMetadata{}
 
 	// get values needed for query
 	phVals := []interface{}{} // placeholder values
@@ -29,7 +31,7 @@ func getLocs(
 		request.GetSpatialPolygon(), request.GetSpatialCircle(), request.GetFilter(), tspec,
 		&phVals)
 	if err != nil {
-		return fmt.Errorf("createLocsQueryVals() failed: %v", err)
+		return nil, fmt.Errorf("createLocsQueryVals() failed: %v", err)
 	}
 
 	// define and execute query
@@ -52,14 +54,14 @@ func getLocs(
 
 	rows, err := db.Query(query, phVals...)
 	if err != nil {
-		return fmt.Errorf("db.Query() failed: %v", err)
+		return nil, fmt.Errorf("db.Query() failed: %v", err)
 	}
 	defer rows.Close()
 
 	// process rows ...
 
 	addResultItem := func(point postgis.PointS, pform, pformName string, paramNames *[]string) {
-		*locs = append(*locs, &datastore.LocMetadata{
+		locs = append(locs, &datastore.LocMetadata{
 			GeoPoint: &datastore.Point{
 				Lon: point.X,
 				Lat: point.Y,
@@ -101,7 +103,7 @@ func getLocs(
 
 		err = rows.Scan(&point, &platform, &platformName, &paramName)
 		if err != nil {
-			return fmt.Errorf("rows.Scan() failed: %v", err)
+			return nil, fmt.Errorf("rows.Scan() failed: %v", err)
 		}
 
 		var pi *pformInfo
@@ -128,7 +130,7 @@ func getLocs(
 			pformInfo.paramNames)
 	}
 
-	return nil
+	return &locs, nil
 }
 
 // GetLocations ... (see documentation in StorageBackend interface)
@@ -136,10 +138,10 @@ func (sbe *PostgreSQL) GetLocations(
 	request *datastore.GetLocsRequest, tspec common.TemporalSpec) (
 	*datastore.GetLocsResponse, codes.Code, string) {
 
-	locs := []*datastore.LocMetadata{}
-	if err := getLocs(sbe.Db, request, tspec, &locs); err != nil {
+	locs, err := getLocs(sbe.Db, request, tspec)
+	if err != nil {
 		return nil, codes.Internal, fmt.Sprintf("getLocs() failed: %v", err)
 	}
 
-	return &datastore.GetLocsResponse{Locations: locs}, codes.OK, ""
+	return &datastore.GetLocsResponse{Locations: *locs}, codes.OK, ""
 }

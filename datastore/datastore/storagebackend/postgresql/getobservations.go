@@ -423,13 +423,15 @@ func convertSelectCol(
 	return "NULL" // colName not included
 }
 
-// getObs gets into obs all observations that match request and tspec. Fields to include
+// getObs gets all observations that match request and tspec. Fields to include
 // (as non-NULL values) in the final result are defined in incFields.
 //
-// Returns nil upon success, otherwise error.
+// Returns (observations, nil) upon success, otherwise (..., error).
 func getObs(
 	db *sql.DB, request *datastore.GetObsRequest, tspec common.TemporalSpec,
-	obs *[]*datastore.Metadata2, incFields common.StringSet) error {
+	incFields common.StringSet) (*[]*datastore.Metadata2, error) {
+
+	obs := []*datastore.Metadata2{}
 
 	// get distinct spec
 	distinctSpec := ""
@@ -445,7 +447,7 @@ func getObs(
 		request.GetSpatialPolygon(), request.GetSpatialCircle(), request.GetFilter(), tspec,
 		&phVals)
 	if err != nil {
-		return fmt.Errorf("createObsQueryVals() failed: %v", err)
+		return nil, fmt.Errorf("createObsQueryVals() failed: %v", err)
 	}
 
 	// convert obsInt64MdataCols according to incFields
@@ -488,7 +490,7 @@ func getObs(
 
 	rows, err := db.Query(query, phVals...)
 	if err != nil {
-		return fmt.Errorf("db.Query() failed: %v", err)
+		return nil, fmt.Errorf("db.Query() failed: %v", err)
 	}
 	defer rows.Close()
 
@@ -498,7 +500,7 @@ func getObs(
 	for rows.Next() {
 		obsMdata, tsID, err := scanObsRow(rows)
 		if err != nil {
-			return fmt.Errorf("scanObsRow() failed: %v", err)
+			return nil, fmt.Errorf("scanObsRow() failed: %v", err)
 		}
 
 		// Handle obstime_instant as a special case instead of using convertSelectCol. Its value is
@@ -526,18 +528,18 @@ func getObs(
 		tsIDs = append(tsIDs, fmt.Sprintf("%d", tsID))
 	}
 	if err = getTSMetadata(db, tsIDs, tsMdatas, incFields); err != nil {
-		return fmt.Errorf("getTSMetadata() failed: %v", err)
+		return nil, fmt.Errorf("getTSMetadata() failed: %v", err)
 	}
 
 	// assemble final output
 	for tsID, obsMdata := range obsMdatas {
-		*obs = append(*obs, &datastore.Metadata2{
+		obs = append(obs, &datastore.Metadata2{
 			TsMdata:  tsMdatas[tsID],
 			ObsMdata: obsMdata,
 		})
 	}
 
-	return nil
+	return &obs, nil
 }
 
 // GetObservations ... (see documentation in StorageBackend interface)
@@ -552,11 +554,10 @@ func (sbe *PostgreSQL) GetObservations(
 		return nil, codes.Internal, fmt.Sprintf("getIncRespFields() failed: %v", err)
 	}
 
-	obs := []*datastore.Metadata2{}
-	if err = getObs(
-		sbe.Db, request, tspec, &obs, incFields); err != nil {
+	obs, err := getObs(sbe.Db, request, tspec, incFields)
+	if err != nil {
 		return nil, codes.Internal, fmt.Sprintf("getObs() failed: %v", err)
 	}
 
-	return &datastore.GetObsResponse{Observations: obs}, codes.OK, ""
+	return &datastore.GetObsResponse{Observations: *obs}, codes.OK, ""
 }
