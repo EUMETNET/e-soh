@@ -1,13 +1,13 @@
 package postgresql
 
 import (
+	"cmp"
 	"database/sql"
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
 	"maps"
 	"slices"
-	"sort"
 
 	"github.com/cridenour/go-postgis"
 	_ "github.com/lib/pq"
@@ -61,13 +61,12 @@ func getLocs(
 	// process rows ...
 
 	getRepresentativePoint := func(points *[]postgis.PointS) postgis.PointS {
-		sort.Slice(*points, func(i, j int) bool {
-			if (*points)[i].Y != (*points)[j].Y { // sort primarily on latitude ...
-				return (*points)[i].Y < (*points)[j].Y
+		return slices.MinFunc(*points, func(a, b postgis.PointS) int {
+			if a.Y != b.Y { // sort primarily on latitude ...
+				return cmp.Compare(a.Y, b.Y)
 			}
-			return (*points)[i].X < (*points)[j].X // ... and secondarily on longitude
+			return cmp.Compare(a.X, b.X) // ... and secondarily on longitude
 		})
-		return (*points)[0]
 	}
 
 	// per platform info
