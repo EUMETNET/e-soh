@@ -7,7 +7,7 @@ from utilities import seconds_to_iso_8601_duration
 from utilities import convert_cm_to_m
 
 
-def _make_properties(ts):
+def _make_properties(ts, base_url):
     ts_metadata = {key.name: value for key, value in ts.ts_mdata.ListFields() if value}
 
     ts_metadata["platform_vocabulary"] = (
@@ -26,10 +26,18 @@ def _make_properties(ts):
     if "platform_name" not in ts_metadata:
         ts_metadata["platform_name"] = f'platform-{ts_metadata["platform"]}'
 
+    ts_metadata["data"] = (
+        base_url
+        + "collections/observations/locations/"
+        + ts_metadata["platform"]
+        + "?=parameter-name="
+        + ts_metadata["parameter_name"]
+    )
+
     return ts_metadata
 
 
-def convert_to_geojson(observations):
+def convert_to_geojson(observations, base_url):
     """
     Will only generate geoJSON for stationary timeseries
     """
@@ -37,7 +45,7 @@ def convert_to_geojson(observations):
         Feature(
             type="Feature",
             id=ts.ts_mdata.timeseries_id,
-            properties=_make_properties(ts=ts),
+            properties=_make_properties(ts=ts, base_url=base_url),
             geometry=Point(
                 type="Point",
                 coordinates=[
