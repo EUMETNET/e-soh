@@ -60,18 +60,6 @@ func getLocs(
 
 	// process rows ...
 
-	addResultItem := func(point postgis.PointS, pform, pformName string, paramNames *[]string) {
-		locs = append(locs, &datastore.LocMetadata{
-			GeoPoint: &datastore.Point{
-				Lon: point.X,
-				Lat: point.Y,
-			},
-			Platform:       pform,
-			PlatformName:   pformName,
-			ParameterNames: *paramNames,
-		})
-	}
-
 	getRepresentativePoint := func(points *[]postgis.PointS) postgis.PointS {
 		sort.Slice(*points, func(i, j int) bool {
 			if (*points)[i].Y != (*points)[j].Y { // sort primarily on latitude ...
@@ -125,9 +113,16 @@ func getLocs(
 	// add result items sorted on platform
 	for _, platform := range slices.Sorted(maps.Keys(pformInfos)) {
 		pformInfo := pformInfos[platform]
-		addResultItem(
-			getRepresentativePoint(pformInfo.points), platform, pformInfo.platformName,
-			pformInfo.paramNames)
+		point := getRepresentativePoint(pformInfo.points)
+		locs = append(locs, &datastore.LocMetadata{
+			GeoPoint: &datastore.Point{
+				Lon: point.X,
+				Lat: point.Y,
+			},
+			Platform:       platform,
+			PlatformName:   pformInfo.platformName,
+			ParameterNames: *pformInfo.paramNames,
+		})
 	}
 
 	return &locs, nil
