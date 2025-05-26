@@ -165,7 +165,7 @@ func getUpsertStatement(nRows int) string {
 	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load",
 	// with the following modifications:
 	// 1. Using ON CONFLICT UPDATE (instead of NOTHING), but only doing an update if at least one of the values
-	//    actually changed (to avoid table trashing).
+	//    actually changed (to avoid table churn).
 	// 2. Use approach 5 of https://stackoverflow.com/a/12427434 to avoid having to provide types for the input VALUES
 	// 3. Deal with "Concurrency issue 1" by retrying the whole query is returned number of rows is wrong.
 	// 4. Deal with deadlocks by ordering the data
@@ -185,8 +185,8 @@ func getUpsertStatement(nRows int) string {
 				SELECT * FROM input_rows
 				ON CONFLICT ON CONSTRAINT unique_main
 					DO UPDATE SET %s  -- do update of fields not in unique constraint
-						WHERE %s      -- only if at least one value is actually different, to avoid table trashing
-				RETURNING id, %s  -- RETURNING only gives back rows that were actually inserterd or modified
+						WHERE %s      -- only if at least one value is actually different, to avoid table churn
+				RETURNING id, %s  -- RETURNING only gives back rows that were actually inserted or modified
 		)
 		SELECT id, %s  -- magic to get the id's for all rows'
 		FROM   ins
@@ -210,10 +210,10 @@ func getUpsertStatement(nRows int) string {
 	return insertCmd
 }
 
-// upsertTSs returns a map that can be used up to look up the timeseries ID for a timeseries.
+// upsertTSs returns a map that can be used to look up the timeseries ID for a timeseries.
 // The key is based on the values of the columns in the unique constraint of the table.
 //
-// UpsertTSs inserts a new row if necessary.
+// upsertTSs inserts a new row if necessary.
 // If the row already existed, the function ensures that the row is updated with the tsMdata.
 //
 // Returns (map, nil) upon success, otherwise (..., error).
@@ -264,7 +264,7 @@ func upsertTSs(
 					log.Printf("db.Query() failed: HINT: %v", e.Hint)
 				}
 			}
-			return nil, fmt.Errorf("tx.Query() failed: %v", err)
+			return nil, fmt.Errorf("db.Query() failed: %v", err)
 		}
 
 		defer rows.Close()
@@ -284,7 +284,7 @@ func upsertTSs(
 
 		// Under concurrent load, if another process is adding the same entry, in which case this transaction
 		// waited for it to complete. Once completed, this transaction would not change it (because of the WHERE),
-		// and therefore not return the row. The SELECT would also not return it, because it see the snapshot
+		// and therefore not return the row. The SELECT would also not return it, because it sees the snapshot
 		// at the start of this transaction.
 		// A simple solution is to just rerun the query.
 		// See under "Concurrency issue 1" for a similar case here: https://stackoverflow.com/a/42217872
@@ -408,7 +408,7 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 
 		// Under concurrent load, if another process is adding the same entry, in which case this transaction
 		// waited for it to complete. Once completed, this transaction would not change it (because of the WHERE),
-		// and therefore not return the row. The SELECT would also not return it, because it see the snapshot
+		// and therefore not return the row. The SELECT would also not return it, because it sees the snapshot
 		// at the start of this transaction.
 		// A simple solution is to just rerun the query.
 		// See under "Concurrency issue 1" for a similar case here: https://stackoverflow.com/a/42217872

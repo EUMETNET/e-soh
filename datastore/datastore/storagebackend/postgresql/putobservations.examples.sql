@@ -89,8 +89,8 @@ WITH input_rows AS (SELECT *
                       time_series.title IS DISTINCT FROM EXCLUDED.title OR
                       time_series.institution IS DISTINCT FROM EXCLUDED.institution OR
                       time_series.keywords_vocabulary IS DISTINCT FROM EXCLUDED.keywords_vocabulary OR
-                      time_series.unit IS DISTINCT FROM EXCLUDED.unit -- only if at least one value is actually different, to avoid table trashing
-        RETURNING id, naming_authority,platform,standard_name,level,function,period,instrument -- RETURNING only gives back rows that were actually inserterd or modified
+                      time_series.unit IS DISTINCT FROM EXCLUDED.unit -- only if at least one value is actually different, to avoid table churn
+        RETURNING id, naming_authority,platform,standard_name,level,function,period,instrument -- RETURNING only gives back rows that were actually inserted or modified
 )
 SELECT id,
        naming_authority,
