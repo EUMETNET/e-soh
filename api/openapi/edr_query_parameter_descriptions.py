@@ -6,14 +6,14 @@ parameter_name = (
     "Each of the components can be replaced by the wildcard character `*`. "
     "To get all the air temperatures measured at 1.5 meter, use `air_temperature:1.5:*:*`."
 )
-standard_names = "Comma separated list of parameter standard_name(s) to query."
-levels = (
+standard_name = "Comma separated list of parameter standard_name(s) to query."
+level = (
     "Define the vertical level(s) to return data from using either a comma separated list, "
     "a range or a repeating interval. <br /> Repeating intervals are defined in the format of "
     "'__R__ *number of intervals / min-level / height to increment by*'."
 )
-methods = "Comma separated list of parameter aggregation methods to query."
-durations = "Define the aggregation period(s) to return data from using either a comma separated list or " "a range."
+method = "Comma separated list of parameter aggregation methods to query."
+duration = "Define the aggregation period(s) to return data from using either a comma separated list or " "a range."
 wigos_id = "WIGOS Station Identifier (WSI) of the station to query data from."
 format = "Specify wanted return format."
 point = "Point to query all data within 10 meters, specified as Well-Known Text (WKT) point coordinates."
