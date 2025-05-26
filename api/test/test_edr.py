@@ -51,12 +51,12 @@ def test_get_locations_without_query_params():
         mock_get_loc_request.return_value = create_mock_loc_response(test_data)
         mock_ts_ag_request.return_value = create_mock_ts_response(param_test_data)
 
-        # Create a GetObsRequest object with the expected arguments
+        # Create a GetLocsRequest object with the expected arguments
         expected_args = dstore.GetLocsRequest()
 
         response = client.get("/collections/observations/locations")
 
-        # Check that getObsRequest gets without arguments when no parameters
+        # Check that GetLocsRequest gets called without arguments when no parameters
         # given in query
         mock_get_loc_request.assert_called_once()
         mock_ts_ag_request.assert_called_once()
@@ -97,7 +97,7 @@ def test_get_locations_with_query_params():
             "&parameter-name=air_pressure_at_mean_sea_level:1.0:mean:PT1M, air_temperature:0.1:minimum:PT10M"
         )
 
-        # Check that getObsRequest gets called with correct arguments given in query
+        # Check that GetLocsRequest gets called with correct arguments given in query
         mock_get_loc_request.assert_called_once()
         m_args = mock_get_loc_request.call_args[0][0]
 
