@@ -212,6 +212,10 @@ cf_standard_names_v84.txt
 # Ignore qudt dictionary, as it is generated while docker build.
 qudt_units.json
 
+# Inogre all the copied std_name_unit in directories, except the config directory.
+**/std_name_units.json
+!units_config/std_name_units.json
+
 # API
 api/test/output/
 datastore/load-test/output/
