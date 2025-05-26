@@ -51,7 +51,7 @@ copy-units:
 
     for path in "${destination_paths[@]}"
     do
-        cp -v -r "./units_config/" "$path"
+        cp -v -r "./units_config/std_name_units.json" "$path"
     done
 
 
