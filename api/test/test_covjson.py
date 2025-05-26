@@ -96,7 +96,7 @@ def test_single_parameter_area_convert():
 
 
 def test_empty_response_convert():
-    test_data = load_json("test/test_data/test_empty_proto.json")
+    test_data = load_json("test/test_data/test_empty_observations_proto.json")
     response = create_mock_obs_response(test_data)
 
     # Expect to get an HTTPException with status code of 404 and detail of
