@@ -104,6 +104,7 @@ func initSnakeCaseConverter() {
 }
 
 func init() { // automatically called once on program startup (on first import of this package)
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
 	initValidTimeRange()
 	initSnakeCaseConverter()
 }
