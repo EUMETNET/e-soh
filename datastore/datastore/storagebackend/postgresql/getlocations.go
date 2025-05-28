@@ -36,7 +36,7 @@ func getLocs(
 
 	// define and execute query
 	query := fmt.Sprintf(`
-		SELECT DISTINCT ON (platform, parameter_name)
+		SELECT DISTINCT ON (ts_id)
 			point,
 			platform,
 			platform_name,
@@ -45,7 +45,7 @@ func getLocs(
 		JOIN time_series on observation.ts_id = time_series.id
 		JOIN geo_point ON observation.geo_point_id = geo_point.id
 		WHERE %s AND %s AND %s AND %s
-		ORDER BY platform, parameter_name, obstime_instant DESC
+		ORDER BY ts_id, obstime_instant DESC;
 		`,
 		timeFilter,
 		geoFilter,
@@ -112,6 +112,7 @@ func getLocs(
 	// add result items sorted on platform
 	for _, platform := range slices.Sorted(maps.Keys(pformInfos)) {
 		pformInfo := pformInfos[platform]
+		slices.Sort(*pformInfo.paramNames)
 		point := getRepresentativePoint(pformInfo.points)
 		locs = append(locs, &datastore.LocMetadata{
 			GeoPoint: &datastore.Point{
