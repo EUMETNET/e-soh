@@ -30,7 +30,8 @@
         "timeseries_id": "20bf5cc13b08b4c1d737966b64d0aea5",
         "platform_vocabulary": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06275",
         "platform_name": "DEELEN",
-        "method": "minimum"
+        "method": "minimum",
+        "data": "http://localhost:8008/collections/observations/locations/0-20000-0-06275?=parameter-name=air_temperature:2.0:minimum:PT12H"
     },
     "id": "20bf5cc13b08b4c1d737966b64d0aea5"
 }

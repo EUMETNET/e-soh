@@ -32,4 +32,4 @@ COPY "./test_api.py" "${DOCKER_PATH}/test_api.py"
 COPY "./response/" "${DOCKER_PATH}/response/"
 
 WORKDIR "${DOCKER_PATH}"
-CMD ["pytest"]
+CMD ["/bin/sh", "-c", "python -m pytest"]

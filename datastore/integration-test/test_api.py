@@ -12,6 +12,9 @@ logger.setLevel(os.environ.get("LOG_LEVEL", logging.INFO))
 
 
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8008")
+exclude_data = r"^root\['properties'\]\['data'\]$"
+exclude_properties_data = r"^root\['features'\]\[[0-9+]\]\['properties'\]\['data'\]$"
+exclude_properties_timeseries = r"^root\['features'\]\[[0-9+]\]\['properties'\]\['timeseries-link'\]$"
 
 
 def load_json(expected_path):
@@ -110,7 +113,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox():
     expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
 
     assert actual_response.status_code == 200
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(
+        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+    )
 
 
 def test_from_a_single_collection_get_locations_within_a_bbox_with_durations_range_filtering():
@@ -123,7 +128,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_durations_ran
     expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
 
     assert actual_response.status_code == 200
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(
+        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+    )
 
 
 def test_from_a_single_collection_get_locations_within_bbox_with_levels_range_filtering():
@@ -134,7 +141,9 @@ def test_from_a_single_collection_get_locations_within_bbox_with_levels_range_fi
     expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
 
     assert actual_response.status_code == 200
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(
+        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+    )
 
 
 def test_from_a_single_collection_get_locations_within_a_bbox_with_parameter_name_filtering():
@@ -148,7 +157,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_parameter_nam
     expected_json = load_json("response/data_locations_two_points_with_two_parameters.json")
 
     assert actual_response.status_code == 200
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(
+        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+    )
 
 
 def test_from_a_single_collection_get_locations_within_a_bbox_with_methods_and_levels_filtering():
@@ -164,7 +175,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_methods_and_l
     expected_json = load_json("response/data_locations_two_points_with_two_parameters.json")
 
     assert actual_response.status_code == 200
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(
+        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+    )
 
 
 def test_from_a_single_collection_get_locations_within_a_bbox_with_duration_and_standard_name_filtering():
@@ -181,7 +194,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_duration_and_
     expected_json = load_json("response/data_locations_two_points_with_five_parameters.json")
 
     assert actual_response.status_code == 200
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(
+        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+    )
 
 
 def test_from_a_single_collection_get_a_single_location():
@@ -423,7 +438,7 @@ def test_items_get_area():
     assert actual_response.status_code == 200
     assert actual_response.headers["Content-Type"] == "application/geo+json"
     expected_json = load_json("response/items_within_area_single_platform.json")
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(actual_response, expected_json, exclude_regex_paths=exclude_properties_data)
 
 
 def test_items_get_id():
@@ -434,7 +449,7 @@ def test_items_get_id():
     assert actual_response.status_code == 200
     assert actual_response.headers["Content-Type"] == "application/geo+json"
     expected_json = load_json("response/items_area_with_one_parameter_name.json")
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(actual_response, expected_json, exclude_regex_paths=exclude_data)
 
 
 def test_items_get_area_with_one_parameter_name():
@@ -448,7 +463,7 @@ def test_items_get_area_with_one_parameter_name():
     assert actual_response.status_code == 200
     assert actual_response.headers["Content-Type"] == "application/geo+json"
     expected_json = load_json("response/items_area_with_one_parameter_name.json")
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(actual_response, expected_json, exclude_regex_paths=exclude_data)
 
 
 def test_items_get_one_platform():
@@ -459,7 +474,7 @@ def test_items_get_one_platform():
     assert actual_response.status_code == 200
     assert actual_response.headers["Content-Type"] == "application/geo+json"
     expected_json = load_json("response/items_within_area_single_platform.json")
-    actual_response_is_expected_response(actual_response, expected_json)
+    actual_response_is_expected_response(actual_response, expected_json, exclude_regex_paths=exclude_properties_data)
 
 
 # This test can not be made at the moment. Datetime have to limitation on the number

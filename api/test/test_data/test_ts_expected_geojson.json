@@ -17,7 +17,8 @@
         "timeseries_id": "d036b10ac4f6e62049b9a496f04e0a81",
         "platform_vocabulary": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06280",
         "platform_name": "GRONINGEN AP EELDE",
-        "method": "mean"
+        "method": "mean",
+        "data": "http://fake.url/collections/observations/locations/0-20000-0-06280?=parameter-name=wind_speed:10.0:mean:PT10M"
     },
     "id": "d036b10ac4f6e62049b9a496f04e0a81"
 }
