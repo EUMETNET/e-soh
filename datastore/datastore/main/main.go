@@ -8,12 +8,14 @@ import (
 	"datastore/storagebackend"
 	"datastore/storagebackend/postgresql"
 	"fmt"
+	"log"
+	"net"
+	"strings"
+	"time"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"log"
-	"net"
-	"time"
 
 	// gRPC
 	"google.golang.org/grpc"
@@ -22,7 +24,8 @@ import (
 	"google.golang.org/grpc/peer"
 
 	// Monitoring
-	"datastore/metrics"
+	promservermetrics "datastore/metrics"
+
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 
 	_ "expvar"
@@ -44,22 +47,6 @@ func createStorageBackend() (storagebackend.StorageBackend, error) {
 
 func main() {
 
-	reqTimeLogger := func(
-		ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler) (interface{}, error) {
-		start := time.Now()
-		resp, err := handler(ctx, req)
-		reqTime := time.Since(start)
-		if info.FullMethod != "/grpc.health.v1.Health/Check" {
-			var clientIp = "unknown"
-			if p, ok := peer.FromContext(ctx); ok {
-				clientIp = p.Addr.String()
-			}
-			log.Printf("time for method %q: %d ms. Client ip: %s", info.FullMethod, reqTime.Milliseconds(), clientIp)
-		}
-		return resp, err
-	}
-
 	grpcMetrics := grpcprometheus.NewServerMetrics(
 		grpcprometheus.WithServerHandlingTimeHistogram(
 			grpcprometheus.WithHistogramBuckets([]float64{0.001, 0.01, 0.1, 0.3, 0.6, 1, 3, 6, 9, 20, 30, 60, 90, 120}),
@@ -77,15 +64,45 @@ func main() {
 
 	go promservermetrics.TrackUptime()
 
-	// create gRPC server with middleware
-	server := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(
-			reqTimeLogger,
+	// define RPC interceptor to log request time and client IP
+	reqStatsLogger := func(
+		ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler) (interface{}, error) {
+		start := time.Now()
+		resp, err := handler(ctx, req)
+		reqTime := time.Since(start)
+		if info.FullMethod != "/grpc.health.v1.Health/Check" {
+			var clientIp = "unknown"
+			if p, ok := peer.FromContext(ctx); ok {
+				clientIp = p.Addr.String()
+			}
+			log.Printf(
+				"time for method %q: %d ms. Client ip: %s",
+				info.FullMethod, reqTime.Milliseconds(), clientIp)
+		}
+		return resp, err
+	}
+
+	// define RPC interceptors to use
+	interceptors := func() []grpc.UnaryServerInterceptor {
+		// initialize with standard interceptors
+		icpts := []grpc.UnaryServerInterceptor{
 			promservermetrics.InFlightRequestInterceptor,
 			promservermetrics.ResponseSizeUnaryInterceptor,
 			grpcMetrics.UnaryServerInterceptor(),
-		),
-	)
+		}
+
+		// optionally prepend interceptor to log request stats (WARNING: may potentially use a lot
+		// of disk space, so disabled by default)
+		logReqStats := strings.ToLower(common.Getenv("LOGREQSTATS", "false"))
+		if (logReqStats != "false") && (logReqStats != "no") && (logReqStats != "0") {
+			icpts = append([]grpc.UnaryServerInterceptor{reqStatsLogger}, icpts...)
+		}
+		return icpts
+	}
+
+	// create gRPC server with middleware
+	server := grpc.NewServer(grpc.ChainUnaryInterceptor(interceptors()...))
 
 	grpcMetrics.InitializeMetrics(server)
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
