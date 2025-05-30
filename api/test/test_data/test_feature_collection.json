@@ -14,7 +14,7 @@
                 "name": "DE BILT AWS",
                 "detail": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06260",
                 "parameter-name": [
-                    "air_pressure_at_sea_level:1.0:mean:PT1M",
+                    "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                     "air_temperature:0.1:minimum:PT10M"
                 ]
             },
@@ -33,7 +33,7 @@
                 "name": "DEELEN",
                 "detail": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06275",
                 "parameter-name": [
-                    "air_pressure_at_sea_level:1.0:mean:PT1M",
+                    "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                     "air_temperature:0.1:minimum:PT10M"
                 ]
             },
@@ -41,15 +41,15 @@
         }
     ],
     "parameters": {
-        "air_pressure_at_sea_level:1.0:mean:PT1M": {
+        "air_pressure_at_mean_sea_level:1.0:mean:PT1M": {
             "type": "Parameter",
             "description": {
-                "en": "Air pressure at sea level at 1.0m, aggregated over PT1M with method 'mean'"
+                "en": "Air pressure at mean sea level at 1.0m, aggregated over PT1M with method 'mean'"
             },
             "observedProperty": {
-                "id": "https://vocab.nerc.ac.uk/standard_name/air_pressure_at_sea_level",
+                "id": "https://vocab.nerc.ac.uk/standard_name/air_pressure_at_mean_sea_level",
                 "label": {
-                    "en": "Air pressure at sea level"
+                    "en": "Air pressure at mean sea level"
                 }
             },
             "unit": {
@@ -65,7 +65,7 @@
                 "method": "mean",
                 "duration": "PT1M"
             },
-            "metocean:standard_name": "air_pressure_at_sea_level",
+            "metocean:standard_name": "air_pressure_at_mean_sea_level",
             "metocean:level": 1.0
         },
         "air_temperature:0.1:minimum:PT10M": {

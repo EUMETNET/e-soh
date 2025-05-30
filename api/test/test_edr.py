@@ -5,6 +5,8 @@ from fastapi.testclient import TestClient
 from main import app
 from test.utilities import create_mock_obs_response
 from test.utilities import load_json
+from test.utilities import create_mock_loc_response
+from test.utilities import create_mock_ts_response
 
 
 client = TestClient(app)
@@ -37,36 +39,38 @@ expected_data_endpoint_response_fields = [
 
 
 def test_get_locations_without_query_params():
-    with patch("routers.edr.get_obs_request") as mock_get_obs_request, patch(
-        "utilities.verify_parameter_names"
-    ) as mock_verify_parameter_names:
+    with patch("routers.edr.get_locations_request") as mock_get_loc_request, patch(
+        "routers.edr.get_ts_ag_request"
+    ) as mock_ts_ag_request, patch("utilities.verify_parameter_names") as mock_verify_parameter_names:
+
         # Load arbitrary test data for making a mock_obs_request
         test_data = load_json("test/test_data/test_feature_collection_proto.json")
+        param_test_data = load_json("test/test_data/test_ts_request_proto.json")
 
         mock_verify_parameter_names.return_value = None
-        mock_get_obs_request.return_value = create_mock_obs_response(test_data)
+        mock_get_loc_request.return_value = create_mock_loc_response(test_data)
+        mock_ts_ag_request.return_value = create_mock_ts_response(param_test_data)
 
-        # Create a GetObsRequest object with the expected arguments
-        expected_args = dstore.GetObsRequest(
-            temporal_latest=True, included_response_fields=expected_metadata_endpoint_response_fields
-        )
+        # Create a GetLocsRequest object with the expected arguments
+        expected_args = dstore.GetLocsRequest()
 
         response = client.get("/collections/observations/locations")
 
-        # Check that getObsRequest gets called with correct arguments when no parameters
+        # Check that GetLocsRequest gets called without arguments when no parameters
         # given in query
-        mock_get_obs_request.assert_called_once()
-        m_args = mock_get_obs_request.call_args[0][0]
+        mock_get_loc_request.assert_called_once()
+        mock_ts_ag_request.assert_called_once()
+        m_args = mock_get_loc_request.call_args[0][0]
 
         assert m_args == expected_args
         assert response.status_code == 200
 
 
 def test_get_locations_with_empty_response():
-    with patch("routers.edr.get_obs_request") as mock_get_obs_request:
-        test_data = load_json("test/test_data/test_empty_proto.json")
+    with patch("routers.edr.get_locations_request") as mock_get_loc_request:
+        test_data = load_json("test/test_data/test_empty_locations_proto.json")
 
-        mock_get_obs_request.return_value = create_mock_obs_response(test_data)
+        mock_get_loc_request.return_value = create_mock_loc_response(test_data)
 
         response = client.get("/collections/observations/locations")
 
@@ -75,29 +79,31 @@ def test_get_locations_with_empty_response():
 
 
 def test_get_locations_with_query_params():
-    with patch("routers.edr.get_obs_request") as mock_get_obs_request, patch(
+    with patch("routers.edr.get_locations_request") as mock_get_loc_request, patch(
         "utilities.verify_parameter_names"
-    ) as mock_verify_parameter_names:
+    ) as mock_verify_parameter_names, patch("routers.edr.get_ts_ag_request") as mock_ts_ag_request:
+
         test_data = load_json("test/test_data/test_feature_collection_proto.json")
+        test_param_data = load_json("test/test_data/test_ts_request_proto.json")
         compare_data = load_json("test/test_data/test_feature_collection.json")
 
         mock_verify_parameter_names.return_value = None
-        mock_get_obs_request.return_value = create_mock_obs_response(test_data)
+        mock_get_loc_request.return_value = create_mock_loc_response(test_data)
+        mock_ts_ag_request.return_value = create_mock_ts_response(test_param_data)
 
         response = client.get(
             "/collections/observations/locations?bbox=5.1,52.0,6.0,52.1"
             "&datetime=2022-12-31T00:00:00Z/2022-12-31T01:00:00Z"
-            "&parameter-name=wind_speed:10.0:mean:PT10M, air_temperature:0.1:minimum:PT10M"
+            "&parameter-name=air_pressure_at_mean_sea_level:1.0:mean:PT1M, air_temperature:0.1:minimum:PT10M"
         )
 
-        # Check that getObsRequest gets called with correct arguments given in query
-        mock_get_obs_request.assert_called_once()
-        m_args = mock_get_obs_request.call_args[0][0]
+        # Check that GetLocsRequest gets called with correct arguments given in query
+        mock_get_loc_request.assert_called_once()
+        m_args = mock_get_loc_request.call_args[0][0]
 
-        assert {"wind_speed:10.0:mean:PT10M", "air_temperature:0.1:minimum:PT10M"} == set(
+        assert {"air_pressure_at_mean_sea_level:1.0:mean:PT1M", "air_temperature:0.1:minimum:PT10M"} == set(
             m_args.filter["parameter_name"].values
         )
-        assert m_args.temporal_latest
         assert len(m_args.spatial_polygon.points) == 5
         assert m_args.spatial_polygon.points[0].lon == 5.1
         assert "2022-12-31 00:00:00" == m_args.temporal_interval.start.ToDatetime().strftime("%Y-%m-%d %H:%M:%S")
@@ -202,7 +208,7 @@ def test_get_locations_id_with_incorrect_datetime_range():
 
 def test_get_locations_id_with_empty_response():
     with patch("routers.edr.get_obs_request") as mock_get_obs_request:
-        test_data = load_json("test/test_data/test_empty_proto.json")
+        test_data = load_json("test/test_data/test_empty_observations_proto.json")
 
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
@@ -402,7 +408,7 @@ def test_get_data_with_invalid_levels_repeating_interval():
 def test_get_data_with_lowercase_duration_range_without_existing_data():
     with patch("routers.edr.get_obs_request") as mock_get_obs_request:
 
-        test_data = load_json("test/test_data/test_empty_proto.json")
+        test_data = load_json("test/test_data/test_empty_observations_proto.json")
 
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 

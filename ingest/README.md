@@ -33,3 +33,10 @@ To install in dev mode run `pip install --editable .` from the top level of this
 | libeccodes-data | 2.24.2  |
 | rapidjson-dev   | 1.1.0   |
 | pybind11-dev    | 2.9.1   |
+
+
+## Prerequisites of running locally
+Move the `std_unit_names.json`to the ingest/api folder with
+```bash
+just copy-units
+```

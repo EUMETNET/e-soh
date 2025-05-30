@@ -1,0 +1,24 @@
+{
+    "groups": [
+        {
+            "combo": {
+                "standard_name": "air_pressure_at_mean_sea_level",
+                "unit": "hPa",
+                "level": 100,
+                "function": "mean",
+                "period": 60,
+                "parameter_name": "air_pressure_at_mean_sea_level:1.0:mean:PT1M"
+            }
+        },
+        {
+            "combo": {
+                "standard_name": "air_temperature",
+                "unit": "Cel",
+                "level": 10,
+                "function": "minimum",
+                "period": 600,
+                "parameter_name": "air_temperature:0.1:minimum:PT10M"
+            }
+        }
+    ]
+}

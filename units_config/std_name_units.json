@@ -416,8 +416,9 @@
         "symbol": "W/m2"
     },
     "surface_upwelling_radiance_in_air": {
-        "unit": "W/m2/sr",
+        "unit": "W.m-2.sr-1",
         "alias": [
+            "W/m2/sr",
             "Wm-2sr-1",
             "W m-2 sr-1"
         ],

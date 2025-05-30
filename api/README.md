@@ -17,6 +17,11 @@ Environment variable used to set the `forwarded-allow-ips` in gunicorn. If this 
 ## Prerequisites of running locally
 
 ### QUDT
+Move the `std_unit_names.json`to the api folder with
+```bash
+just copy-units
+```
+
 Generate the file needed for QUDT dictionary by running
 ```bash
 python generate_qudt_units.py

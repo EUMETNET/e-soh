@@ -128,6 +128,9 @@ jobs:
       - name: Copy protobuf files
         run: just copy-proto
 
+      - name: Copy standard name units
+        run: just copy-units
+
       - name: Run the unit test
         run: just ingest-unit
 

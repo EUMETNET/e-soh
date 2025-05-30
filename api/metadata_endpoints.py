@@ -163,8 +163,8 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
             ),
             unit=Unit(
                 symbol=Symbol(
-                    value=qudt_unit_dict[ts.unit]["value"],
-                    type=qudt_unit_dict[ts.unit]["type"],
+                    value=qudt_unit_dict[ts.standard_name]["value"],
+                    type=qudt_unit_dict[ts.standard_name]["type"],
                 ),
                 label=ts.unit,
             ),

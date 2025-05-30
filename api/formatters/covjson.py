@@ -57,8 +57,8 @@ def make_parameter(ts_mdata):
         },
         unit=Unit(
             symbol=Symbol(
-                value=qudt_unit_dict[ts_mdata.unit]["value"],
-                type=qudt_unit_dict[ts_mdata.unit]["type"],
+                value=qudt_unit_dict[ts_mdata.standard_name]["value"],
+                type=qudt_unit_dict[ts_mdata.standard_name]["type"],
             ),
             label={"en": ts_mdata.unit},
         ),
