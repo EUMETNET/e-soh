@@ -1,27 +1,28 @@
 package main
 
 import (
+	"context"
 	"datastore/common"
 	"datastore/datastore"
 	"datastore/dsimpl"
 	"datastore/storagebackend"
 	"datastore/storagebackend/postgresql"
 	"fmt"
-	"log"
-	"net"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"log"
+	"net"
+	"time"
 
 	// gRPC
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/peer"
 
 	// Monitoring
-	promservermetrics "datastore/metrics"
-
+	"datastore/metrics"
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 
 	_ "expvar"
@@ -43,6 +44,22 @@ func createStorageBackend() (storagebackend.StorageBackend, error) {
 
 func main() {
 
+	reqTimeLogger := func(
+		ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler) (interface{}, error) {
+		start := time.Now()
+		resp, err := handler(ctx, req)
+		reqTime := time.Since(start)
+		if info.FullMethod != "/grpc.health.v1.Health/Check" {
+			var clientIp = "unknown"
+			if p, ok := peer.FromContext(ctx); ok {
+				clientIp = p.Addr.String()
+			}
+			log.Printf("time for method %q: %d ms. Client ip: %s", info.FullMethod, reqTime.Milliseconds(), clientIp)
+		}
+		return resp, err
+	}
+
 	grpcMetrics := grpcprometheus.NewServerMetrics(
 		grpcprometheus.WithServerHandlingTimeHistogram(
 			grpcprometheus.WithHistogramBuckets([]float64{0.001, 0.01, 0.1, 0.3, 0.6, 1, 3, 6, 9, 20, 30, 60, 90, 120}),
@@ -63,6 +80,7 @@ func main() {
 	// create gRPC server with middleware
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			reqTimeLogger,
 			promservermetrics.InFlightRequestInterceptor,
 			promservermetrics.ResponseSizeUnaryInterceptor,
 			grpcMetrics.UnaryServerInterceptor(),
