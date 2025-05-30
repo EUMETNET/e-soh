@@ -60,15 +60,6 @@ func getLocs(
 
 	// process rows ...
 
-	getRepresentativePoint := func(points *[]postgis.PointS) postgis.PointS {
-		return slices.MinFunc(*points, func(a, b postgis.PointS) int {
-			if a.Y != b.Y { // sort primarily on latitude ...
-				return cmp.Compare(a.Y, b.Y)
-			}
-			return cmp.Compare(a.X, b.X) // ... and secondarily on longitude
-		})
-	}
-
 	// per platform info
 	type pformInfo struct {
 		platformName string
@@ -113,7 +104,15 @@ func getLocs(
 	for _, platform := range slices.Sorted(maps.Keys(pformInfos)) {
 		pformInfo := pformInfos[platform]
 		slices.Sort(*pformInfo.paramNames)
-		point := getRepresentativePoint(pformInfo.points)
+
+		// get representative point
+		point := slices.MinFunc(*pformInfo.points, func(a, b postgis.PointS) int {
+			if a.Y != b.Y { // sort primarily on latitude ...
+				return cmp.Compare(a.Y, b.Y)
+			}
+			return cmp.Compare(a.X, b.X) // ... and secondarily on longitude
+		})
+
 		locs = append(locs, &datastore.LocMetadata{
 			GeoPoint: &datastore.Point{
 				Lon: point.X,
