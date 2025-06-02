@@ -128,9 +128,9 @@ async def get_locations(
             detail="Query did not return any locations.",
         )
 
-    features = []
+    features: list[Feature] = []
     uniq_parameters: Set[str] = set()
-    for loc in locations:
+    for loc in sorted(locations, key=lambda x: x.platform):
         features.append(
             Feature(
                 type="Feature",
@@ -138,7 +138,7 @@ async def get_locations(
                 properties={
                     "name": loc.platform_name if loc.platform_name else f"platform-{loc.platform}",
                     "detail": f"https://oscar.wmo.int/surface/rest/api/search/station?wigosId={loc.platform}",
-                    "parameter-name": list(loc.parameter_names),
+                    "parameter-name": sorted(loc.parameter_names),
                 },
                 geometry=Point(
                     type="Point",
