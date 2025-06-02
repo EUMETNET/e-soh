@@ -34,4 +34,9 @@ type StorageBackend interface {
 	//
 	// Returns (extents, codes.OK, ...) upon success, otherwise (..., error code, reason).
 	GetExtents(*datastore.GetExtentsRequest) (*datastore.GetExtentsResponse, codes.Code, string)
+
+	// GetLocations gets the locations of the most recent observation of the distinct platforms
+	// currently represented in the storage.
+	GetLocations(*datastore.GetLocsRequest, common.TemporalSpec) (
+		*datastore.GetLocsResponse, codes.Code, string)
 }

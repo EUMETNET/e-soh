@@ -41,3 +41,9 @@ async def get_extents_request(request):
     grpc_stub = get_grpc_stub()
     response = await grpc_stub.GetExtents(request)
     return response
+
+
+async def get_locations_request(request):
+    grpc_stub = get_grpc_stub()
+    response = await grpc_stub.GetLocations(request)
+    return response

@@ -363,7 +363,7 @@ $ grpcurl -d '{"attrs": ["standard_name"], "include_instances": true}' -plaintex
     ...
     "platform": "0-20000-0-06215",
           "platform_name": "VOORSCHOTEN AWS",
-    "standard_name": "air_temperature",
+          "standard_name": "air_temperature",
     ...
         },
         {
@@ -514,6 +514,20 @@ ERROR:
 ```
 
 I.e. none of the otherwise matching observations had processing level A.
+
+### Retrieve all locations (of the most recent observation of the distinct platforms currently represented in the storage)
+
+```text
+$ grpcurl -plaintext -proto protobuf/datastore.proto 127.0.0.1:50050 datastore.Datastore.GetLocations
+...
+```
+
+### Retrieve locations in a polygon
+
+```text
+$ grpcurl -d '{"spatial_polygon": {"points": [{"lat": 52.0, "lon": 3.0}, {"lat": 54.0, "lon": 3.0}, {"lat": 54.0, "lon": 4.0}, {"lat": 52.0, "lon": 4.0}]}}' -plaintext -proto protobuf/datastore.proto 127.0.0.1:50050 datastore.Datastore.GetLocations
+...
+```
 
 ## Testing the datastore service with a Python client
 

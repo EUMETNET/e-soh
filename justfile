@@ -40,6 +40,20 @@ copy-proto:
         cp -v -r "./protobuf" "$path"
     done
 
+copy-units:
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    declare -a destination_paths=(
+        "./api"
+        "./ingest/api"
+    )
+
+    for path in "${destination_paths[@]}"
+    do
+        cp -v -r "./units_config/std_name_units.json" "$path"
+    done
+
 
 # Check if the python version is 3.11 for reproducability
 _check-python-version:
@@ -127,7 +141,7 @@ client:
 #                                    build                                     #
 # ---------------------------------------------------------------------------- #
 # Build the docker images
-build: copy-proto
+build: copy-proto copy-units
     docker compose --env-file ./ci/config/env.list --profile monitoring --profile test build
 
 

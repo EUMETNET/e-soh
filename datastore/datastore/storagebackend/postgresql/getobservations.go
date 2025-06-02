@@ -201,35 +201,6 @@ func getTSMetadata(
 	return nil
 }
 
-// getObsTimeFilter derives from tspec the expression used in a WHERE clause for overall
-// (i.e. not time series specific) filtering on obs time.
-//
-// Returns expression.
-func getObsTimeFilter(tspec common.TemporalSpec) string {
-
-	// by default, restrict only to current valid time range
-	loTime, hiTime := common.GetValidTimeRange()
-	timeExprs := []string{
-		fmt.Sprintf("obstime_instant >= to_timestamp(%d)", loTime.Unix()),
-		fmt.Sprintf("obstime_instant <= to_timestamp(%d)", hiTime.Unix()),
-	}
-
-	ti := tspec.Interval
-	if ti != nil { // restrict filter additionally to specified interval
-		// (note the open-ended [from,to> form)
-		if start := ti.GetStart(); start != nil {
-			timeExprs = append(timeExprs, fmt.Sprintf(
-				"obstime_instant >= to_timestamp(%f)", common.Tstamp2float64Secs(start)))
-		}
-		if end := ti.GetEnd(); end != nil {
-			timeExprs = append(timeExprs, fmt.Sprintf(
-				"obstime_instant < to_timestamp(%f)", common.Tstamp2float64Secs(end)))
-		}
-	}
-
-	return fmt.Sprintf("(%s)", strings.Join(timeExprs, " AND "))
-}
-
 // TODO: move to postgresql.go since only used there?
 type filterInfo struct {
 	colName  string
@@ -344,54 +315,6 @@ func getGeoFilter(
 	return fmt.Sprintf("(%s) AND (%s)", polygonExpr, circleExpr), nil
 }
 
-// createObsQueryVals creates from request and tspec values used for querying observations.
-//
-// Values to be used for query placeholders are appended to phVals.
-//
-// Upon success the function returns six values:
-// - distinct spec, possibly just an empty string
-// - time filter used in a 'WHERE ... AND ...' clause (possibly just 'TRUE')
-// - geo filter ... ditto
-// - filter for reflectable metadata fields of type int64 ... ditto
-// - filter for reflectable metadata fields of type string ... ditto
-// - nil,
-// otherwise (..., ..., ..., ..., ..., error).
-func createObsQueryVals(
-	request *datastore.GetObsRequest, tspec common.TemporalSpec, phVals *[]interface{}) (
-	string, string, string, string, string, error) {
-
-	distinctSpec := ""
-	if tspec.Latest {
-		// ensure that we select only one observation per time series (which will be the most
-		// recent one thanks to '... ORDER BY ts_id, obstime_instant DESC')
-		distinctSpec = "DISTINCT ON (ts_id)"
-	}
-
-	timeFilter := getObsTimeFilter(tspec)
-
-	geoFilter, err := getGeoFilter(request.GetSpatialPolygon(), request.GetSpatialCircle(), phVals)
-	if err != nil {
-		return "", "", "", "", "", fmt.Errorf("getGeoFilter() failed: %v", err)
-	}
-
-	// --- BEGIN filters for reflectable metadata (of type int64 or string) -------------
-
-	for fieldName := range request.GetFilter() {
-		if !supReflFilterFields.Contains(fieldName) {
-			return "", "", "", "", "", fmt.Errorf(
-				"no such field: %s; available fields: %s",
-				fieldName, strings.Join(supReflFilterFieldsSorted, ", "))
-		}
-	}
-
-	int64MdataFilter := getInt64MdataFilter(request.GetFilter(), phVals)
-	stringMdataFilter := getStringMdataFilter(request.GetFilter(), phVals)
-
-	// --- END filters for reflectable metadata (of type int64 or string) -------------
-
-	return distinctSpec, timeFilter, geoFilter, int64MdataFilter, stringMdataFilter, nil
-}
-
 // scanObsRow scans all columns from the current result row in rows and converts to an ObsMetadata
 // object.
 // Returns (ObsMetadata object, time series ID, nil) upon success, otherwise (..., ..., error).
@@ -500,20 +423,31 @@ func convertSelectCol(
 	return "NULL" // colName not included
 }
 
-// getObs gets into obs all observations that match request and tspec. Fields to include
+// getObs gets all observations that match request and tspec. Fields to include
 // (as non-NULL values) in the final result are defined in incFields.
 //
-// Returns nil upon success, otherwise error.
+// Returns (observations, nil) upon success, otherwise (..., error).
 func getObs(
 	db *sql.DB, request *datastore.GetObsRequest, tspec common.TemporalSpec,
-	obs *[]*datastore.Metadata2, incFields common.StringSet) error {
+	incFields common.StringSet) (*[]*datastore.Metadata2, error) {
+
+	obs := []*datastore.Metadata2{}
+
+	// get distinct spec
+	distinctSpec := ""
+	if tspec.Latest {
+		// ensure that we select only one observation per time series (which will be the most
+		// recent one thanks to '... ORDER BY ts_id, obstime_instant DESC')
+		distinctSpec = "DISTINCT ON (ts_id)"
+	}
 
 	// get values needed for query
 	phVals := []interface{}{} // placeholder values
-	distinctSpec, timeFilter, geoFilter, int64MdataFilter, stringMdataFilter,
-		err := createObsQueryVals(request, tspec, &phVals)
+	timeFilter, geoFilter, int64MdataFilter, stringMdataFilter, err := createObsQueryVals(
+		request.GetSpatialPolygon(), request.GetSpatialCircle(), request.GetFilter(), tspec,
+		&phVals)
 	if err != nil {
-		return fmt.Errorf("createObsQueryVals() failed: %v", err)
+		return nil, fmt.Errorf("createObsQueryVals() failed: %v", err)
 	}
 
 	// convert obsInt64MdataCols according to incFields
@@ -539,7 +473,7 @@ func getObs(
 			%s,
 			%s
 		FROM observation
-		JOIN time_series on time_series.id = observation.ts_id
+		JOIN time_series on observation.ts_id = time_series.id
 		JOIN geo_point ON observation.geo_point_id = geo_point.id
 		WHERE %s AND %s AND %s AND %s
 		ORDER BY ts_id, obstime_instant DESC
@@ -556,7 +490,7 @@ func getObs(
 
 	rows, err := db.Query(query, phVals...)
 	if err != nil {
-		return fmt.Errorf("db.Query() failed: %v", err)
+		return nil, fmt.Errorf("db.Query() failed: %v", err)
 	}
 	defer rows.Close()
 
@@ -566,7 +500,7 @@ func getObs(
 	for rows.Next() {
 		obsMdata, tsID, err := scanObsRow(rows)
 		if err != nil {
-			return fmt.Errorf("scanObsRow() failed: %v", err)
+			return nil, fmt.Errorf("scanObsRow() failed: %v", err)
 		}
 
 		// Handle obstime_instant as a special case instead of using convertSelectCol. Its value is
@@ -594,18 +528,18 @@ func getObs(
 		tsIDs = append(tsIDs, fmt.Sprintf("%d", tsID))
 	}
 	if err = getTSMetadata(db, tsIDs, tsMdatas, incFields); err != nil {
-		return fmt.Errorf("getTSMetadata() failed: %v", err)
+		return nil, fmt.Errorf("getTSMetadata() failed: %v", err)
 	}
 
 	// assemble final output
 	for tsID, obsMdata := range obsMdatas {
-		*obs = append(*obs, &datastore.Metadata2{
+		obs = append(obs, &datastore.Metadata2{
 			TsMdata:  tsMdatas[tsID],
 			ObsMdata: obsMdata,
 		})
 	}
 
-	return nil
+	return &obs, nil
 }
 
 // GetObservations ... (see documentation in StorageBackend interface)
@@ -620,11 +554,10 @@ func (sbe *PostgreSQL) GetObservations(
 		return nil, codes.Internal, fmt.Sprintf("getIncRespFields() failed: %v", err)
 	}
 
-	obs := []*datastore.Metadata2{}
-	if err = getObs(
-		sbe.Db, request, tspec, &obs, incFields); err != nil {
+	obs, err := getObs(sbe.Db, request, tspec, incFields)
+	if err != nil {
 		return nil, codes.Internal, fmt.Sprintf("getObs() failed: %v", err)
 	}
 
-	return &datastore.GetObsResponse{Observations: obs}, codes.OK, ""
+	return &datastore.GetObsResponse{Observations: *obs}, codes.OK, ""
 }
