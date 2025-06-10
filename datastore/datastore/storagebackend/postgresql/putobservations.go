@@ -571,7 +571,7 @@ type tsInfo struct {
 // PutObservations ... (see documentation in StorageBackend interface)
 func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.Code, string) {
 
-	log.Printf("Entered PutObservations with %v observations...", len(request.Observations))
+	//log.Printf("Entered PutObservations with %v observations...", len(request.Observations))
 
 	// reject call if # of observations exceeds limit
 	if len(request.Observations) > putObsLimit {
