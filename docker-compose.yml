@@ -58,6 +58,7 @@ services:
       - HITIME=$HITIME
       - CLEANUPINTERVAL=$CLEANUPINTERVAL
       - PUTOBSLIMIT=$PUTOBSLIMIT
+      - LOGREQSTATS=true
     restart: on-failure
     healthcheck:
       test:

@@ -153,9 +153,10 @@ The following environment variables are supported:
 | `ENABLE_SSL`        | No  | `disable`          | Weather to use ssl for connection |
 | `DYNAMICTIME`     | No  | `true`             | Whether the valid time range is _dynamic_ or _static_ (defined below). |
 | `LOTIME`          | No  | `86400`            | The _earliest_ valid time as seconds to be either [1] subtracted from the current time (if the valid time range is _dynamic_) or [2] added to UNIX epoch (1970-01-01T00:00:00Z) (if the valid time range is _static_). In the case of a _static_ valid time range, the `LOTIME` can optionally be specified as an ISO-8601 datetime of the exact form `2023-10-10T00:00:00Z`. |
-| `HITIME`          | No  | `-600`               | Same as `LOTIME`, but for the _latest_ valid time. Note a default leeway of 10 minutes into the future to reduce risk of missing visual observations. |
+| `HITIME`          | No  | `-600`             | Same as `LOTIME`, but for the _latest_ valid time. Note a default leeway of 10 minutes into the future to reduce risk of missing visual observations. |
 | `CLEANUPINTERVAL` | No  | `86400`            | The minimum time duration in seconds between automatic cleanups (like removing obsolete observations from the physical store). |
 | `PUTOBSLIMIT`     | No  | `100000`           | Maximum number of observations allowed in a single call to `PutObservations`. |
+| `LOGREQSTATS`     | No  | `false`            | Whether request stats (like client IP and processing time) will be logged using log.Printf(). |
 
 **TODO:** Ensure that these variables are [passed properly](https://docs.docker.com/compose/environment-variables/set-environment-variables/) to the relevant `docker compose`
 commands. Any secrets should be passed using a [special mechanism](https://docs.docker.com/compose/use-secrets/), etc.
