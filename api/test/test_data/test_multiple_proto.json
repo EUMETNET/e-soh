@@ -4,7 +4,7 @@
             "ts_mdata": {
                 "platform": "0-20000-0-06280",
                 "standard_name": "wind_speed",
-                "unit": "m s-1",
+                "unit": "m/s",
                 "level": 1000,
                 "function": "mean",
                 "period": 600,
@@ -42,7 +42,7 @@
             "ts_mdata": {
                 "platform": "0-20000-0-06280",
                 "standard_name": "wind_from_direction",
-                "unit": "degree",
+                "unit": "deg",
                 "level": 200,
                 "function": "mean",
                 "period": 600,

@@ -111,14 +111,18 @@
             "unit": {
                 "label": {
                     "en": "hPa"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/HectoPA",
+                    "value": "hPa"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
-            "rodeo:standard_name": "air_pressure_at_mean_sea_level",
-            "rodeo:level": 1.0
+            "metocean:standard_name": "air_pressure_at_mean_sea_level",
+            "metocean:level": 1.0
         },
         "air_temperature:0.0:minimum:PT12H": {
             "type": "Parameter",
@@ -133,15 +137,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 0.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 0.0
         },
         "air_temperature:0.0:minimum:PT14H": {
             "type": "Parameter",
@@ -156,15 +164,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT14H"
+                "duration": "PT14H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 0.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 0.0
         },
         "air_temperature:0.0:minimum:PT6H": {
             "type": "Parameter",
@@ -179,15 +191,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 0.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 0.0
         },
         "air_temperature:0.1:minimum:PT10M": {
             "type": "Parameter",
@@ -202,15 +218,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 0.1
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 0.1
         },
         "air_temperature:1.5:maximum:PT10M": {
             "type": "Parameter",
@@ -225,15 +245,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 1.5
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 1.5
         },
         "air_temperature:1.5:minimum:PT10M": {
             "type": "Parameter",
@@ -248,15 +272,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 1.5
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 1.5
         },
         "air_temperature:2.0:maximum:PT12H": {
             "type": "Parameter",
@@ -271,15 +299,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "air_temperature:2.0:maximum:PT24H": {
             "type": "Parameter",
@@ -294,15 +326,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT24H"
+                "duration": "PT24H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "air_temperature:2.0:maximum:PT6H": {
             "type": "Parameter",
@@ -317,15 +353,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "air_temperature:2.0:mean:PT1M": {
             "type": "Parameter",
@@ -340,15 +380,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "air_temperature:2.0:minimum:PT12H": {
             "type": "Parameter",
@@ -363,15 +407,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "air_temperature:2.0:minimum:PT14H": {
             "type": "Parameter",
@@ -386,15 +434,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT14H"
+                "duration": "PT14H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "air_temperature:2.0:minimum:PT6H": {
             "type": "Parameter",
@@ -409,15 +461,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "cloud_area_fraction:2.0:point:PT0S": {
             "type": "Parameter",
@@ -432,15 +488,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "oktas"
+                    "en": "okta"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/OKTA",
+                    "value": "okta"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "point",
-                "period": "PT0S"
+                "duration": "PT0S"
             },
-            "rodeo:standard_name": "cloud_area_fraction",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "cloud_area_fraction",
+            "metocean:level": 2.0
         },
         "cloud_base_altitude:2.0:point:PT0S": {
             "type": "Parameter",
@@ -456,14 +516,18 @@
             "unit": {
                 "label": {
                     "en": "m"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/M",
+                    "value": "m"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "point",
-                "period": "PT0S"
+                "duration": "PT0S"
             },
-            "rodeo:standard_name": "cloud_base_altitude",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "cloud_base_altitude",
+            "metocean:level": 2.0
         },
         "dew_point_temperature:1.5:mean:PT1M": {
             "type": "Parameter",
@@ -478,15 +542,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
-            "rodeo:standard_name": "dew_point_temperature",
-            "rodeo:level": 1.5
+            "metocean:standard_name": "dew_point_temperature",
+            "metocean:level": 1.5
         },
         "duration_of_sunshine:2.0:point:PT0S": {
             "type": "Parameter",
@@ -502,14 +570,18 @@
             "unit": {
                 "label": {
                     "en": "s"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/SEC",
+                    "value": "s"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "point",
-                "period": "PT0S"
+                "duration": "PT0S"
             },
-            "rodeo:standard_name": "duration_of_sunshine",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "duration_of_sunshine",
+            "metocean:level": 2.0
         },
         "lwe_precipitation_rate:1.8:mean:PT10M": {
             "type": "Parameter",
@@ -525,14 +597,18 @@
             "unit": {
                 "label": {
                     "en": "mm/h"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/MilliM-PER-HR",
+                    "value": "mm/h"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "lwe_precipitation_rate",
-            "rodeo:level": 1.8
+            "metocean:standard_name": "lwe_precipitation_rate",
+            "metocean:level": 1.8
         },
         "lwe_precipitation_rate:2.5:mean:PT10M": {
             "type": "Parameter",
@@ -548,14 +624,18 @@
             "unit": {
                 "label": {
                     "en": "mm/h"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/MilliM-PER-HR",
+                    "value": "mm/h"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "lwe_precipitation_rate",
-            "rodeo:level": 2.5
+            "metocean:standard_name": "lwe_precipitation_rate",
+            "metocean:level": 2.5
         },
         "rainfall_amount:2.0:point:PT0S": {
             "type": "Parameter",
@@ -571,14 +651,18 @@
             "unit": {
                 "label": {
                     "en": "kg/m2"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                    "value": "kg/m²"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "point",
-                "period": "PT0S"
+                "duration": "PT0S"
             },
-            "rodeo:standard_name": "rainfall_amount",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "rainfall_amount",
+            "metocean:level": 2.0
         },
         "rainfall_amount:2.0:point:PT12H": {
             "type": "Parameter",
@@ -594,14 +678,18 @@
             "unit": {
                 "label": {
                     "en": "kg/m2"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                    "value": "kg/m²"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "point",
-                "period": "PT12H"
+                "duration": "PT12H"
             },
-            "rodeo:standard_name": "rainfall_amount",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "rainfall_amount",
+            "metocean:level": 2.0
         },
         "rainfall_amount:2.0:point:PT24H": {
             "type": "Parameter",
@@ -617,14 +705,18 @@
             "unit": {
                 "label": {
                     "en": "kg/m2"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                    "value": "kg/m²"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "point",
-                "period": "PT24H"
+                "duration": "PT24H"
             },
-            "rodeo:standard_name": "rainfall_amount",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "rainfall_amount",
+            "metocean:level": 2.0
         },
         "rainfall_amount:2.0:point:PT6H": {
             "type": "Parameter",
@@ -640,14 +732,18 @@
             "unit": {
                 "label": {
                     "en": "kg/m2"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/KiloGM-PER-M2",
+                    "value": "kg/m²"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "point",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
-            "rodeo:standard_name": "rainfall_amount",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "rainfall_amount",
+            "metocean:level": 2.0
         },
         "rainfall_rate:2.0:mean:PT10M": {
             "type": "Parameter",
@@ -663,14 +759,18 @@
             "unit": {
                 "label": {
                     "en": "mm/h"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/MilliM-PER-HR",
+                    "value": "mm/h"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "rainfall_rate",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "rainfall_rate",
+            "metocean:level": 2.0
         },
         "relative_humidity:2.0:mean:PT1M": {
             "type": "Parameter",
@@ -685,15 +785,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "percent"
+                    "en": "%"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/PERCENT",
+                    "value": "%"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT1M"
+                "duration": "PT1M"
             },
-            "rodeo:standard_name": "relative_humidity",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "relative_humidity",
+            "metocean:level": 2.0
         },
         "surface_downwelling_shortwave_flux_in_air:2.0:mean:PT10M": {
             "type": "Parameter",
@@ -709,14 +813,18 @@
             "unit": {
                 "label": {
                     "en": "W/m2"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/W-PER-M2",
+                    "value": "W/m²"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "surface_downwelling_shortwave_flux_in_air",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "surface_downwelling_shortwave_flux_in_air",
+            "metocean:level": 2.0
         },
         "visibility_in_air:1.8:mean:PT10M": {
             "type": "Parameter",
@@ -732,14 +840,18 @@
             "unit": {
                 "label": {
                     "en": "m"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/M",
+                    "value": "m"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "visibility_in_air",
-            "rodeo:level": 1.8
+            "metocean:standard_name": "visibility_in_air",
+            "metocean:level": 1.8
         },
         "visibility_in_air:2.5:mean:PT10M": {
             "type": "Parameter",
@@ -755,14 +867,18 @@
             "unit": {
                 "label": {
                     "en": "m"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/M",
+                    "value": "m"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "visibility_in_air",
-            "rodeo:level": 2.5
+            "metocean:standard_name": "visibility_in_air",
+            "metocean:level": 2.5
         },
         "wind_from_direction:2.0:mean:PT10M": {
             "type": "Parameter",
@@ -777,15 +893,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degrees"
+                    "en": "deg"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG",
+                    "value": "°"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "wind_from_direction",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "wind_from_direction",
+            "metocean:level": 2.0
         },
         "wind_speed:10.0:mean:PT10M": {
             "type": "Parameter",
@@ -801,14 +921,18 @@
             "unit": {
                 "label": {
                     "en": "m/s"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                    "value": "m/s"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "mean",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "wind_speed",
-            "rodeo:level": 10.0
+            "metocean:standard_name": "wind_speed",
+            "metocean:level": 10.0
         },
         "wind_speed_of_gust:10.0:maximum:PT10M": {
             "type": "Parameter",
@@ -824,14 +948,18 @@
             "unit": {
                 "label": {
                     "en": "m/s"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                    "value": "m/s"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT10M"
+                "duration": "PT10M"
             },
-            "rodeo:standard_name": "wind_speed_of_gust",
-            "rodeo:level": 10.0
+            "metocean:standard_name": "wind_speed_of_gust",
+            "metocean:level": 10.0
         }
     }
 }

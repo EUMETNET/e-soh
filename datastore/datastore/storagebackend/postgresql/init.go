@@ -77,9 +77,6 @@ var (
 	// - Protobuf names are identical to corresponding database column names.
 	// - Protobuf names are snake case (aaa_bbb) whereas Go names are camel case (aaaBbb or AaaBbb).
 
-	// used by upsertTS
-	upsertTSInsertCmd, upsertTSSelectCmd string
-
 	// fields allowable in included_response_fields
 	supIncRespFields    common.StringSet
 	supIncRespFieldsCSV string
@@ -133,6 +130,7 @@ func init() { // automatically called once on program startup (on first import o
 
 	// create ts{Int64|String}StructFields
 	tsInt64StructFields = []reflect.StructField{}
+	tsStringStructFields = []reflect.StructField{}
 	for _, field := range reflect.VisibleFields(reflect.TypeOf(datastore.TSMetadata{})) {
 		if field.IsExported() {
 			switch field.Type.Kind() {
@@ -163,6 +161,9 @@ func init() { // automatically called once on program startup (on first import o
 	}
 
 	// create obs{Int64|String}Pb2go, obs{Int64|String}MdataGoNames, and obs{Int64|String}MdataCols
+	obsInt64Pb2go = map[string]string{}
+	obsInt64MdataGoNames = []string{}
+	obsInt64MdataCols = []string{}
 	obsStringPb2go = map[string]string{}
 	obsStringMdataGoNames = []string{}
 	obsStringMdataCols = []string{}
@@ -259,6 +260,9 @@ func init() { // automatically called once on program startup (on first import o
 	supIncRespFields.Set("links")
 	// --- END TSMetadata fields -------------------
 	// --- BEGIN ObsMetadata fields -------------------
+	for _, f := range obsInt64MdataCols {
+		supIncRespFields.Set(strings.TrimPrefix(f, "observation."))
+	}
 	for _, f := range obsStringMdataCols {
 		supIncRespFields.Set(strings.TrimPrefix(f, "observation."))
 	}

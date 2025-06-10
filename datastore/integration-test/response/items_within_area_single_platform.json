@@ -25,7 +25,7 @@
                 "source": "Royal Netherlands Meteorological Institute (KNMI)",
                 "platform": "0-20000-0-06225",
                 "standard_name": "wind_from_direction",
-                "unit": "degrees",
+                "unit": "deg",
                 "level": 2.0,
                 "period": "PT10M",
                 "instrument": "dd",

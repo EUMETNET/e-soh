@@ -142,14 +142,15 @@ go mod tidy
 
 The following environment variables are supported:
 
-| Variable | Mandatory | Default value | Description |
-| :--      | :--       | :--           | :-- |
+| Variable          | Mandatory | Default value | Description |
+|:------------------| :--       | :--           | :-- |
 | `SERVERPORT`      | No  | `50050`            | Server port number. |
 | `PGHOST`          | No  | `localhost`        | PostgreSQL host. |
 | `PGPORT`          | No  | `5433`             | PostgreSQL port number. |
-| `PGBUSER`         | No  | `postgres`         | PostgreSQL user name. |
+| `PGUSER`          | No  | `postgres`         | PostgreSQL user name. |
 | `PGPASSWORD`      | No  | `mysecretpassword` | PostgreSQL password. |
 | `PGDBNAME`        | No  | `data`             | PostgreSQL database name. |
+| `ENABLE_SSL`        | No  | `disable`          | Weather to use ssl for connection |
 | `DYNAMICTIME`     | No  | `true`             | Whether the valid time range is _dynamic_ or _static_ (defined below). |
 | `LOTIME`          | No  | `86400`            | The _earliest_ valid time as seconds to be either [1] subtracted from the current time (if the valid time range is _dynamic_) or [2] added to UNIX epoch (1970-01-01T00:00:00Z) (if the valid time range is _static_). In the case of a _static_ valid time range, the `LOTIME` can optionally be specified as an ISO-8601 datetime of the exact form `2023-10-10T00:00:00Z`. |
 | `HITIME`          | No  | `-600`             | Same as `LOTIME`, but for the _latest_ valid time. Note a default leeway of 10 minutes into the future to reduce risk of missing visual observations. |
@@ -338,20 +339,20 @@ $ grpcurl -d '{"attrs": ["standard_name"], "include_instances": true}' -plaintex
       },
       "instances": [
         {
-	  ...
-	  "platform": "0-20000-0-06215",
+    ...
+    "platform": "0-20000-0-06215",
           "platform_name": "VOORSCHOTEN AWS",
-	  "standard_name": "air_pressure_at_sea_level",
-	  ...
+    "standard_name": "air_pressure_at_sea_level",
+    ...
         },
         {
-	  ...
-	  "platform": "0-20000-0-06320",
+    ...
+    "platform": "0-20000-0-06320",
           "platform_name": "LICHTEILAND GOEREE",
           "standard_name": "air_pressure_at_sea_level",
-	  ...
+    ...
         },
-	...
+  ...
       ]
     },
     {
@@ -360,20 +361,20 @@ $ grpcurl -d '{"attrs": ["standard_name"], "include_instances": true}' -plaintex
       },
       "instances": [
         {
-	  ...
-	  "platform": "0-20000-0-06215",
+    ...
+    "platform": "0-20000-0-06215",
           "platform_name": "VOORSCHOTEN AWS",
-	  "standard_name": "air_temperature",
-	  ...
+          "standard_name": "air_temperature",
+    ...
         },
         {
-	  ...
-	  "platform": "0-20000-0-06320",
+    ...
+    "platform": "0-20000-0-06320",
           "platform_name": "LICHTEILAND GOEREE",
           "standard_name": "air_temperature",
-	  ...
+    ...
         },
-	...
+  ...
       ]
     },
     ...
@@ -392,8 +393,8 @@ $ grpcurl -d '{"attrs": ["platform", "standard_name"], "include_instances": true
       },
       "instances": [
         {
-	  "title": "Air Pressure at Sea Level 1 Min Average",
-	  ...
+    "title": "Air Pressure at Sea Level 1 Min Average",
+    ...
           "platform": "0-20000-0-06201",
           "platform_name": "D15-FA-1",
           "standard_name": "air_pressure_at_sea_level",
@@ -415,7 +416,7 @@ $ grpcurl -d '{"attrs": ["platform", "standard_name"], "include_instances": true
       "instances": [
         {
           "title": "Air Temperature Maximum last 24 Hours",
-	  ...
+    ...
           "platform": "0-20000-0-06201",
           "platform_name": "D15-FA-1",
           "standard_name": "air_temperature",
@@ -429,7 +430,7 @@ $ grpcurl -d '{"attrs": ["platform", "standard_name"], "include_instances": true
         },
         {
           "title": "Ambient Temperature 1.5m 10 Min Maximum",
-	  ...
+    ...
           "platform": "0-20000-0-06201",
           "platform_name": "D15-FA-1",
           "standard_name": "air_temperature",
@@ -441,7 +442,7 @@ $ grpcurl -d '{"attrs": ["platform", "standard_name"], "include_instances": true
           "parameter_name": "air_temperature:1.5:maximum:PT10M",
           "timeseries_id": "1030bcb120a2e9409b043c2e8e2f2c65"
         },
-	...
+  ...
       ]
     },
     ...
@@ -514,6 +515,20 @@ ERROR:
 ```
 
 I.e. none of the otherwise matching observations had processing level A.
+
+### Retrieve all locations (of the most recent observation of the distinct platforms currently represented in the storage)
+
+```text
+$ grpcurl -plaintext -proto protobuf/datastore.proto 127.0.0.1:50050 datastore.Datastore.GetLocations
+...
+```
+
+### Retrieve locations in a polygon
+
+```text
+$ grpcurl -d '{"spatial_polygon": {"points": [{"lat": 52.0, "lon": 3.0}, {"lat": 54.0, "lon": 3.0}, {"lat": 54.0, "lon": 4.0}, {"lat": 52.0, "lon": 4.0}]}}' -plaintext -proto protobuf/datastore.proto 127.0.0.1:50050 datastore.Datastore.GetLocations
+...
+```
 
 ## Testing the datastore service with a Python client
 

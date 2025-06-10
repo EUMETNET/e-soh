@@ -5,13 +5,12 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
+	_ "github.com/lib/pq"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	_ "github.com/lib/pq"
 )
 
 // PostgreSQL is an implementation of the StorageBackend interface that
@@ -79,49 +78,12 @@ func (sbe *PostgreSQL) setTSUniqueMainCols() error {
 	return nil
 }
 
-// setUpsertTSInsertCmd sets upsertTSInsertCmd to be used by upsertTS.
-func setUpsertTSInsertCmd() {
-
-	cols := getTSColNames()
-
-	formats := make([]string, len(cols))
-	for i := 0; i < len(cols); i++ {
-		formats[i] = "$%d"
-	}
-
-	updateExpr := []string{}
-	for _, col := range getTSColNamesUniqueCompl() {
-		updateExpr = append(updateExpr, fmt.Sprintf("%s = EXCLUDED.%s", col, col))
-	}
-
-	upsertTSInsertCmd = fmt.Sprintf(`
-		INSERT INTO time_series (%s) VALUES (%s)
-		ON CONFLICT ON CONSTRAINT unique_main DO UPDATE SET %s
-		`,
-		strings.Join(cols, ","),
-		strings.Join(createPlaceholders(formats), ","),
-		strings.Join(updateExpr, ","),
-	)
-}
-
-// setUpsertTSSelectCmd sets upsertTSSelectCmd to be used by upsertTS.
-func setUpsertTSSelectCmd() {
-
-	whereExpr := []string{}
-	for i, col := range getTSColNamesUnique() {
-		whereExpr = append(whereExpr, fmt.Sprintf("%s=$%d", col, i+1))
-	}
-
-	upsertTSSelectCmd = fmt.Sprintf(
-		`SELECT id FROM time_series WHERE %s`, strings.Join(whereExpr, " AND "))
-}
-
 // openDB opens database identified by host/port/user/password/dbname.
 // Returns (DB, nil) upon success, otherwise (..., error).
-func openDB(host, port, user, password, dbname string) (*sql.DB, error) {
+func openDB(host, port, user, password, dbname, enable_ssl string) (*sql.DB, error) {
 	connInfo := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, enable_ssl)
 
 	db, err := sql.Open("postgres", connInfo)
 	if err != nil {
@@ -147,10 +109,10 @@ func NewPostgreSQL() (*PostgreSQL, error) {
 	user := common.Getenv("PGUSER", "postgres")
 	password := common.Getenv("PGPASSWORD", "mysecretpassword")
 	dbname := common.Getenv("PGDBNAME", "data")
-
+	enable_ssl := common.Getenv("ENABLE_SSL", "disable")
 	var err error
 
-	sbe.Db, err = openDB(host, port, user, password, dbname)
+	sbe.Db, err = openDB(host, port, user, password, dbname, enable_ssl)
 	if err != nil {
 		return nil, fmt.Errorf("openDB() failed: %v", err)
 	}
@@ -163,9 +125,6 @@ func NewPostgreSQL() (*PostgreSQL, error) {
 	if err != nil {
 		return nil, fmt.Errorf("sbe.setTSUniqueMainCols() failed: %v", err)
 	}
-
-	setUpsertTSInsertCmd()
-	setUpsertTSSelectCmd()
 
 	// cleanup the database at regular intervals
 	ticker := time.NewTicker(cleanupInterval)

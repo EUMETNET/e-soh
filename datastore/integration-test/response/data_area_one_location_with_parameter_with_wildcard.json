@@ -23,12 +23,12 @@
         "referencing": [
             {
                 "coordinates": [
-                    "y",
-                    "x"
+                    "x",
+                    "y"
                 ],
                 "system": {
                     "type": "GeographicCRS",
-                    "id": "http://www.opengis.net/def/crs/EPSG/0/4326"
+                    "id": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
                 }
             },
             {
@@ -56,15 +56,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "maximum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         },
         "air_temperature:2.0:minimum:PT6H": {
             "type": "Parameter",
@@ -79,15 +83,19 @@
             },
             "unit": {
                 "label": {
-                    "en": "degC"
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "type": "https://qudt.org/vocab/unit/DEG_C",
+                    "value": "°C"
                 }
             },
-            "measurementType": {
+            "metocean:measurementType": {
                 "method": "minimum",
-                "period": "PT6H"
+                "duration": "PT6H"
             },
-            "rodeo:standard_name": "air_temperature",
-            "rodeo:level": 2.0
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": 2.0
         }
     },
     "ranges": {
@@ -96,8 +104,8 @@
             "dataType": "float",
             "axisNames": [
                 "t",
-                "y",
-                "x"
+                "x",
+                "y"
             ],
             "shape": [
                 1,
@@ -113,8 +121,8 @@
             "dataType": "float",
             "axisNames": [
                 "t",
-                "y",
-                "x"
+                "x",
+                "y"
             ],
             "shape": [
                 1,
@@ -126,5 +134,5 @@
             ]
         }
     },
-    "rodeo:wigosId": "0-20000-0-06257"
+    "metocean:wigosId": "0-20000-0-06257"
 }

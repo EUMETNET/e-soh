@@ -1,4 +1,4 @@
-standard_names = {
+standard_name = {
     "Default": {
         "value": "",
     },
@@ -16,7 +16,7 @@ standard_names = {
     },
 }
 
-levels = {
+level = {
     "Default": {
         "value": "",
     },
@@ -42,7 +42,7 @@ levels = {
     },
 }
 
-periods = {
+duration = {
     "Default": {
         "value": "",
     },
@@ -64,7 +64,7 @@ periods = {
     },
 }
 
-methods = {
+method = {
     "Default": {
         "value": "",
     },

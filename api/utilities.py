@@ -1,17 +1,16 @@
-import sys
 import re
-import isodate
-
+import sys
 from datetime import datetime
 from datetime import timedelta
-from typing import Tuple
 from itertools import chain
+from typing import Tuple
 
-from isodate import ISO8601Error
 import datastore_pb2 as dstore
+import isodate
 from fastapi import HTTPException
 from google.protobuf.timestamp_pb2 import Timestamp
 from grpc_getter import get_ts_ag_request
+from isodate import ISO8601Error
 from pydantic import AwareDatetime
 from pydantic import TypeAdapter
 
@@ -91,15 +90,8 @@ async def verify_parameter_names(parameter_names: list) -> None:
 
 
 def create_url_from_request(request):
-    # The server root_path contains the path added by a reverse proxy
-    base_path = request.scope.get("root_path")
-
-    # The host will (should) be correctly set from X-Forwarded-Host and X-Forwarded-Scheme
-    # headers by any proxy in front of it
-    host = request.headers["host"]
-    scheme = request.url.scheme
-
-    return f"{scheme}://{host}{base_path}/collections"
+    # IMPORTANT: We rely on proxy to block attempts to modify the URL (e.g. blocking "Host" header)
+    return f"{request.base_url}collections"
 
 
 def split_and_strip(cs_string: str) -> list[str]:
@@ -140,7 +132,7 @@ async def add_request_parameters(
     standard_names: str | None,
     levels: str | None,
     methods: str | None,
-    periods: str | None,
+    durations: str | None,
 ):
     if parameter_name:
         parameter_name = split_and_strip(parameter_name)
@@ -161,8 +153,8 @@ async def add_request_parameters(
     if methods:
         request.filter["function"].values.extend(split_and_strip(methods))
 
-    if periods:
-        request.filter["period"].values.extend(get_periods_or_range(periods))
+    if durations:
+        request.filter["period"].values.extend(get_periods_or_range(durations))
 
 
 def get_periods_or_range(periods: str) -> list[str]:

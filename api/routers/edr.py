@@ -1,10 +1,7 @@
 # For developing:    uvicorn main:app --reload
-from collections import defaultdict
 from typing import Annotated
-from typing import DefaultDict
 from typing import Dict
 from typing import Set
-from typing import Tuple
 
 import datastore_pb2 as dstore
 import formatters
@@ -23,6 +20,8 @@ from formatters.covjson import make_parameter
 from geojson_pydantic import Feature
 from geojson_pydantic import Point
 from grpc_getter import get_obs_request
+from grpc_getter import get_locations_request
+from grpc_getter import get_ts_ag_request
 from response_classes import CoverageJsonResponse
 from response_classes import GeoJsonResponse
 from shapely import geometry
@@ -79,127 +78,86 @@ async def get_locations(
             openapi_examples=openapi_examples.parameter_name,
         ),
     ] = None,
-    standard_names: Annotated[
+    standard_name: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.standard_names,
-            openapi_examples=custom_dimension_examples.standard_names,
+            description=edr_query_parameter_descriptions.standard_name,
+            openapi_examples=custom_dimension_examples.standard_name,
         ),
     ] = None,
-    levels: Annotated[
+    level: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.levels,
-            openapi_examples=custom_dimension_examples.levels,
+            description=edr_query_parameter_descriptions.level,
+            openapi_examples=custom_dimension_examples.level,
         ),
     ] = None,
-    methods: Annotated[
+    method: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.methods,
-            openapi_examples=custom_dimension_examples.methods,
+            description=edr_query_parameter_descriptions.method,
+            openapi_examples=custom_dimension_examples.method,
         ),
     ] = None,
-    periods: Annotated[
+    duration: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.duration,
+            openapi_examples=custom_dimension_examples.duration,
         ),
     ] = None,
 ) -> EDRFeatureCollection:  # Hack to use string
-    ts_request = dstore.GetObsRequest(
-        temporal_latest=True,
-        included_response_fields=[
-            "parameter_name",
-            "platform",
-            "platform_name",
-            "geo_point",
-            "standard_name",
-            "unit",
-            "level",
-            "period",
-            "function",
-        ],
-    )
+    loc_request = dstore.GetLocsRequest()
+
     # Add spatial polygon to the time series request if bbox exists.
     if bbox:
         left, bottom, right, top = validate_bbox(bbox)
         poly = geometry.Polygon([(left, bottom), (right, bottom), (right, top), (left, top)])
-        ts_request.spatial_polygon.points.extend(
+        loc_request.spatial_polygon.points.extend(
             [dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords],
         )
 
-    await add_request_parameters(ts_request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(loc_request, parameter_name, datetime, standard_name, level, method, duration)
 
-    grpc_response = await get_obs_request(ts_request)
-    observations = grpc_response.observations
+    grpc_response = await get_locations_request(loc_request)
+    locations = grpc_response.locations
 
-    if len(observations) == 0:
+    if len(locations) == 0:
         raise HTTPException(
             status_code=404,
             detail="Query did not return any locations.",
         )
 
-    platform_parameters: DefaultDict[str, Set[str]] = defaultdict(set)
-    platform_names: Dict[str, Set[str]] = defaultdict(set)
-    platform_coordinates: Dict[str, Set[Tuple[float, float]]] = defaultdict(set)
+    features: list[Feature] = []
+    uniq_parameters: Set[str] = set()
+    for loc in sorted(locations, key=lambda x: x.platform):
+        features.append(
+            Feature(
+                type="Feature",
+                id=loc.platform,
+                properties={
+                    "name": loc.platform_name if loc.platform_name else f"platform-{loc.platform}",
+                    "detail": f"https://oscar.wmo.int/surface/rest/api/search/station?wigosId={loc.platform}",
+                    "parameter-name": sorted(loc.parameter_names),
+                },
+                geometry=Point(
+                    type="Point",
+                    coordinates=(loc.geo_point.lon, loc.geo_point.lat),
+                ),
+            )
+        )
+        uniq_parameters.update(loc.parameter_names)
+
+    ts_request = dstore.GetTSAGRequest(attrs=["parameter_name", "standard_name", "unit", "level", "period", "function"])
+    ts_response = await get_ts_ag_request(ts_request)
+
     all_parameters: Dict[str, Parameter] = {}
-    for obs in observations:
-        platform_names[obs.ts_mdata.platform].add(
-            obs.ts_mdata.platform_name if obs.ts_mdata.platform_name else f"platform-{obs.ts_mdata.platform}"
-        )
-        parameter = make_parameter(obs.ts_mdata)
-        platform_parameters[obs.ts_mdata.platform].add(obs.ts_mdata.parameter_name)
-        # Take last point
-        platform_coordinates[obs.ts_mdata.platform].add(
-            (obs.obs_mdata[-1].geo_point.lon, obs.obs_mdata[-1].geo_point.lat)
-        )
-        # There might be parameter inconsistencies (e.g one station is reporting in Pa, and another in hPa)
-        # We always return the "last" parameter definition found (in /locations and collection metadata).
-        # Note that the correct UoM is always returned in the Coverage parameters for the data endpoints.
+    for group in ts_response.groups:
+        ts = group.combo
+        all_parameters[ts.parameter_name] = make_parameter(ts)
 
-        all_parameters[obs.ts_mdata.parameter_name] = parameter
-
-    # TODO: Do we want to check for multiple coordinates or names on one station?
-    #  Can we communicate this to the user without throwing an error?
-    # for station_id in platform_parameters.keys():
-    #     if len(platform_coordinates[station_id]) > 1:
-    #         raise HTTPException(
-    #             status_code=500,
-    #             detail={
-    #                 "coordinates": f"Station with id `{station_id} "
-    #                 f"has multiple coordinates: {platform_coordinates[station_id]}"
-    #             },
-    #         )
-    #     if len(platform_names[station_id]) > 1:
-    #         raise HTTPException(
-    #             status_code=500,
-    #             detail={
-    #                 "platform_name": f"Station with id `{station_id} "
-    #                                  f"has multiple names: {platform_names[station_id]}"
-    #             },
-    #         )
-
-    features = [
-        Feature(
-            type="Feature",
-            id=station_id,
-            properties={
-                "name": sorted(list(platform_names[station_id]))[0],  # Get "first" one if there are multiple
-                "detail": f"https://oscar.wmo.int/surface/rest/api/search/station?wigosId={station_id}",
-                "parameter-name": sorted(platform_parameters[station_id]),
-            },
-            geometry=Point(
-                type="Point",
-                coordinates=sorted(list(platform_coordinates[station_id]))[0],  # Get "first" one if there are multiple
-            ),
-        )
-        for station_id in sorted(platform_parameters.keys())  # Sort by station_id
-    ]
-    parameters = {parameter_id: all_parameters[parameter_id] for parameter_id in sorted(all_parameters)}
-
-    return EDRFeatureCollection(features=features, type="FeatureCollection", parameters=parameters)
+    return_parameters = {parameter_name: all_parameters[parameter_name] for parameter_name in sorted(uniq_parameters)}
+    return EDRFeatureCollection(features=features, type="FeatureCollection", parameters=return_parameters)
 
 
 @router.get(
@@ -228,32 +186,32 @@ async def get_data_location_id(
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
     ] = formatters.Formats.covjson,
-    standard_names: Annotated[
+    standard_name: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.standard_names,
-            openapi_examples=custom_dimension_examples.standard_names,
+            description=edr_query_parameter_descriptions.standard_name,
+            openapi_examples=custom_dimension_examples.standard_name,
         ),
     ] = None,
-    levels: Annotated[
+    level: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.levels,
-            openapi_examples=custom_dimension_examples.levels,
+            description=edr_query_parameter_descriptions.level,
+            openapi_examples=custom_dimension_examples.level,
         ),
     ] = None,
-    methods: Annotated[
+    method: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.methods,
-            openapi_examples=custom_dimension_examples.methods,
+            description=edr_query_parameter_descriptions.method,
+            openapi_examples=custom_dimension_examples.method,
         ),
     ] = None,
-    periods: Annotated[
+    duration: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.duration,
+            openapi_examples=custom_dimension_examples.duration,
         ),
     ] = None,
 ):
@@ -264,7 +222,7 @@ async def get_data_location_id(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -302,32 +260,32 @@ async def get_data_position(
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
     ] = formatters.Formats.covjson,
-    standard_names: Annotated[
+    standard_name: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.standard_names,
-            openapi_examples=custom_dimension_examples.standard_names,
+            description=edr_query_parameter_descriptions.standard_name,
+            openapi_examples=custom_dimension_examples.standard_name,
         ),
     ] = None,
-    levels: Annotated[
+    level: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.levels,
-            openapi_examples=custom_dimension_examples.levels,
+            description=edr_query_parameter_descriptions.level,
+            openapi_examples=custom_dimension_examples.level,
         ),
     ] = None,
-    methods: Annotated[
+    method: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.methods,
-            openapi_examples=custom_dimension_examples.methods,
+            description=edr_query_parameter_descriptions.method,
+            openapi_examples=custom_dimension_examples.method,
         ),
     ] = None,
-    periods: Annotated[
+    duration: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.duration,
+            openapi_examples=custom_dimension_examples.duration,
         ),
     ] = None,
 ):
@@ -357,7 +315,7 @@ async def get_data_position(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -392,32 +350,32 @@ async def get_data_area(
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
     ] = formatters.Formats.covjson,
-    standard_names: Annotated[
+    standard_name: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.standard_names,
-            openapi_examples=custom_dimension_examples.standard_names,
+            description=edr_query_parameter_descriptions.standard_name,
+            openapi_examples=custom_dimension_examples.standard_name,
         ),
     ] = None,
-    levels: Annotated[
+    level: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.levels,
-            openapi_examples=custom_dimension_examples.levels,
+            description=edr_query_parameter_descriptions.level,
+            openapi_examples=custom_dimension_examples.level,
         ),
     ] = None,
-    methods: Annotated[
+    method: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.methods,
-            openapi_examples=custom_dimension_examples.methods,
+            description=edr_query_parameter_descriptions.method,
+            openapi_examples=custom_dimension_examples.method,
         ),
     ] = None,
-    periods: Annotated[
+    duration: Annotated[
         str | None,
         Query(
-            description=edr_query_parameter_descriptions.periods,
-            openapi_examples=custom_dimension_examples.periods,
+            description=edr_query_parameter_descriptions.duration,
+            openapi_examples=custom_dimension_examples.duration,
         ),
     ] = None,
 ):
@@ -448,7 +406,7 @@ async def get_data_area(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_names, levels, methods, periods)
+    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations

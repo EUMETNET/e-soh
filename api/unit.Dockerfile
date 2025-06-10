@@ -34,6 +34,7 @@ ENV PROMETHEUS_MULTIPROC_DIR=/tmp/metrics
 RUN mkdir -p /tmp/metrics
 
 WORKDIR "${DOCKER_PATH}"
+RUN python "generate_qudt_units.py"
 CMD ["/bin/sh", "-c", "{ python -m pytest \
     --timeout=60 \
     --junitxml=./output/pytest.xml \
