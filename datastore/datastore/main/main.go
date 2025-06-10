@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"datastore/common"
 	"datastore/datastore"
 	"datastore/dsimpl"
@@ -9,6 +10,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
@@ -18,6 +21,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/peer"
 
 	// Monitoring
 	promservermetrics "datastore/metrics"
@@ -60,14 +64,45 @@ func main() {
 
 	go promservermetrics.TrackUptime()
 
-	// create gRPC server with middleware
-	server := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(
+	// define RPC interceptor to log request time and client IP
+	reqStatsLogger := func(
+		ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler) (interface{}, error) {
+		start := time.Now()
+		resp, err := handler(ctx, req)
+		reqTime := time.Since(start)
+		if info.FullMethod != "/grpc.health.v1.Health/Check" {
+			var clientIp = "unknown"
+			if p, ok := peer.FromContext(ctx); ok {
+				clientIp = p.Addr.String()
+			}
+			log.Printf(
+				"time for method %q: %d ms. Client ip: %s",
+				info.FullMethod, reqTime.Milliseconds(), clientIp)
+		}
+		return resp, err
+	}
+
+	// define RPC interceptors to use
+	interceptors := func() []grpc.UnaryServerInterceptor {
+		// initialize with standard interceptors
+		icpts := []grpc.UnaryServerInterceptor{
 			promservermetrics.InFlightRequestInterceptor,
 			promservermetrics.ResponseSizeUnaryInterceptor,
 			grpcMetrics.UnaryServerInterceptor(),
-		),
-	)
+		}
+
+		// optionally prepend interceptor to log request stats (WARNING: may potentially use a lot
+		// of disk space, so disabled by default)
+		logReqStats := strings.ToLower(common.Getenv("LOGREQSTATS", "false"))
+		if (logReqStats != "false") && (logReqStats != "no") && (logReqStats != "0") {
+			icpts = append([]grpc.UnaryServerInterceptor{reqStatsLogger}, icpts...)
+		}
+		return icpts
+	}
+
+	// create gRPC server with middleware
+	server := grpc.NewServer(grpc.ChainUnaryInterceptor(interceptors()...))
 
 	grpcMetrics.InitializeMetrics(server)
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
