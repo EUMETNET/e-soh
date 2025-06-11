@@ -124,7 +124,6 @@ INSERT INTO observation (ts_id,
                          history,
                          processing_level,
                          quality_code,
-                         camsl,
                          value)
 VALUES ($1,
         to_timestamp($2),
@@ -135,8 +134,7 @@ VALUES ($1,
         $7,
         $8,
         $9,
-        $10,
-        $11),
+        $10),
        ($12,
         to_timestamp($13),
         $14,
@@ -146,8 +144,7 @@ VALUES ($1,
         $18,
         $19,
         $20,
-        $21,
-        $22)
+        $21)
 ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE
     SET id               = EXCLUDED.id,
         geo_point_id     = EXCLUDED.geo_point_id,
@@ -156,7 +153,6 @@ ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE
         history          = EXCLUDED.history,
         processing_level = EXCLUDED.processing_level,
         quality_code     = EXCLUDED.quality_code,
-        camsl            = EXCLUDED.camsl,
         value            = EXCLUDED.value
 WHERE observation.id IS DISTINCT FROM EXCLUDED.id
    OR observation.geo_point_id IS DISTINCT FROM EXCLUDED.geo_point_id
@@ -165,4 +161,3 @@ WHERE observation.id IS DISTINCT FROM EXCLUDED.id
    OR observation.history IS DISTINCT FROM EXCLUDED.history
    OR observation.processing_level IS DISTINCT FROM EXCLUDED.processing_level
    OR observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code
-   OR observation.camsl IS DISTINCT FROM EXCLUDED.camsl

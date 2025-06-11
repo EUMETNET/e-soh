@@ -36,8 +36,8 @@ func getTimeFilter(tspec common.TemporalSpec) string {
 	return fmt.Sprintf("(%s)", strings.Join(timeExprs, " AND "))
 }
 
-// createObsQueryVals creates from polygon, circle, filter, and tspec values used for querying
-// observations.
+// createObsQueryVals creates from polygon, circle, camslRange, filter, and tspec values used for
+// querying observations.
 //
 // Values to be used for query placeholders are appended to phVals.
 //
@@ -49,13 +49,13 @@ func getTimeFilter(tspec common.TemporalSpec) string {
 // - nil,
 // otherwise (..., ..., ..., ..., error).
 func createObsQueryVals(
-	polygon *datastore.Polygon, circle *datastore.Circle, filter map[string]*datastore.Strings,
-	tspec common.TemporalSpec, phVals *[]interface{}) (
+	polygon *datastore.Polygon, circle *datastore.Circle, camslRange string,
+	filter map[string]*datastore.Strings, tspec common.TemporalSpec, phVals *[]interface{}) (
 	string, string, string, string, error) {
 
 	timeFilter := getTimeFilter(tspec)
 
-	geoFilter, err := getGeoFilter(polygon, circle, phVals)
+	geoFilter, err := getGeoFilter(polygon, circle, camslRange, phVals)
 	if err != nil {
 		return "", "", "", "", fmt.Errorf("getGeoFilter() failed: %v", err)
 	}
@@ -70,8 +70,15 @@ func createObsQueryVals(
 		}
 	}
 
-	int64MdataFilter := getInt64MdataFilter(filter, phVals)
-	stringMdataFilter := getStringMdataFilter(filter, phVals)
+	int64MdataFilter, err := getInt64MdataFilter(filter, phVals)
+	if err != nil {
+		return "", "", "", "", fmt.Errorf("getInt64MdataFilter() failed: %v", err)
+	}
+
+	stringMdataFilter, err := getStringMdataFilter(filter, phVals)
+	if err != nil {
+		return "", "", "", "", fmt.Errorf("getStringMdataFilter() failed: %v", err)
+	}
 
 	// --- END filters for reflectable metadata (of type int64 or string) -------------
 

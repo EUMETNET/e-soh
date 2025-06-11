@@ -136,25 +136,25 @@ message ObsMetadata {
     Point geo_point = 1 [json_name = "geo_point"];
     Polygon geo_polygon = 2 [json_name = "geo_polygon"];
   }
-  oneof obstime {
-    google.protobuf.Timestamp obstime_instant = 3 [json_name = "obstime_instant"];
-    //TimeInterval obstime_interval = 4 [json_name = "obstime_interval"]; -- unsupported for now
-  }
-  google.protobuf.Timestamp pubtime = 5;
-  // --- END non-reflectable metadata -----------------
-
-  // --- BEGIN reflectable metadata (of type int64 or string)
-  string id = 6;
-  string data_id = 7 [json_name = "data_id"];
-  string history = 8;
-  string processing_level = 9 [json_name = "processing_level"];
-  int64 quality_code = 10 [json_name = "quality_code"];
-  int64 camsl = 11; // centimeters above mean sea level
+  optional int32 camsl = 3; // centimeters above mean sea level
   // Case 1 - stationary data: camsl of the station ground position
   // Case 2 - mobile data: camsl of the sensor itself
   // NOTE: in Case 1, the absolute vertical location of the sensor would be camsl + level where
   //   level is the height above ground (hag) of the sensor. (Typical values for level are the WMO
   //   standard 2m for temperature and 10m for wind.)
+  oneof obstime {
+    google.protobuf.Timestamp obstime_instant = 4 [json_name = "obstime_instant"];
+    //TimeInterval obstime_interval = 5 [json_name = "obstime_interval"]; -- unsupported for now
+  }
+  google.protobuf.Timestamp pubtime = 6;
+  // --- END non-reflectable metadata -----------------
+
+  // --- BEGIN reflectable metadata (of type int64 or string)
+  string id = 7;
+  string data_id = 8 [json_name = "data_id"];
+  string history = 9;
+  string processing_level = 10 [json_name = "processing_level"];
+  int64 quality_code = 11 [json_name = "quality_code"];
   // --- END reflectable metadata -----------------
 
   string value = 12; // obs value (not metadata in a strict sense)
@@ -207,9 +207,25 @@ message GetObsRequest {
 
   // --- END temporal spec ----------------------------------
 
-  // spatial filter
+  // --- BEGIN spatial filter ---------------------------------------------
   Polygon spatial_polygon = 3; // if specified, only observations in this polygon may be returned
   Circle spatial_circle = 4; // if specified, only observations in this circle may be returned
+  string camsl_range = 5; // if specified, only observations within this CAMSL (centimeters above
+  // mean sea level) range may be returned.
+  // Syntax:
+  // (NOTE: lo and hi are both int32)
+  // Case 1 - 'lo/hi': matches all V where lo <= V <= hi.
+  //     Examples that match V = 10: '10/10', '-10/10', '9/10', '10/11'.
+  //
+  // Case 2 - '../hi': matches all V where V <= hi.
+  //     Examples that match V = 10: '../10' and '../11'.
+  //
+  // Case 3 - 'lo/..': matches all V where lo <= V.
+  //     Examples that match V = 10: '10/..', '9/..'.
+  //
+  // Case 4 - '../..': matches any V. NOTE: this is the default behavior and is thus never required
+  //     to be explicitly specified (it is supported for completeness/consistency).
+  // --- END spatial filter ---------------------------------------------
 
   // search wrt. TSMetadata.links
   // TODO - needs special handling
@@ -257,12 +273,12 @@ message GetObsRequest {
   //           default behavior and is thus never required to be explicitly specified (it is
   //           supported for completeness/consistency).
   //
-  //       Case 2.5: If P is not any of the integer interval forms of Case 2.1..4, then the value
+  //       Case 2.5: If P is none of the integer interval forms of Case 2.1..4, then the value
   //           V of F is converted to a string and matched against P just like in Case 1.
   //           Example: for F='level', V='10', the following values for P will match:
   //           '10', '1*', '*0', '*'.
   //
-  map<string, Strings> filter = 5;
+  map<string, Strings> filter = 6;
 
   // --- END filter for reflectable metadata of type int64 or string -------------------------
 
@@ -274,12 +290,13 @@ message GetObsRequest {
   //       'history')
   //     * 'links' (non-reflectable field in TSMedatata)
   //     * 'geo_point' (non-reflectable field in ObsMetadata)
+  //     * 'camsl' (--- '' ---)
   //     * 'obstime_instant' (--- '' ---)
   //     * 'pubtime' (--- '' ---)
   //     * 'value' (non-reflection handleable string field in ObsMetadata)
-  repeated string included_response_fields = 6;
+  repeated string included_response_fields = 7;
 
-  // repeated string excluded_response_fields = 7; // TODO
+  // repeated string excluded_response_fields = 8; // TODO
 }
 
 message GetObsResponse {
@@ -334,7 +351,8 @@ message GetLocsRequest {
   TimeInterval temporal_interval = 1;
   Polygon spatial_polygon = 2;
   Circle spatial_circle = 3;
-  map<string, Strings> filter = 4;
+  string camsl_range = 4;
+  map<string, Strings> filter = 5;
 }
 
 message LocMetadata {
