@@ -350,7 +350,7 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 	index := 0
 	// Loop over unique points
 	for point := range uniquePoints {
-		valsExpr0 := fmt.Sprintf(`(ST_MakePoint($%d, $%d)::geography, $%d)`,
+		valsExpr0 := fmt.Sprintf(`(ST_MakePoint($%d, $%d)::geography, $%d::integer)`,
 			index+1,
 			index+2,
 			index+3,
@@ -399,7 +399,7 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 					log.Printf("db.Query() failed: HINT: %v", e.Hint)
 				}
 			}
-			return nil, fmt.Errorf("tx.Query() failed: %v", err)
+			return nil, fmt.Errorf("db.Query() failed: %v", err)
 		}
 
 		gpIDmap := map[GeoPoint]int64{}
