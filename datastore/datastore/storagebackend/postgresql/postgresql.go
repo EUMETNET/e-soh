@@ -193,20 +193,6 @@ func getTSColNamesUniqueCompl() []string {
 	return result
 }
 
-// createPlaceholders returns the list of n placeholder strings for
-// values in a parameterized query, e.g. $1, to_timestamp($2), ..., $n.
-// Items in formats must be strings containing exactly one "$%d" pattern,
-// e.g. "$%d", "to_timestamp($%d)" etc.
-func createPlaceholders(formats []string) []string {
-	phs := []string{}
-	for i, format := range formats {
-		index := i + 1
-		ph := fmt.Sprintf(format, index)
-		phs = append(phs, ph)
-	}
-	return phs
-}
-
 // createSetFilter creates expression used in a WHERE clause for testing
 // if the value in column colName is included in a set of string values.
 // The filter is fully closed (--> return FALSE) if the set non-nil but empty.
