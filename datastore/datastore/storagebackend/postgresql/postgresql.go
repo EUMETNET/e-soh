@@ -5,12 +5,13 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
-	_ "github.com/lib/pq"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 // PostgreSQL is an implementation of the StorageBackend interface that
@@ -220,16 +221,24 @@ func createSetFilter(colName string, vals []string) string {
 
 // addWhereCondMatchAnyPatternForInt64 appends to whereExpr an expression of the form
 // "(cond1 OR cond2 OR ... OR condN)" where condi tests if the ith pattern in patterns matches
-// colName assumed to be of type int64/BIGINT. A pattern of the form <int64>/<int64> generates
-// a range filter directly on the int type where the from and to values are appended to phVals.
-// Otherwise the function generates an expression where the pattern is matched agains a text-version
-// of the int type in a case-insensitive way. In this case an asterisk in a pattern matches zero or
-// more arbitrary characters, and patterns with '*' replaced with '%' are appended to phVals.
+// colName assumed to be of integer type. A pattern of the form lo/hi, ../hi, lo/.., or ../..
+// generates a range filter directly on the int type where the integer lo and hi values are
+// appended to phVals as appropriate, and the function returns nil.
+//
+// If none of the four patterns matched, there are two cases:
+//
+// Case 1: allowStringMatchFallback is true => the function generates an expression where the
+// pattern is matched against a text-version of the int type in a case-insensitive way. In this
+// case an asterisk in a pattern matches zero or more arbitrary characters, patterns with '*'
+// replaced with '%' are appended to phVals, and the function returns nil.
+//
+// Case 2: allowStringMatchFallback is false => the function returns error.
 func addWhereCondMatchAnyPatternForInt64(
-	colName string, patterns []string, whereExpr *[]string, phVals *[]interface{}) {
+	colName string, patterns []string, whereExpr *[]string, phVals *[]interface{},
+	allowStringMatchFallback bool) error {
 
 	if (patterns == nil) || (len(patterns) == 0) {
-		return // nothing to do
+		return nil // nothing to do
 	}
 
 	// getInt64RangeBoth checks if ptn is of the form '<int64>/<int64>', in which case
@@ -319,15 +328,20 @@ func addWhereCondMatchAnyPatternForInt64(
 			// disable int range filtering, but note that we still don't want to fall
 			// back to regular string matching!
 			whereExprOR = append(whereExprOR, "TRUE")
-		} else { // fall back to regular string matching
+		} else if allowStringMatchFallback { // fall back to regular string matching
 			index++
 			expr := fmt.Sprintf("(lower(%s::text) LIKE lower($%d))", colName, index)
 			whereExprOR = append(whereExprOR, expr)
 			*phVals = append(*phVals, strings.ReplaceAll(ptn, "*", "%"))
+		} else {
+			return fmt.Errorf(
+				"invalid int range pattern: %s; must be one of lo/hi, ../hi, lo/.., or ../..", ptn)
 		}
 	}
 
 	*whereExpr = append(*whereExpr, fmt.Sprintf("(%s)", strings.Join(whereExprOR, " OR ")))
+
+	return nil
 }
 
 // addWhereCondMatchAnyPatternForString appends to whereExpr an expression of the form
@@ -336,10 +350,10 @@ func addWhereCondMatchAnyPatternForInt64(
 // pattern matches zero or more arbitrary characters. The patterns with '*' replaced with '%' are
 // appended to phVals.
 func addWhereCondMatchAnyPatternForString(
-	colName string, patterns []string, whereExpr *[]string, phVals *[]interface{}) {
+	colName string, patterns []string, whereExpr *[]string, phVals *[]interface{}, _ bool) error {
 
 	if (patterns == nil) || (len(patterns) == 0) {
-		return
+		return nil
 	}
 
 	whereExprOR := []string{}
@@ -353,6 +367,8 @@ func addWhereCondMatchAnyPatternForString(
 	}
 
 	*whereExpr = append(*whereExpr, fmt.Sprintf("(%s)", strings.Join(whereExprOR, " OR ")))
+
+	return nil
 }
 
 // getInt64MdataFilterFromFilterInfos derives from filterInfos the expression used in a WHERE
@@ -369,15 +385,20 @@ func addWhereCondMatchAnyPatternForString(
 //
 // Values to be used for query placeholders are appended to phVals.
 //
-// Returns expression.
+// Returns (expression, nil) on success, otherwise (..., error).
 func getMdataFilterFromFilterInfos(
 	filterInfos []filterInfo, phVals *[]interface{},
-	whereExprGenerator func(string, []string, *[]string, *[]interface{})) string {
+	whereExprGenerator func(string, []string, *[]string, *[]interface{}, bool) error,
+	allowStringMatchFallback bool) (string, error) {
 
 	whereExprAND := []string{}
 
 	for _, sfi := range filterInfos {
-		whereExprGenerator(sfi.colName, sfi.patterns, &whereExprAND, phVals)
+		if err := whereExprGenerator(
+			sfi.colName, sfi.patterns, &whereExprAND, phVals,
+			allowStringMatchFallback); err != nil {
+			return "", fmt.Errorf("whereExprGenerator() failed: %v", err)
+		}
 	}
 
 	whereExpr := "TRUE" // by default, don't filter
@@ -385,7 +406,7 @@ func getMdataFilterFromFilterInfos(
 		whereExpr = fmt.Sprintf("(%s)", strings.Join(whereExprAND, " AND "))
 	}
 
-	return whereExpr
+	return whereExpr, nil
 }
 
 // getMdataFilter creates from 'filter' the metadata filter used for querying observations or
@@ -394,11 +415,13 @@ func getMdataFilterFromFilterInfos(
 // pbType2table defines field->table mapping for the type in question.
 // whereExprGenerator defines the expression at the lowest level for the type in question.
 //
-// Returns a metadata filter for a 'WHERE ... AND ...' clause (possibly just 'TRUE').
+// Returns ((a metadata filter for a 'WHERE ... AND ...' clause (possibly just 'TRUE')), nil)
+// on success, otherwise (..., error).
 func getMdataFilter(
 	filter map[string]*datastore.Strings, phVals *[]interface{},
 	pbType2table map[string]string,
-	whereExprGenerator func(string, []string, *[]string, *[]interface{})) string {
+	whereExprGenerator func(string, []string, *[]string, *[]interface{}, bool) error,
+	allowStringMatchFallback bool) (string, error) {
 
 	filterInfos := []filterInfo{}
 
@@ -415,17 +438,26 @@ func getMdataFilter(
 		}
 	}
 
-	return getMdataFilterFromFilterInfos(filterInfos, phVals, whereExprGenerator)
+	whereExpr, err := getMdataFilterFromFilterInfos(
+		filterInfos, phVals, whereExprGenerator, allowStringMatchFallback)
+	if err != nil {
+		return "", fmt.Errorf("getMdataFilterFromFilterInfos() failed: %v", err)
+	}
+	return whereExpr, nil
 }
 
 // getInt64MdataFilter is a convenience wrapper around getMdataFilter for type int64.
-func getInt64MdataFilter(filter map[string]*datastore.Strings, phVals *[]interface{}) string {
-	return getMdataFilter(filter, phVals, pbInt642table, addWhereCondMatchAnyPatternForInt64)
+func getInt64MdataFilter(
+	filter map[string]*datastore.Strings, phVals *[]interface{}) (string, error) {
+	return getMdataFilter(
+		filter, phVals, pbInt642table, addWhereCondMatchAnyPatternForInt64, true)
 }
 
 // getStringMdataFilter is a convenience wrapper around getMdataFilter for type string.
-func getStringMdataFilter(filter map[string]*datastore.Strings, phVals *[]interface{}) string {
-	return getMdataFilter(filter, phVals, pbString2table, addWhereCondMatchAnyPatternForString)
+func getStringMdataFilter(
+	filter map[string]*datastore.Strings, phVals *[]interface{}) (string, error) {
+	return getMdataFilter(
+		filter, phVals, pbString2table, addWhereCondMatchAnyPatternForString, true)
 }
 
 // cleanup performs various cleanup tasks, like removing old observations from the database.
