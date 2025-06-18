@@ -57,7 +57,7 @@ class Content(BaseModel):
             "including data compression (for example `gzip`)."
         ),
     )
-    value: str = Field(..., description="The inline content of the file.")
+    value: str = Field(..., description="The value of the observation.")
     standard_name: str = Field(..., description="CF standard for the data included in this message.")
     unit: str = Field(..., description="Unit for the data")
 
@@ -91,6 +91,15 @@ class Content(BaseModel):
             raise ValueError(
                 f"Unknown unit or unit alias for {self.standard_name}. Provided unit {self.unit} is unknown."
             )
+
+        return self
+
+    @model_validator(mode="after")
+    def check_that_value_is_number(self):
+        try:
+            float(self.value)
+        except ValueError:
+            raise ValueError(f'Could not convert "{self.value}" to a number')
 
         return self
 
