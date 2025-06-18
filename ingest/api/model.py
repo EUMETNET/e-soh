@@ -99,7 +99,7 @@ class Content(BaseModel):
         try:
             float(self.value)
         except ValueError:
-            raise ValueError(f"Could not convert {self.value} to a number")
+            raise ValueError(f'Could not convert "{self.value}" to a number')
 
         return self
 
