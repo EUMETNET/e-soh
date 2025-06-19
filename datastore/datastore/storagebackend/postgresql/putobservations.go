@@ -5,11 +5,12 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
-	"github.com/cridenour/go-postgis"
 	"log"
 	"reflect"
 	"slices"
 	"strings"
+
+	"github.com/cridenour/go-postgis"
 
 	"github.com/lib/pq"
 	"google.golang.org/grpc/codes"
@@ -294,7 +295,7 @@ func upsertTSs(
 		log.Printf("In upsertTSs(): concurrency issue detected: 'len(tsIDmap)=%v', 'len(mapTScolVals)=%v', "+
 			"retrying db query...", len(tsIDmap), len(mapTScolVals))
 	}
-	return nil, fmt.Errorf("upsertTSs() failed: still concurrency issues afer 3 retries")
+	return nil, fmt.Errorf("still concurrency issues after 3 retries")
 }
 
 // getObsTime extracts the obs time from obsMdata.
@@ -324,8 +325,9 @@ func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error)
 // --- END a variant of getObsTime that also supports intervals ---------------------------------
 
 type GeoPoint struct {
-	lon float64
-	lat float64
+	lon   float64
+	lat   float64
+	camsl *int32
 }
 
 // getGeoPointIDs returns a map of GeoPoint to ID of the row in table geo_point that matches point,
@@ -337,21 +339,23 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 	phVals := []interface{}{}
 
 	// Collect all unique points
-	// This looks like premature optimisation... but it is not. Postgres will throw error on duplicates in the INSERT
+	// This looks like premature optimisation... but it is not. Postgres will throw error on
+	// duplicates in the INSERT
 	uniquePoints := map[GeoPoint]bool{}
 	for _, obs := range observations {
 		point := obs.GetObsMdata().GetGeoPoint()
-		uniquePoints[GeoPoint{point.Lon, point.Lat}] = true
+		uniquePoints[GeoPoint{point.Lon, point.Lat, obs.GetObsMdata().Camsl}] = true
 	}
 
 	index := 0
 	// Loop over unique points
 	for point := range uniquePoints {
-		valsExpr0 := fmt.Sprintf(`(ST_MakePoint($%d, $%d)::geography)`,
+		valsExpr0 := fmt.Sprintf(`(ST_MakePoint($%d, $%d)::geography, $%d::integer)`,
 			index+1,
 			index+2,
+			index+3,
 		)
-		phVals0 := []interface{}{point.lon, point.lat}
+		phVals0 := []interface{}{point.lon, point.lat, point.camsl}
 
 		valsExpr = append(valsExpr, valsExpr0)
 		phVals = append(phVals, phVals0...)
@@ -366,21 +370,21 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 	cmd := fmt.Sprintf(`
 	WITH input_rows AS (
 		SELECT * FROM (
-			(SELECT point FROM geo_point LIMIT 0)  -- only copies column names and types
+			(SELECT point, camsl FROM geo_point LIMIT 0)  -- only copies column names and types
 			UNION ALL
 			VALUES %s
-		) t ORDER BY point  -- ORDER BY for consistent order to avoid deadlocks
+		) t ORDER BY point, camsl  -- ORDER BY for consistent order to avoid deadlocks
 	)
    , ins AS (
-		INSERT INTO geo_point (point)
+		INSERT INTO geo_point (point, camsl)
 			SELECT * FROM input_rows
-			ON CONFLICT (point) DO NOTHING
-			RETURNING id, point
+			ON CONFLICT (point, camsl) DO NOTHING
+			RETURNING id, point, camsl
 	)
-	SELECT id, point FROM ins
+	SELECT id, point, camsl FROM ins
 	UNION
-	SELECT c.id, point FROM input_rows
-	JOIN geo_point c USING (point)
+	SELECT c.id, point, camsl FROM input_rows
+	JOIN geo_point c USING (point, camsl)
 	`, strings.Join(valsExpr, ","))
 
 	for range 3 { // try at most 3 times
@@ -395,15 +399,20 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 					log.Printf("db.Query() failed: HINT: %v", e.Hint)
 				}
 			}
-			return nil, fmt.Errorf("tx.Query() failed: %v", err)
+			return nil, fmt.Errorf("db.Query() failed: %v", err)
 		}
 
 		gpIDmap := map[GeoPoint]int64{}
 		var id int64
-		var p postgis.PointS
+		var point postgis.PointS
+		var camsl0 sql.NullInt32
 		for rows.Next() {
-			rows.Scan(&id, &p)
-			gpIDmap[GeoPoint{p.X, p.Y}] = id
+			rows.Scan(&id, &point, &camsl0)
+			var camsl *int32 // default nil
+			if camsl0.Valid {
+				camsl = &camsl0.Int32
+			}
+			gpIDmap[GeoPoint{point.X, point.Y, camsl}] = id
 		}
 
 		// Under concurrent load, if another process is adding the same entry, in which case this transaction
@@ -418,12 +427,11 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 		log.Printf("In getGeoPointIDs(): concurrency issue detected: 'len(gpIDmap)=%v', 'len(uniquePoints)=%v', "+
 			"retrying db query...", len(gpIDmap), len(uniquePoints))
 	}
-	return nil, fmt.Errorf("getGeoPointIDs() failed: still concurrency issues afer 3 retries")
+	return nil, fmt.Errorf("still concurrency issues after 3 retries")
 }
 
 // createInsertVals generates from (tsID, obsTimes, gpIDs, and omds) two arrays:
-//   - in valsExpr: the list of arguments to the VALUES clause in the SQL INSERT
-//     statement, and
+//   - in valsExpr: the list of arguments to the VALUES clause in the SQL INSERT statement, and
 //   - in phVals: the total, flat list of all placeholder values.
 func createInsertVals(
 	tsInfos map[int64]tsInfo, valsExpr *[]string, phVals *[]interface{}) {
@@ -433,14 +441,13 @@ func createInsertVals(
 		obsTimes := tsInfo.obsTimes
 		omds := tsInfo.omds
 		gpIDs := tsInfo.gpIDs
-		for i := 0; i < len(*obsTimes); i++ {
+		for i := range *obsTimes {
 			valsExpr0 := fmt.Sprintf(`(
 			$%d,
 			to_timestamp($%d),
 			$%d,
 			$%d,
 			to_timestamp($%d),
-			$%d,
 			$%d,
 			$%d,
 			$%d,
@@ -457,7 +464,6 @@ func createInsertVals(
 				index+8,
 				index+9,
 				index+10,
-				index+11,
 			)
 
 			phVals0 := []interface{}{
@@ -470,7 +476,6 @@ func createInsertVals(
 				(*omds)[i].GetHistory(),
 				(*omds)[i].GetProcessingLevel(),
 				(*omds)[i].GetQualityCode(),
-				(*omds)[i].GetCamsl(),
 				(*omds)[i].GetValue(),
 			}
 
@@ -520,7 +525,6 @@ func upsertObs(
 			history,
 			processing_level,
 			quality_code,
-			camsl,
 			value)
 		VALUES %s
 		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE
@@ -532,7 +536,6 @@ func upsertObs(
 	 		history = EXCLUDED.history,
 	 		processing_level = EXCLUDED.processing_level,
 			quality_code = EXCLUDED.quality_code,
-			camsl = EXCLUDED.camsl,
 	 		value = EXCLUDED.value
 		WHERE
 		    observation.id IS DISTINCT FROM EXCLUDED.id OR
@@ -541,8 +544,7 @@ func upsertObs(
 			observation.data_id IS DISTINCT FROM EXCLUDED.data_id OR
 			observation.history IS DISTINCT FROM EXCLUDED.history OR
 			observation.processing_level IS DISTINCT FROM EXCLUDED.processing_level OR
-			observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code OR
-			observation.camsl IS DISTINCT FROM EXCLUDED.camsl
+			observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code
 	`, strings.Join(valsExpr, ","))
 
 	_, err := db.Exec(cmd, phVals...)
@@ -627,7 +629,7 @@ func (sbe *PostgreSQL) PutObservations(request *datastore.PutObsRequest) (codes.
 			tsID := tsIDMap[key]
 
 			point := obs.GetObsMdata().GetGeoPoint()
-			gpID := gpIDMap[GeoPoint{point.GetLon(), point.GetLat()}]
+			gpID := gpIDMap[GeoPoint{point.GetLon(), point.GetLat(), obs.GetObsMdata().Camsl}]
 
 			var obsTimes []*timestamppb.Timestamp
 			var gpIDs []int64
