@@ -17,6 +17,7 @@ from openapi.openapi_metadata import openapi_metadata
 from routers import edr
 from routers import feature
 from utilities import create_url_from_request
+from fastapi.middleware.cors import CORSMiddleware
 
 
 all_collections = collections_metadata.keys()
@@ -42,6 +43,16 @@ app = FastAPI(
 )
 app.add_middleware(BrotliMiddleware)
 add_metrics(app)
+
+cors_origins = os.getenv("CORS_ORIGINS", None)
+if cors_origins is not None:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins.split(",") if cors_origins else ["*"],
+        allow_credentials=bool(cors_origins),
+        allow_methods=["GET"],
+        allow_headers=["*"],
+    )
 
 
 @app.get(
