@@ -41,18 +41,16 @@ app = FastAPI(
     root_path=os.getenv("FASTAPI_ROOT_PATH", ""),
     **openapi_metadata,
 )
-app.add_middleware(BrotliMiddleware)
+
 add_metrics(app)
 
-cors_origins = os.getenv("CORS_ORIGINS", None)
-if cors_origins is not None:
+if (cors_origins := os.getenv("CORS_ORIGINS", None)) is not None:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=cors_origins.split(",") if cors_origins else ["*"],
-        allow_credentials=bool(cors_origins),
-        allow_methods=["GET"],
-        allow_headers=["*"],
+        allow_origins=cors_origins.split(","),
+        allow_headers=os.getenv("CORS_HEADERS", "").split(","),
     )
+app.add_middleware(BrotliMiddleware)
 
 
 @app.get(
