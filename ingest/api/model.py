@@ -242,7 +242,7 @@ class Properties(BaseModel):
         description=("Instrument level above ground in meters."),
     )
     period: str = Field(
-        ...,
+        None,
         description=(
             "Aggregation period for the measurement. Must be provided in ISO8601 duration format."
             "https://www.iso.org/iso-8601-date-and-time-format.html"
@@ -284,7 +284,7 @@ class Properties(BaseModel):
         ),
     )
     datetime: str = Field(
-        ...,
+        None,
         description="Identifies the date/time of the datas being published, in RFC3339 format.",
     )
     start_datetime: Optional[str] = Field(
@@ -346,16 +346,60 @@ class Properties(BaseModel):
         return self
 
     @model_validator(mode="after")
+    def check_required_datetime_attributes(self) -> "Properties":
+
+        has_start_datetime = self.start_datetime is not None and len(self.start_datetime)
+        has_end_datetime = self.end_datetime is not None and len(self.end_datetime)
+        has_datetime = self.datetime is not None and len(self.datetime)
+        has_period = self.period is not None and len(self.period)
+        if has_datetime:
+            if has_start_datetime or has_end_datetime:
+                raise ValueError("Double required attributes: datetime or start_datetime/end_datetime")
+            if not has_period:
+                raise ValueError("Required attribute: period")
+        else:
+            if not has_start_datetime:
+                raise ValueError("Required attribute: start_datetime")
+            if not has_end_datetime:
+                raise ValueError("Required attribute: end_datetime")
+
+        return self
+
+    @model_validator(mode="after")
     def check_datetime_iso(self) -> "Properties":
         try:
-            dt = parser.isoparse(self.datetime)
+            has_start_datetime = self.start_datetime is not None and len(self.start_datetime)
+            has_end_datetime = self.end_datetime is not None and len(self.end_datetime)
+
+            if has_start_datetime and has_end_datetime:
+                st = parser.isoparse(self.start_datetime)
+                et = parser.isoparse(self.end_datetime)
+            else:
+                dt = parser.isoparse(self.datetime)
         except ValueError:
-            raise ValueError(f"{self.datetime} not in ISO format(YYYY-MM-DDTHH:MM:SSZ)")
+            if has_start_datetime and has_end_datetime:
+                raise ValueError(
+                    f"{self.start_datetime} or {self.end_datetime} not in ISO format(YYYY-MM-DDTHH:MM:SSZ)"
+                )
+            else:
+                raise ValueError(f"{self.datetime} not in ISO format(YYYY-MM-DDTHH:MM:SSZ)")
         except Exception as e:
             raise e
 
-        if dt.tzname() != "UTC":
-            raise ValueError(f"Input datetime, {self.datetime}, is not in UTC timezone")
+        if has_start_datetime and has_end_datetime:
+            if et < st:
+                raise ValueError(
+                    f"end_datetime {self.end_datetime} is earlier than start_datetime {self.start_datetime}"
+                )
+            if st.tzname() != "UTC":
+                raise ValueError(f"Input start_datetime, {self.start_datetime}, is not in UTC timezone")
+            if et.tzname() != "UTC":
+                raise ValueError(f"Input end_datetime, {self.end_datetime}, is not in UTC timezone")
+            self.period = "PT" + str((et - st).seconds) + "S"
+        else:
+            if dt.tzname() != "UTC":
+                raise ValueError(f"Input datetime, {self.datetime}, is not in UTC timezone")
+
         return self
 
     @model_validator(mode="after")

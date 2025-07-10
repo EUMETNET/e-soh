@@ -26,6 +26,17 @@ def build_messages(message: object, uuid_prefix: str):
     # Set message publication time in RFC3339 format
     # Create UUID for the message, and state message format version
     for json_msg in message:
+
+        # Convert: (start_datetime, end_datetime) => (datetime, period)
+        if "start_datetime" in json_msg["properties"] and "end_datetime" in json_msg["properties"]:
+            json_msg["properties"]["datetime"] = json_msg["properties"]["end_datetime"]
+            start_dt = datetime.fromisoformat(json_msg["properties"]["start_datetime"])
+            end_dt = datetime.fromisoformat(json_msg["properties"]["end_datetime"])
+            period_int = end_dt - start_dt
+            json_msg["properties"]["period"] = "PT" + str(period_int) + "S"
+            json_msg["properties"].pop("start_datetime")
+            json_msg["properties"].pop("end_datetime")
+
         period = json_msg["properties"]["period_int"]
         message_uuid = f"{uuid_prefix}:{str(uuid.uuid4())}"
         json_msg["id"] = message_uuid
