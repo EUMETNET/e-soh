@@ -42,8 +42,7 @@ app = FastAPI(
     **openapi_metadata,
 )
 
-add_metrics(app)
-
+app.add_middleware(BrotliMiddleware)
 if (cors_origins := os.getenv("CORS_ORIGINS", None)) is not None:
     cors_headers = os.getenv("CORS_HEADERS", None)
     app.add_middleware(
@@ -51,7 +50,7 @@ if (cors_origins := os.getenv("CORS_ORIGINS", None)) is not None:
         allow_origins=cors_origins.split(","),
         allow_headers=[] if cors_headers is None else cors_headers.split(","),
     )
-app.add_middleware(BrotliMiddleware)
+add_metrics(app)
 
 
 @app.get(
