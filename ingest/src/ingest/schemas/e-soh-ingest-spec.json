@@ -268,7 +268,7 @@
                     "allOf": [
                         {
                             "required": [
-                                "datetime.",
+                                "datetime",
                                 "period"
                             ]
                         }
