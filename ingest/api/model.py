@@ -13,7 +13,7 @@ from isodate import ISO8601Error
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import model_validator
-
+from pydantic import conlist
 
 with open("api/cf_standard_names_v84.txt", "r") as file:
     standard_names = {line.strip() for line in file}
@@ -35,7 +35,7 @@ class Coordinate(BaseModel):
 
 class Geometry(BaseModel):
     type: Literal["Point"]
-    coordinates: Coordinate
+    coordinates: Coordinate | conlist(float | int, min_length=2, max_length=2)
 
 
 class Integrity(BaseModel):

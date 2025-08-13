@@ -15,17 +15,18 @@ logger = logging.getLogger(__name__)
 
 
 def build_json_payload(bufr: object):
-
     unfinished_messages = build_all_json_payloads_from_bufr(bufr)
     loaded_schemas = [JsonMessageSchema(**i) for i in unfinished_messages]
     return loaded_schemas
 
 
 def build_messages(message: object, uuid_prefix: str):
-
     # Set message publication time in RFC3339 format
     # Create UUID for the message, and state message format version
     for json_msg in message:
+        if isinstance(json_msg["geometry"]["coordinates"], list):
+            lat, lon = json_msg["geometry"]["coordinates"]
+            json_msg["geometry"]["coordinates"] = {"lat": lat, "lon": lon}
         period = json_msg["properties"]["period_int"]
         message_uuid = f"{uuid_prefix}:{str(uuid.uuid4())}"
         json_msg["id"] = message_uuid
