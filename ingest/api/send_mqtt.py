@@ -8,7 +8,15 @@ logger = logging.getLogger(__name__)
 
 if "MQTT_TOPIC_PREPEND" in os.environ:
     mqtt_topic_prepend = os.getenv("MQTT_TOPIC_PREPEND", "")
-    mqtt_topic_prepend = mqtt_topic_prepend if mqtt_topic_prepend.endswith("/") else mqtt_topic_prepend + "/"
+    if mqtt_topic_prepend and not mqtt_topic_prepend.endswith("/") and len(mqtt_topic_prepend) > 1:
+        mqtt_topic_prepend = mqtt_topic_prepend + "/"
+    else:
+        mqtt_topic_prepend = ""
+        logger.error(
+            "MQTT_TOPIC_PREPEND cannot be just a '/' and can not be empty. Setting topic prepend to empty string."
+        )
+else:
+    mqtt_topic_prepend = ""
 
 
 def connect_mqtt(mqtt_conf: dict):
