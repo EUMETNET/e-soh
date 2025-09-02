@@ -6,8 +6,7 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
-if "MQTT_TOPIC_PREPEND" in os.environ:
-    mqtt_topic_prepend = os.getenv("MQTT_TOPIC_PREPEND", "")
+mqtt_topic_prepend = os.getenv("MQTT_TOPIC_PREPEND", "")
     if not mqtt_topic_prepend or mqtt_topic_prepend == "/":
         mqtt_topic_prepend = ""
         logger.error(
