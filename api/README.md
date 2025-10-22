@@ -12,6 +12,26 @@ Environment variables that can be used to configure the container or the environ
 | GUNICORN_CMD_ARGS   | Command-line arguments for configuring Gunicorn, a Python WSGI HTTP Server.                                                   | ☐         |
 | CORS_ORIGINS        | Indicates whether the response can be shared with requesting code from the given origins (passed as a comma separated string) | ☐         |
 | CORS_HEADERS        | Indicates what headers should be supported with cross-origin requests (passed as a comma separated string)                    | ☐         |
+| JINJA2_TEMPLATES    | Path to a folder with jinja2 templates to override the default templates used by the API. See template section for details    | ☐         |
+| OPENAPI_METADATA_PATH | Path to an alternative OpenAPI metadata json file. It need to have the same fields as the openapi/openapi_metadata.py file. | ☐         |
+
+## JINJA2_TEMPLATES
+
+The jinja2 folder must container the following files:
+
+- dataset_metadata_template.j2: this is the metadata template for the observation collection.
+
+### dataset_metadata_template.j2
+
+The current jinja2 filters will be replaced. It's important to just the json j2 filter when inserting these strings.
+
+- spatial_extent
+- temporal_extent
+- url_base
+- url_conformance
+- url_docs
+
+All url fields are dynamically generated based on the request url base.
 
 ## Prerequisites of running locally
 
