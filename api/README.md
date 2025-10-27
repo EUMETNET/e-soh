@@ -27,7 +27,7 @@ The jinja2 folder must container the following files:
 
 ### dataset_metadata_template.j2
 
-The current jinja2 filters will be replaced. It's important to just the json j2 filter when inserting these strings.
+The current jinja2 filters will be replaced. It's important to use the json j2 filter when inserting these strings.
 
 - spatial_extent
 - temporal_extent
@@ -37,7 +37,7 @@ The current jinja2 filters will be replaced. It's important to just the json j2 
 
 All url fields are dynamically generated based on the request url base.
 
-To load a custom template, mount a folder with your new template in to the container and set the `JINJA2_TEMPLATES` environment variable to point your new template.
+To load a custom template, mount a folder with your new template in to the container and set the `JINJA2_TEMPLATES` environment variable to point your new folder.
 
 ## Prerequisites of running locally
 
