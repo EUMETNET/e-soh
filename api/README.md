@@ -17,7 +17,7 @@ Environment variables that can be used to configure the container or the environ
 
 ## OpenAPI metadata
 
-To load your own metadata file, mount your new openapi metadata json file, with the same structure and key as the default one, found in openapi_default_files, and point the environment variable `OPENAPI_METADATA_PATH` to the new file.
+To load your own metadata file, mount your new openapi metadata json file, with the same structure and key as the default one, found in openapi_default_files, and point the environment variable `OPENAPI_METADATA_PATH` to the new file. If you mount your folder to the same as the default one, make sure to not overwrite files you have not replaced.
 
 ## JINJA2_TEMPLATES
 
