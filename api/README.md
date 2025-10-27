@@ -15,6 +15,10 @@ Environment variables that can be used to configure the container or the environ
 | JINJA2_TEMPLATES    | Path to a folder with jinja2 templates to override the default templates used by the API. See template section for details    | ☐         |
 | OPENAPI_METADATA_PATH | Path to an alternative OpenAPI metadata json file. It need to have the same fields as the openapi/openapi_metadata.py file. | ☐         |
 
+## OpenAPI metadata
+
+To load your own metadata file, mount your new openapi metadata json file, with the same structure and key as the default one, found in openapi_default_files, and point the environment variable `OPENAPI_METADATA_PATH` to the new file.
+
 ## JINJA2_TEMPLATES
 
 The jinja2 folder must container the following files:
@@ -32,6 +36,8 @@ The current jinja2 filters will be replaced. It's important to just the json j2 
 - url_docs
 
 All url fields are dynamically generated based on the request url base.
+
+To load a custom template, mount a folder with your new template in to the container and set the `JINJA2_TEMPLATES` environment variable to point your new template.
 
 ## Prerequisites of running locally
 
