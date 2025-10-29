@@ -7,7 +7,7 @@ from datetime import timezone
 from api.model import JsonMessageSchema
 
 
-from ingest.bufr.create_mqtt_message_from_bufr import (
+from bufr_tools.create_mqtt_message_from_bufr import (
     build_all_json_payloads_from_bufr,
 )
 
