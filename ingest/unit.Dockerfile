@@ -19,7 +19,7 @@ COPY "requirements-dev.txt" "${DOCKER_PATH}/api/"
 COPY "./src/" "${DOCKER_PATH}/src/"
 COPY "./test" "${DOCKER_PATH}/test"
 
-RUN pip install --no-cache-dir --upgrade -r "${DOCKER_PATH}/api/requirements-dev.txt" 
+RUN pip install --no-cache-dir --upgrade -r "${DOCKER_PATH}/api/requirements-dev.txt"
 
 WORKDIR /
 
