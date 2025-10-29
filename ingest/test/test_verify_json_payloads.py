@@ -3,9 +3,7 @@ import pytest
 from jsonschema import ValidationError
 from api.model import JsonMessageSchema
 from api.messages import build_all_json_payloads_from_bufr
-from bufr_tools.bufresohmsg_py import init_bufr_schema_py
 from bufr_tools.bufresohmsg_py import init_bufrtables_py
-from bufr_tools.bufresohmsg_py import init_oscar_py
 
 
 @pytest.mark.timeout(1000)
