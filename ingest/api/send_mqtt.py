@@ -6,6 +6,13 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
+
+mqtt_protocols = {
+    "3.1": mqtt_client.MQTTv31,
+    "3.1.1": mqtt_client.MQTTv311,
+    "5": mqtt_client.MQTTv5,
+}
+
 mqtt_topic_prepend = os.getenv("MQTT_TOPIC_PREPEND", "")
 if not mqtt_topic_prepend or mqtt_topic_prepend == "/":
     mqtt_topic_prepend = ""
@@ -24,7 +31,10 @@ def connect_mqtt(mqtt_conf: dict):
     def on_disconnect(client, userdata, flags, rc, properties):
         logger.warning(f"Disconnected from MQTT broker with result code {str(rc)}")
 
-    client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
+    client = mqtt_client.Client(
+        mqtt_client.CallbackAPIVersion.VERSION2,
+        protocol=mqtt_protocols[os.getenv("MQTT_PROTOCOL_VERSION", "5")],
+    )
     client.enable_logger(logger)
     client.username_pw_set(mqtt_conf["username"], mqtt_conf["password"])
 
