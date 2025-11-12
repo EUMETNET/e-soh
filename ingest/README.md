@@ -21,7 +21,7 @@
 | `INGEST_LOGLEVEL`          |                            | Logging level for the ingestion process.                                     |
 | `GUNICORN_CMD_ARGS`        |                            | Command-line arguments for configuring Gunicorn, a Python WSGI HTTP Server.  |
 | `FASTAPI_ROOT_PATH`        |                            | If this api is behind proxy, this need to be set to the root path |
-| `MQTT_PROTTOCOL_VERSION` | 5 | Set the MQTT protocol version. Defaults to v5. Available protocols are v3.1, v3.1.1 and v5 |
+| `MQTT_PROTOCOL_VERSION` | 5 | Set the MQTT protocol version. Defaults to v5. Available protocols are v3.1, v3.1.1 and v5 |
 
 ## Dev install
 
