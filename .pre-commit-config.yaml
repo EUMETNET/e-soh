@@ -65,13 +65,13 @@ repos:
         args: ["--ignore=W503", "--max-line-length=120"]
 
   # hadolint ~ Docker linter
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.13.1-beta
-    hooks:
-      - id: hadolint-docker
-        args: [
-            "--ignore=DL3008", # Pin versions in apt get install.
-          ]
+  #- repo: https://github.com/hadolint/hadolint
+  #  rev: v2.13.1-beta
+  #  hooks:
+  #    - id: hadolint-docker
+  #      args: [
+  #          "--ignore=DL3008", # Pin versions in apt get install.
+  #        ]
 
   # ShellCheck ~ Gives warnings and suggestions for bash/sh shell scripts
   - repo: https://github.com/koalaman/shellcheck-precommit

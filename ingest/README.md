@@ -21,6 +21,7 @@
 | `INGEST_LOGLEVEL`          |                            | Logging level for the ingestion process.                                     |
 | `GUNICORN_CMD_ARGS`        |                            | Command-line arguments for configuring Gunicorn, a Python WSGI HTTP Server.  |
 | `FASTAPI_ROOT_PATH`        |                            | If this api is behind proxy, this need to be set to the root path |
+| `MQTT_PROTOCOL_VERSION` | 5 | Set the MQTT protocol version. Defaults to v5. Available protocols are v3.1, v3.1.1 and v5 |
 
 ## Dev install
 
@@ -34,9 +35,10 @@ To install in dev mode run `pip install --editable .` from the top level of this
 | rapidjson-dev   | 1.1.0   |
 | pybind11-dev    | 2.9.1   |
 
-
 ## Prerequisites of running locally
+
 Move the `std_unit_names.json`to the ingest/api folder with
+
 ```bash
 just copy-units
 ```
