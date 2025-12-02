@@ -24,10 +24,7 @@ from utilities import split_and_strip
 
 router = APIRouter(prefix="/collections/observations")
 
-env = Environment(
-    loader=FileSystemLoader(os.getenv("JINJA2_TEMPLATES", "templates")),
-    autoescape=select_autoescape(),
-)
+env = Environment(loader=FileSystemLoader(os.getenv("JINJA2_TEMPLATES", "templates")), autoescape=select_autoescape())
 
 
 @router.get(
@@ -64,32 +61,21 @@ async def search_timeseries(
     ] = None,
     institution: Annotated[
         str | None,
-        Query(
-            description="Institution that published the data",
-            openapi_examples=openapi_examples.institution,
-        ),
+        Query(description="Institution that published the data", openapi_examples=openapi_examples.institution),
     ] = None,
     platform: Annotated[
         str | None,
-        Query(
-            description="Platform ID, WIGOS or WIGOS equivalent.",
-            openapi_examples=openapi_examples.wigos_id,
-        ),
+        Query(description="Platform ID, WIGOS or WIGOS equivalent.", openapi_examples=openapi_examples.wigos_id),
     ] = None,
     standard_name: Annotated[
         str | None,
         Query(
-            alias="standard-name",
-            description="CF 1.9 standard name",
-            openapi_examples=openapi_examples.standard_name,
+            alias="standard-name", description="CF 1.9 standard name", openapi_examples=openapi_examples.standard_name
         ),
     ] = None,
     unit: Annotated[
         str | None,
-        Query(
-            description="Unit of observed physical property",
-            openapi_examples=openapi_examples.unit,
-        ),
+        Query(description="Unit of observed physical property", openapi_examples=openapi_examples.unit),
     ] = None,
     instrument: Annotated[str | None, Query(description="Instrument Id")] = None,
     level: Annotated[
@@ -101,16 +87,12 @@ async def search_timeseries(
     ] = None,
     period: Annotated[
         str | None,
-        Query(
-            description="Duration of collection period in ISO8601",
-            openapi_examples=openapi_examples.period,
-        ),
+        Query(description="Duration of collection period in ISO8601", openapi_examples=openapi_examples.period),
     ] = None,
     method: Annotated[
         str | None,
         Query(
-            description="Aggregation method used to sample observed property",
-            openapi_examples=openapi_examples.method,
+            description="Aggregation method used to sample observed property", openapi_examples=openapi_examples.method
         ),
     ] = None,
     f: Annotated[
@@ -168,8 +150,7 @@ async def get_time_series_by_id(
     ] = formatters.Metadata_Formats.geojson,
 ):
     obs_request = dstore.GetObsRequest(
-        filter=dict(timeseries_id=dstore.Strings(values=[item_id])),
-        temporal_latest=True,
+        filter=dict(timeseries_id=dstore.Strings(values=[item_id])), temporal_latest=True
     )
     time_series = await get_obs_request(obs_request)
 
@@ -194,10 +175,7 @@ async def get_dataset_metadata(request: Request):
             ]
         ],
         "temporal_extents": [
-            [
-                f"{extent.temporal_extent.start.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}",
-                "..",
-            ],
+            [f"{extent.temporal_extent.start.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}", ".."],
         ],
         "url_base": base_url,
         "url_conformance": base_url + "conformance",
