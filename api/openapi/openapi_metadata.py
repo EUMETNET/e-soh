@@ -6,4 +6,3 @@ with open(
     "r",
 ) as file:
     openapi_metadata = json.load(file)
-    print(openapi_metadata)
