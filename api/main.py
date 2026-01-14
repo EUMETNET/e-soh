@@ -12,6 +12,7 @@ from edr_pydantic.collections import Collections
 from export_metrics import add_metrics
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.openapi.utils import get_openapi
 from openapi.collections_metadata import collections_metadata
 from openapi.openapi_metadata import openapi_metadata
 from routers import edr
@@ -39,7 +40,6 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     swagger_ui_parameters={"tryItOutEnabled": True},
     root_path=os.getenv("FASTAPI_ROOT_PATH", ""),
-    **openapi_metadata,
 )
 
 app.add_middleware(BrotliMiddleware)
@@ -97,6 +97,42 @@ def create_collection_metadata_endpoint(collection_id: str):
     return collection_metadata
 
 
+def custom_openapi_wrapper():
+    """
+    Available fields for openapi configuration in openapi_metadata:
+    title,
+    version,
+    summary,
+    description,
+    terms_of_service,
+    contact,
+    license_info,
+    tags,
+    servers,
+    external_docs,
+
+    Hidden fields, not available to be set in openapi_metadata:
+    openapi_version
+    routes
+    webhooks
+    separate_input_output_schemas
+    """
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    # Version is mandatory in fastAPI, se we check that it is set
+    if "version" not in openapi_metadata:
+        openapi_metadata["version"] = "0.0.1"
+
+    openapi_schema = get_openapi(
+        routes=app.routes,
+        **openapi_metadata,
+    )
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
 # Create dynamic routes for each collection
 for collection_id in all_collections:
     app.add_api_route(
@@ -112,3 +148,5 @@ for collection_id in all_collections:
 # Include all routes
 app.include_router(edr.router)
 app.include_router(feature.router)
+
+app.openapi = custom_openapi_wrapper
