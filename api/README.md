@@ -21,6 +21,8 @@ To load your own metadata file, mount your new openapi metadata json file, with 
 
 This Metdata is used both for the OpenAPI specification and the EDR landing page.
 
+The available fields are: title, version, summary, description, terms_of_service, contact, license_info, tags, external_docs.
+
 ## JINJA2_TEMPLATES
 
 The jinja2 folder must container the following files:
