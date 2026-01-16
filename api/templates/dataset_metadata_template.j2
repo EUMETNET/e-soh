@@ -1,9 +1,9 @@
 {
-    "id": "urn:wmo:md:eu-eumetnet-observations:swob-realtime",
+  "id": "urn:wmo:md:eu-eumetnet-surface-observations:land-station-observations",
     "conformsTo": [
-        "http://wis.wmo.int/spec/wcmp/2/conf/core"
-    ],
-    "type": "Feature",
+      "http://wis.wmo.int/spec/wcmp/2/conf/core"
+  ],
+  "type": "Feature",
     "geometry": {
         "type": "Polygon",
         "coordinates": {{ spatial_extents }}
@@ -12,105 +12,136 @@
         "interval": {{ temporal_extents|tojson }},
         "resolution": "PT10M"
     },
-    "properties": {
-        "title": "Land surface weather observations",
-        "description": "Land surface observations measured at automatic and manual stations of EUMETNET Members (last 24 hours)",
-        "themes": [
-            {
-                "concepts": [
-                    {
-                        "id": "weather"
-                    }
-                ],
-                "scheme": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline"
-            },
-            {
-                "concepts": [
-                    {
-                        "id": "surface-based-observations"
-                    }
-                ],
-                "scheme": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline/_weather"
-            }
+"properties": {
+    "title": "Land surface weather observations",
+    "description":"Land surface observations measured at automatic and manual weather stations of EUMETNET Members and their trusted partners (last 24 hours only)",
+    "contacts": [
+      {
+        "name": "Met Norway",
+        "organization": "National Meteorological service of Norway, Met Norway",
+        "phones": [
+          {
+            "value": "+4722963000"
+          }
         ],
-        "language": "en",
-        "type": "dataset",
-        "created": "2023-01-01T00:00:00Z",
-        "updated": "2024-09-19T00:00:00Z",
-        "contacts": [
-            {
-                "organization": "EUMETNET",
-                "addresses": [
-                    {
-                        "deliveryPoint": [
-                            "Avenue Circulaire 3"
-                        ],
-                        "city": "Bruxelles",
-                        "postalCode": "1180",
-                        "country": "Belgique"
-                    }
-                ],
-                "links": [
-                    {
-                        "href": "https://www.eumetnet.eu/about-us/",
-                        "rel": "about",
-                        "type": "text/html"
-                    }
-                ],
-                "roles": [
-                    "host"
-                ]
-            }
+        "emails": [
+          {
+            "value": "post@met.no"
+          }
         ],
-        "keywords": [
-            "surface weather",
-            "observations",
-            "meteorology"
+        "addresses": [
+          {
+            "deliveryPoint": [
+              "https://www.met.no/en/contact-us"
+            ],
+            "name": "Met Norway",
+            "city": "Oslo",
+            "postalCode": "0313",
+            "country": "Norway"
+          }
         ],
-        "wmo:dataPolicy": "core"
-    },
-    "links": [
-        {
-            "href": "E-SOH dataset mqtt stream",
-            "rel": "items",
-            "title": "E-SOH dataset data notifications",
-            "type": "application/json"
-        },
-        {
-            "href": "E-SOH time series mqtt stream",
-            "rel": "items",
-            "title": "E-SOH time series data notifications",
-            "type": "application/json"
-        },
-        {
-            "href": {{ url_base|tojson }},
-            "rel": "data",
-            "title": "E-SOH EDR API landing page",
-            "type": "application/json"
-        },
-        {
-            "href": {{ url_docs|tojson }},
-            "rel": "related",
-            "title": "E-SOH API documentation",
-            "type": "application/json"
-        },
-        {
-            "href": {{ url_conformance|tojson }},
-            "rel": "conformance",
-            "title": "E-SOH Conformance Declaration",
-            "type": "application/json"
-        },
-        {
-            "href": "https://www.eumetnet.eu/wp-content/uploads/2018/03/List-of-current-Members-as-pdf.pdf",
+        "links": [
+          {
             "rel": "about",
-            "title": "EUMETNET Members",
-            "type": "text/html"
+            "type": "text/html",
+            "href": "https://www.eumetnet.eu/about-us"
+          }
+        ],
+        "roles": ["host"]
+      }
+    ],
+    "keywords": [
+       "weather",
+       "surface-based observations",
+       "observations",
+       "meteorology",
+       "surface weather",
+       "Norway",
+       "Finland",
+       "The Netherlands"
+     ],
+    "themes": [
+       { "concepts": [
+          {
+            "id":"weather",
+            "title": "Weather",
+            "url": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline/weather"
+          }
+        ],
+        "scheme":"https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline"
+       },
+       { "concepts": [
+          {
+            "id":"surface-based-observations"
+          }
+        ],
+        "scheme":"https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline/weather/surface-based-observations"
         },
-        {
-            "href": "https://creativecommons.org/licenses/by/4.0/",
-            "rel": "license",
-            "title": "Creative Commons BY 4.0 licence",
-            "type": "text/html"
-        }
-    ]
+      {
+        "concepts": [
+          {
+            "id": "air_temperature",
+            "title": "Air temperature",
+            "url": "http://vocab.nerc.ac.uk/standard_name/air_temperature/"
+          },
+          {
+            "id": "wind_speed",
+            "title": "Wind Speed",
+            "url": "http://vocab.nerc.ac.uk/standard_name/wind_speed/"
+          },
+          {
+            "id": "wind_to_direction",
+            "title": "Wind to diection",
+            "url": "http://vocab.nerc.ac.uk/standard_name/wind_to_direction/"
+          }
+                    ],
+        "scheme": "https://vocab.nerc.ac.uk/standard_name"
+      }
+    ],
+    "language":"en",
+    "created": "2025-06-04T14:00:00Z",
+    "updated": "2025-06-04T14:00:00Z",
+    "rights": "Users are granted free and unrestricted access to this data, without charge and with no conditions on use. Users are requested to attribute the producer of this data. WMO Unified Data Policy (Resolution 1 (Cg-Ext 2021))",
+    "licence": "CC BY 4.0 Creative Commons license",
+    "type": "dataset",
+    "wmo:dataPolicy": "recommended"
+  },
+  "links": [
+    {
+        "href": {{ url_base|tojson }},
+        "rel": "data",
+        "title": "E-SOH EDR API landing page",
+        "type": "application/json"
+    },
+    {
+        "href": {{ url_docs|tojson }},
+        "rel": "related",
+        "title": "E-SOH API documentation",
+        "type": "application/json"
+    },
+    {
+        "href": {{ url_conformance|tojson }},
+        "rel": "conformance",
+        "title": "E-SOH Conformance Declaration",
+        "type": "application/json"
+    },
+    {
+      "rel": "related",
+      "href": "https://www.eumetnet.eu/observations/observations-data-sharing-2/",
+      "type": "text/html",
+      "title": "Documentation related to EUMETNET data sharing"
+    },
+    {
+      "rel": "related",
+      "href": "https://www.eumetnet.eu/about-us-2/members-partners/",
+      "type": "text/html",
+      "title": "List of EUMETNET Members"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "title": "Creative Commons BY 4.0 licence",
+      "type": "text/html"
+    }
+  ]
 }

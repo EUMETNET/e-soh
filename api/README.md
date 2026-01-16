@@ -12,6 +12,36 @@ Environment variables that can be used to configure the container or the environ
 | GUNICORN_CMD_ARGS   | Command-line arguments for configuring Gunicorn, a Python WSGI HTTP Server.                                                   | ☐         |
 | CORS_ORIGINS        | Indicates whether the response can be shared with requesting code from the given origins (passed as a comma separated string) | ☐         |
 | CORS_HEADERS        | Indicates what headers should be supported with cross-origin requests (passed as a comma separated string)                    | ☐         |
+| JINJA2_TEMPLATES    | Path to a folder with jinja2 templates to override the default templates used by the API. See template section for details    | ☐         |
+| OPENAPI_METADATA_PATH | Path to an alternative OpenAPI metadata json file. It need to have the same fields as the openapi/openapi_metadata.py file. | ☐         |
+
+## OpenAPI and EDR landing page metadata
+
+To load your own metadata file, mount your new openapi metadata json file, with the same structure and key as the default one, found in openapi_default_files, and point the environment variable `OPENAPI_METADATA_PATH` to the new file. If you mount your folder to the same as the default one, make sure to not overwrite files you have not replaced.
+
+This Metdata is used both for the OpenAPI specification and the EDR landing page.
+
+The available fields are: title, version, summary, description, terms_of_service, contact, license_info, tags, external_docs.
+
+## JINJA2_TEMPLATES
+
+The jinja2 folder must container the following files:
+
+- dataset_metadata_template.j2: this is the metadata template for the observation collection.
+
+### dataset_metadata_template.j2
+
+The current jinja2 filters will be replaced. It's important to use the json j2 filter when inserting these strings.
+
+- spatial_extent
+- temporal_extent
+- url_base
+- url_conformance
+- url_docs
+
+All url fields are dynamically generated based on the request url base.
+
+To load a custom template, mount a folder with your new template in to the container and set the `JINJA2_TEMPLATES` environment variable to point your new folder.
 
 ## Prerequisites of running locally
 
