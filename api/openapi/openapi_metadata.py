@@ -6,3 +6,16 @@ with open(
     "r",
 ) as file:
     openapi_metadata = json.load(file)
+    valid_keys = [
+        "title",
+        "version",
+        "summary",
+        "description",
+        "terms_of_service",
+        "contact",
+        "license_info",
+        "openapi_tags",
+    ]
+    unwanted = set(openapi_metadata) - set(valid_keys)
+    for unwanted_key in unwanted:
+        del openapi_metadata[unwanted_key]
