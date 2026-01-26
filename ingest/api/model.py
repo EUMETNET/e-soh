@@ -156,10 +156,9 @@ class Properties(BaseModel):
     naming_authority: str = Field(
         ...,
         description=(
-            "The organization that provides the initial id (see above) for the dataset."
-            " The naming authority should be uniquely specified by this attribute."
-            " We recommend using reverse-DNS naming for the naming authority; "
-            "URIs are also acceptable. Example: 'edu.ucar.unidata'."
+            "A unique identifier for the organization that provides the dataset."
+            " We recommend using reverse-DNS naming of the organization for the naming authority; "
+            "URIs are also acceptable. Examples: 'fi.fmi', 'nl.knmi'. 'no.met'."
         ),
     )
     creator_type: Optional[Literal["person", "group", "institution", "position"]] = Field(
