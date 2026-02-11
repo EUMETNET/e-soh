@@ -24,9 +24,9 @@ WORKDIR /
 
 # Compiling the protobuf file
 RUN python -m grpc_tools.protoc  \
-    --proto_path="protobuf" "protobuf/datastore.proto" \
-    --python_out="${DOCKER_PATH}"  \
-    --grpc_python_out="${DOCKER_PATH}"
+  --proto_path="protobuf" "protobuf/datastore.proto" \
+  --python_out="${DOCKER_PATH}"  \
+  --grpc_python_out="${DOCKER_PATH}"
 
 WORKDIR "${DOCKER_PATH}"
 

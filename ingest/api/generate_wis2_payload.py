@@ -2,7 +2,6 @@ import os
 import json
 
 
-from api.model import Geometry
 from api.model import Link
 from api.wis2_model import Wis2MessageSchema
 from api.wis2_model import Properties
@@ -27,11 +26,29 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
     """
     This function will generate the WIS2 complient payload based on the JSON schema for ESOH
     """
+    json_payload = json.dumps(
+        {
+            "type": "Feature",
+            "geometry": message["geometry"],
+            "properties": {
+                "observation": message["properties"]["content"]["value"],
+                "CF_standard_name": message["properties"]["content"]["standard_name"],
+                "unit": message["properties"]["content"]["unit"],
+            },
+        },
+        separators=(",", ":"),
+    )
+    json_payload = json_payload.encode("utf-8")
+    json_payload_bytes_size = len(json_payload)
+
     wis2_payload = Wis2MessageSchema(
         type="Feature",
         id=message["id"],
         version="v04",
-        geometry=Geometry(**message["geometry"]),
+        geometry={
+            "type": "Point",
+            "coordinates": [message["geometry"]["coordinates"]["lon"], message["geometry"]["coordinates"]["lat"]],
+        },
         properties=Properties(
             producer=message["properties"]["naming_authority"],
             data_id=message["properties"]["data_id"],
@@ -41,20 +58,10 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
             datetime=message["properties"]["datetime"],
             pubtime=message["properties"]["pubtime"],
             content=Content(
-                value=json.dumps(
-                    {
-                        "type": "Feature",
-                        "geometry": message["geometry"],
-                        "properties": {
-                            "observation": message["properties"]["content"]["value"],
-                            "CF_standard_name": message["properties"]["content"]["standard_name"],
-                            "unit": message["properties"]["content"]["unit"],
-                        },
-                    },
-                    separators=(",", ":"),
-                ),
+                value=json_payload,
                 unit=message["properties"]["content"]["unit"],
                 encoding="utf-8",
+                size=json_payload_bytes_size,
             ),
         ),
         links=(

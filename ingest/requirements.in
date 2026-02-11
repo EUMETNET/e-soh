@@ -3,18 +3,19 @@
 # Install using:
 # pip-sync
 
-numpy ~= 1.25.2
-paho-mqtt == 2.1.0
-gunicorn~=22.0.0
-jsonschema ~= 4.19.0
-protobuf ~= 4.25.3
-grpcio==1.62.1
-grpcio-tools==1.62.1
-fastapi == 0.108.0
-uvicorn==0.25.0
-python-multipart~=0.0.9
-requests == 2.31.0
-isodate~=0.6.1
+numpy
+paho-mqtt
+gunicorn
+jsonschema
+protobuf
+grpcio
+grpcio-tools
+fastapi
+uvicorn
+python-multipart
+requests
+isodate
+pydantic_geojson
 prometheus-fastapi-instrumentator
 rodeo-bufr-tools ~= 0.3.3
 python-dateutil
