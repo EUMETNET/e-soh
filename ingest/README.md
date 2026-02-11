@@ -6,6 +6,9 @@
 |----------------------------|----------------------------|-----------------------------------------------------------------------------|
 | `DSHOST`                   | `store`                    | Host address for the data store. Defaults to `store` if not set.            |
 | `DSPORT`                   | `50050`                    | Port for the data store connection. Defaults to `50050` if not set.         |
+| `DYNAMICTIME`              | `true`                     | Whether the valid time range is _dynamic_ or _static_ (defined below). |
+| `LOTIME`                   | `86400`                    | The _earliest_ valid time as seconds to be either [1] subtracted from the current time (if the valid time range is _dynamic_) or [2] added to UNIX epoch (1970-01-01T00:00:00Z) (if the valid time range is _static_). In the case of a _static_ valid time range, the `LOTIME` can optionally be specified as an ISO-8601 datetime of the exact form `2023-10-10T00:00:00Z`. |
+| `HITIME`                   | `-600`                     | Same as `LOTIME`, but for the _latest_ valid time. Note a default leeway of 10 minutes into the future to reduce risk of missing visual observations. |
 | `MQTT_HOST`                |                            | Host address for the MQTT broker.                                           |
 | `MQTT_USERNAME`            |                            | Username for authentication with the MQTT broker.                           |
 | `MQTT_PASSWORD`            |                            | Password for authentication with the MQTT broker.                           |
