@@ -14,7 +14,7 @@ from typing import Annotated
 from pydantic import UUID4
 from pydantic import PlainSerializer
 from pydantic import model_validator
-from pydantic_geojson import PointModel
+from geojson_pydantic import Point
 
 
 def serialize_timestamp(dt: pkg_datetime.datetime | pkg_datetime.date) -> str:
@@ -50,6 +50,7 @@ class Content(BaseModel):
     def check_size_of_content(self):
         if (file_size := len(self.value)) > 4096:
             raise ValueError(f"Size of message content too large: {file_size} > 4096. Use /upload instead.")
+        return self
 
     class Config:
         str_strip_whitespace = True
@@ -91,11 +92,10 @@ class Properties(BaseModel):
 
     @model_validator(mode="after")
     def set_dateimte(self):
-        if not (bool(self.datetime) != bool(self.start_datetime and self.end_datetime)):
-            raise ValueError(
-                "Set datetime or start_datetime and end_datetime. At least one and not both. "
-                + f"{self.datetime}, {self.start_datetime} - {self.end_datetime}"
-            )
+        assert bool(self.datetime) != bool(self.start_datetime and self.end_datetime), (
+            "Set datetime or start_datetime and end_datetime. At least one and not both. "
+            + f"{self.datetime}, {self.start_datetime} - {self.end_datetime}"
+        )
         return self
 
     @model_validator(mode="after")
@@ -118,7 +118,8 @@ class PropertiesWIS2(Properties):
 
 class Wis2MessageSchema(BaseModel):
     id: UUID4
+    type: Literal["Feature"] = "Feature"
     conformsTo: Literal["http://wis.wmo.int/spec/wnm/1/conf/core"] = "http://wis.wmo.int/spec/wnm/1/conf/core"
-    geometry: PointModel
+    geometry: Point
     properties: PropertiesWIS2
     links: List[Link] = Field(..., min_length=1)

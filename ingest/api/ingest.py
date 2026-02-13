@@ -103,7 +103,9 @@ class IngestToPipeline:
                     if publishWIS2 and self.WIS2_client:
                         send_message(
                             generate_wis2_topic(),
-                            generate_wis2_payload(msg, baseURL).model_dump(exclude_unset=True, exclude_none=True),
+                            generate_wis2_payload(msg, baseURL).model_dump(
+                                exclude_unset=True, exclude_none=True, mode="json"
+                            ),
                             self.WIS2_client,
                         )
                         logger.debug("Succesfully published to mqtt")

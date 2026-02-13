@@ -4,7 +4,7 @@ import json
 
 from api.model import Link
 from api.wis2_model import Wis2MessageSchema
-from api.wis2_model import Properties
+from api.wis2_model import PropertiesWIS2
 from api.wis2_model import Content
 
 
@@ -44,14 +44,14 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
     wis2_payload = Wis2MessageSchema(
         type="Feature",
         id=message["id"],
-        version="v04",
+        conformsTo="http://wis.wmo.int/spec/wnm/1/conf/core",
         geometry={
             "type": "Point",
             "coordinates": [message["geometry"]["coordinates"]["lon"], message["geometry"]["coordinates"]["lat"]],
         },
-        properties=Properties(
+        properties=PropertiesWIS2(
             producer=message["properties"]["naming_authority"],
-            data_id=message["properties"]["data_id"],
+            data_id=os.getenv("WIS2_DATA_ID") or message["properties"]["data_id"],
             metadata_id=os.getenv(
                 "WIS2_METADATA_RECORD_ID", None
             ),  # Need to figure out how we generate this? Is it staic or dynamic?

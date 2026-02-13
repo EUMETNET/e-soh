@@ -55,7 +55,7 @@ if not all(
 
 ingester = IngestToPipeline(
     mqtt_conf=mqtt_configuration,
-    uuid_prefix="uuid",
+    uuid_prefix="urn:uuid",
     mqtt_WIS2_conf=mqtt_wis2_configuration,
 )
 
