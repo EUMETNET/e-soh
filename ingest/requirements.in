@@ -8,6 +8,7 @@ paho-mqtt
 gunicorn
 jsonschema
 protobuf
+python-dateutil
 grpcio
 grpcio-tools
 fastapi
@@ -15,7 +16,7 @@ uvicorn
 python-multipart
 requests
 isodate
-pydantic_geojson
+geojson-pydantic
 prometheus-fastapi-instrumentator
 rodeo-bufr-tools ~= 0.3.3
 python-dateutil
