@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm
+FROM --platform=linux/amd64 python:3.11-slim-bookworm
 
 SHELL ["/bin/bash", "-eux", "-o", "pipefail", "-c"]
 
@@ -6,13 +6,13 @@ ENV DOCKER_PATH="/app"
 
 # hadolint ignore=DL3008
 RUN apt-get update \
-    && apt-get -y upgrade \
-    && apt-get install -y --no-install-recommends git libeccodes-data libudunits2-0\
-    # Cleanup
-    && rm -rf /usr/tmp  \
-    && apt-get autoremove -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+  && apt-get -y upgrade \
+  && apt-get install -y --no-install-recommends git libeccodes-data libudunits2-0\
+  # Cleanup
+  && rm -rf /usr/tmp  \
+  && apt-get autoremove -y \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 COPY "./protobuf/datastore.proto" "/protobuf/datastore.proto"
 COPY "./api" "${DOCKER_PATH}/api/"
 COPY "requirements.txt" "${DOCKER_PATH}/api/"
@@ -34,7 +34,7 @@ RUN python "api/generate_standard_name.py"
 
 # hadolint ignore=DL3013
 RUN pip install --no-cache-dir --upgrade pip \
-    && mkdir -p /tmp/metrics
+  && mkdir -p /tmp/metrics
 
 ENV PROMETHEUS_MULTIPROC_DIR=/tmp/metrics
 
