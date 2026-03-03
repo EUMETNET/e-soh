@@ -44,6 +44,7 @@ response_fields_needed_for_data_api = [
     "unit",
     "obstime_instant",
     "value",
+    "camsl",
 ]
 
 
@@ -145,6 +146,8 @@ async def get_locations(
                     + "collections/observations/items?platform="
                     + loc.platform,
                 },
+                # TODO: loc_request does not return elevation for locations currently
+                # so for now we just leave it out entirely untill #
                 geometry=Point(
                     type="Point",
                     coordinates=(loc.geo_point.lon, loc.geo_point.lat),
