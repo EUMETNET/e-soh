@@ -35,6 +35,7 @@ expected_data_endpoint_response_fields = [
     "unit",
     "obstime_instant",
     "value",
+    "camsl",
 ]
 
 
