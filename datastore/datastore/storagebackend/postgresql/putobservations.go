@@ -510,6 +510,20 @@ func upsertObs(
 	createInsertVals(tsInfos, &valsExpr, &phVals)
 
 	cmd := fmt.Sprintf(`
+		WITH input_rows AS (SELECT *
+			FROM (SELECT *
+				  FROM (VALUES ((NULL::observation).ts_id, (NULL::observation).obstime_instant,
+								(NULL::observation).id, (NULL::observation).geo_point_id,
+								(NULL::observation).pubtime, (NULL::observation).data_id,
+								(NULL::observation).history, (NULL::observation).processing_level,
+								(NULL::observation).quality_code, (NULL::observation).camsl,
+								(NULL::observation).value),  -- header column to get correct column types
+								%s  -- actual values
+					   ) t (ts_id, obstime_instant, id, geo_point_id, pubtime, data_id, history,
+							processing_level, quality_code, camsl, value)
+				  OFFSET 1) t  -- drop null row
+			ORDER BY ts_id, obstime_instant  -- ORDER BY for consistent order to avoid deadlocks
+		)
 		INSERT INTO observation (
 			ts_id,
 			obstime_instant,
@@ -522,7 +536,7 @@ func upsertObs(
 			quality_code,
 			camsl,
 			value)
-		VALUES %s
+		SELECT * FROM input_rows
 		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE
 		SET
 	    	id = EXCLUDED.id,
@@ -544,6 +558,8 @@ func upsertObs(
 			observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code OR
 			observation.camsl IS DISTINCT FROM EXCLUDED.camsl
 	`, strings.Join(valsExpr, ","))
+
+	//fmt.Printf("%v", cmd)
 
 	_, err := db.Exec(cmd, phVals...)
 	if err != nil {
