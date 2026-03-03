@@ -56,10 +56,10 @@ WITH input_rows AS (SELECT *
 )
    , ins AS (
     INSERT INTO time_series (link_href, link_rel, link_type, link_hreflang, link_title, level, period, version, type,
-                            title, summary, keywords, keywords_vocabulary, license, conventions, naming_authority,
-                            creator_type, creator_name, creator_email, creator_url, institution, project, source,
-                            platform, platform_vocabulary, platform_name, standard_name, unit, function, instrument,
-                            instrument_vocabulary, parameter_name, timeseries_id, quality_code_vocabulary)
+                             title, summary, keywords, keywords_vocabulary, license, conventions, naming_authority,
+                             creator_type, creator_name, creator_email, creator_url, institution, project, source,
+                             platform, platform_vocabulary, platform_name, standard_name, unit, function, instrument,
+                             instrument_vocabulary, parameter_name, timeseries_id, quality_code_vocabulary)
         SELECT * FROM input_rows
         ON CONFLICT ON CONSTRAINT unique_main
             DO UPDATE SET link_rel = EXCLUDED.link_rel,keywords = EXCLUDED.keywords,conventions = EXCLUDED.conventions,platform_name = EXCLUDED.platform_name,quality_code_vocabulary = EXCLUDED.quality_code_vocabulary,summary = EXCLUDED.summary,project = EXCLUDED.project,source = EXCLUDED.source,title = EXCLUDED.title,platform_vocabulary = EXCLUDED.platform_vocabulary,license = EXCLUDED.license,creator_type = EXCLUDED.creator_type,version = EXCLUDED.version,instrument_vocabulary = EXCLUDED.instrument_vocabulary,link_type = EXCLUDED.link_type,link_hreflang = EXCLUDED.link_hreflang,type = EXCLUDED.type,keywords_vocabulary = EXCLUDED.keywords_vocabulary,timeseries_id = EXCLUDED.timeseries_id,link_href = EXCLUDED.link_href,link_title = EXCLUDED.link_title,creator_url = EXCLUDED.creator_url,parameter_name = EXCLUDED.parameter_name,creator_name = EXCLUDED.creator_name,creator_email = EXCLUDED.creator_email,institution = EXCLUDED.institution,unit = EXCLUDED.unit -- do update of fields not in unique constraint
