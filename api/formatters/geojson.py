@@ -51,6 +51,7 @@ def convert_to_geojson(observations, base_url):
                 coordinates=[
                     ts.obs_mdata[0].geo_point.lon,
                     ts.obs_mdata[0].geo_point.lat,
+                    convert_cm_to_m(ts.obs_mdata[0].camsl),
                 ],
             ),
         )
