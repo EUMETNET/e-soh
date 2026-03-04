@@ -58,7 +58,7 @@ class Content(BaseModel):
 
 class Integrity(BaseModel):
     method: Literal["sha256", "sha384", "sha512", "sha3-256", "sha3-384", "sha3-512"]
-    value: str = Field(..., desciption="The hash value for the value field in the message content.")
+    value: str = Field(..., description="The hash value for the value field in the message content.")
 
 
 class Properties(BaseModel):
