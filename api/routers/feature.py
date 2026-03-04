@@ -21,6 +21,7 @@ from response_classes import GeoJsonResponse
 from shapely import geometry
 from utilities import get_datetime_range
 from utilities import split_and_strip
+from utilities import get_levels_values
 
 router = APIRouter(prefix="/collections/observations")
 
@@ -47,6 +48,13 @@ async def search_timeseries(
         Query(
             openapi_examples=openapi_examples.datetime,
             description="E-SOH database only contains data from the last 24 hours",
+        ),
+    ] = None,
+    z: Annotated[
+        str | None,
+        Query(
+            description="Vertical level in meters above or below mean sea level",
+            openapi_examples=openapi_examples.z,
         ),
     ] = None,
     id: Annotated[str | None, Query(description="E-SOH time series id")] = None,
@@ -120,6 +128,7 @@ async def search_timeseries(
             level=dstore.Strings(values=split_and_strip(level) if level else None),
             period=dstore.Strings(values=split_and_strip(period) if period else None),
             function=dstore.Strings(values=split_and_strip(method) if method else None),
+            camsl=dstore.Strings(values=get_levels_values(z) if z else None),
         ),
         spatial_polygon=(
             dstore.Polygon(points=[dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords])
