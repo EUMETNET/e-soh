@@ -1,5 +1,10 @@
 bbox = "Bounding box to query data from. The bounding box is an area defined by two longitudes and two latitudes."
 datetime = "Time range to query data from."
+z = (
+    "Vertical level(s) to query data from in meters. Can be a comma separated list, a range or a repeating interval. "
+    "Repeating intervals are defined in the format of "
+    "'__R__ *number of intervals / min-height / height to increment by*'."
+)
 parameter_name = (
     "Comma separated list of parameter names. Each consists of four components separated by colons."
     " The components are standard name, level in meters, aggregation method, and period. "
@@ -8,7 +13,7 @@ parameter_name = (
 )
 standard_name = "Comma separated list of parameter standard_name(s) to query."
 level = (
-    "Define the vertical level(s) to return data from using either a comma separated list, "
+    "Define the standard measurement level(s) to return data from using either a comma separated list, "
     "a range or a repeating interval. <br /> Repeating intervals are defined in the format of "
     "'__R__ *number of intervals / min-level / height to increment by*'."
 )

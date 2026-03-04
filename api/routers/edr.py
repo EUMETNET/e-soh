@@ -73,6 +73,10 @@ async def get_locations(
             openapi_examples=openapi_examples.datetime,
         ),
     ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
+    ] = None,
     parameter_name: Annotated[
         str | None,
         Query(
@@ -120,7 +124,7 @@ async def get_locations(
             [dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords],
         )
 
-    await add_request_parameters(loc_request, parameter_name, datetime, standard_name, level, method, duration)
+    await add_request_parameters(loc_request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_locations_request(loc_request)
     locations = grpc_response.locations
@@ -147,7 +151,7 @@ async def get_locations(
                     + loc.platform,
                 },
                 # TODO: loc_request does not return elevation for locations currently
-                # so for now we just leave it out entirely untill #
+                # so for now we just leave it out entirely untill #256 is done
                 geometry=Point(
                     type="Point",
                     coordinates=(loc.geo_point.lon, loc.geo_point.lat),
@@ -191,6 +195,10 @@ async def get_data_location_id(
         str | None,
         Query(description=edr_query_parameter_descriptions.datetime, openapi_examples=openapi_examples.datetime),
     ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
+    ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
     ] = formatters.Formats.covjson,
@@ -230,7 +238,7 @@ async def get_data_location_id(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -264,6 +272,10 @@ async def get_data_position(
             description=edr_query_parameter_descriptions.datetime,
             openapi_examples=openapi_examples.datetime,
         ),
+    ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
     ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
@@ -317,13 +329,23 @@ async def get_data_position(
             detail={"coords": f"Unexpected error occurred during wkt parsing: {coords}"},
         )
 
+    # TODO: Allow elevation in Point and update backend to use 3D spatial indexing?
     request = dstore.GetObsRequest(
         # 10 meters around the point
         spatial_circle=dstore.Circle(center=dstore.Point(lat=point.y, lon=point.x), radius=0.01),
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    # OGC EDR SPEC states:
+    # If a client request has a coords value which includes a height value and defines a z query parameter,
+    # the z query parameter will be the requested height value.
+    elevation = None
+    if point.has_z:
+        elevation = str(point.z)
+    if z:
+        elevation = z
+
+    await add_request_parameters(request, parameter_name, datetime, elevation, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -354,6 +376,10 @@ async def get_data_area(
     datetime: Annotated[
         str | None,
         Query(description=edr_query_parameter_descriptions.datetime, openapi_examples=openapi_examples.datetime),
+    ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
     ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
@@ -407,6 +433,7 @@ async def get_data_area(
             detail={"coords": f"Unexpected error occurred during wkt parsing: {coords}"},
         )
 
+    # TODO: Allow elevation in Polygon and update backend to use 3D spatial indexing?
     request = dstore.GetObsRequest(
         spatial_polygon=dstore.Polygon(
             points=[dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords]
@@ -414,7 +441,19 @@ async def get_data_area(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    # TODO: This does not explicitly handle the case of a 3D polygon, but instead uses the ranges
+    # from poly.exterior.coords and creates a cube from the lowest to the highest z value.
+    elevation = None
+    if len(poly.exterior.coords[0]) == 3:
+        z_values = [coord[2] for coord in poly.exterior.coords]
+        elevation = f"{min(z_values)}/{max(z_values)}"
+    # OGC EDR SPEC states:
+    # If a client request has a coords value which includes a height value and defines a z query parameter,
+    # the z query parameter will be the requested height value.
+    if z:
+        elevation = z
+
+    await add_request_parameters(request, parameter_name, datetime, elevation, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations

@@ -129,6 +129,7 @@ async def add_request_parameters(
     request,
     parameter_name: str | None,
     datetime: str | None,
+    z: str | None,
     standard_names: str | None,
     levels: str | None,
     methods: str | None,
@@ -143,6 +144,9 @@ async def add_request_parameters(
         start, end = get_datetime_range(datetime)
         request.temporal_interval.start.CopyFrom(start)
         request.temporal_interval.end.CopyFrom(end)
+
+    if z:
+        request.filter["camsl"].values.extend(get_levels_values(z))
 
     if standard_names:
         request.filter["standard_name"].values.extend(split_and_strip(standard_names))
