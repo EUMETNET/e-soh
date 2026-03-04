@@ -58,7 +58,7 @@ class Content(BaseModel):
 
 class Integrity(BaseModel):
     method: Literal["sha256", "sha384", "sha512", "sha3-256", "sha3-384", "sha3-512"]
-    value: str = Field(..., desciption="The hash value for the value field in the message content.")
+    value: str = Field(..., description="The hash value for the value field in the message content.")
 
 
 class Properties(BaseModel):
@@ -91,7 +91,7 @@ class Properties(BaseModel):
     integrity: Optional[Integrity] = Field(None, exclude_from_schema=True)
 
     @model_validator(mode="after")
-    def set_dateimte(self):
+    def set_datetime(self):
         assert bool(self.datetime) != bool(self.start_datetime and self.end_datetime), (
             "Set datetime or start_datetime and end_datetime. At least one and not both. "
             + f"{self.datetime}, {self.start_datetime} - {self.end_datetime}"
