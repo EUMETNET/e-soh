@@ -93,7 +93,7 @@ class Properties(BaseModel):
     @model_validator(mode="after")
     def set_datetime(self):
         assert bool(self.datetime) != bool(self.start_datetime and self.end_datetime), (
-            "Set datetime or start_datetime and end_datetime. At least one and not both. "
+            "Set either 'datetime' OR 'start_datetime' and 'end_datetime'. Not both options. "
             + f"{self.datetime}, {self.start_datetime} - {self.end_datetime}"
         )
         return self
