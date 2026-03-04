@@ -22,6 +22,7 @@ from shapely import geometry
 from utilities import get_datetime_range
 from utilities import split_and_strip
 from utilities import get_levels_values
+from utilities import get_periods_or_range
 
 router = APIRouter(prefix="/collections/observations")
 
@@ -125,8 +126,8 @@ async def search_timeseries(
             standard_name=dstore.Strings(values=split_and_strip(standard_name) if standard_name else None),
             unit=dstore.Strings(values=split_and_strip(unit) if unit else None),
             instrument=dstore.Strings(values=split_and_strip(instrument) if instrument else None),
-            level=dstore.Strings(values=split_and_strip(level) if level else None),
-            period=dstore.Strings(values=split_and_strip(period) if period else None),
+            level=dstore.Strings(values=get_levels_values(level) if level else None),
+            period=dstore.Strings(values=get_periods_or_range(period) if period else None),
             function=dstore.Strings(values=split_and_strip(method) if method else None),
             camsl=dstore.Strings(values=get_levels_values(z) if z else None),
         ),
