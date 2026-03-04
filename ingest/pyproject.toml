@@ -38,3 +38,13 @@ build = ["cp310-manylinux_x86_64"]
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y rapidjson-devel"
+
+[dependency-groups]
+dev = [
+  "ipython>=9.10.0",
+  "httpx~=0.27.0",
+  "pytest~=8.1",
+  "pre-commit",
+  "pytest-cov~=5.0",
+  "pytest-timeout~=2.3",
+]
