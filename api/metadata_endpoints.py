@@ -16,6 +16,8 @@ from edr_pydantic.data_queries import EDRQuery
 from edr_pydantic.extent import Custom
 from edr_pydantic.extent import Extent
 from edr_pydantic.extent import Spatial
+
+# from edr_pydantic.extent import Vertical
 from edr_pydantic.extent import Temporal
 from edr_pydantic.link import EDRQueryLink
 from edr_pydantic.link import Link
@@ -176,11 +178,13 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
 
         all_parameters[ts.parameter_name] = parameter
 
+    # TODO: Get the vertical extent values with GetExtentsRequest
     extent_request = dstore.GetExtentsRequest()
     extent_response = await get_extents_request(extent_request)
     spatial_extent = extent_response.spatial_extent
     interval_start = extent_response.temporal_extent.start.ToDatetime(tzinfo=timezone.utc)
     interval_end = extent_response.temporal_extent.end.ToDatetime(tzinfo=timezone.utc)
+    # vertical_extent = extent_response.vertical_extent
 
     # TODO: Check if these make /collections significantly slower. If yes, do we need DB indices on these? And parallel
     levels = [convert_cm_to_m(level) for level in await get_unique_values_for_metadata("level")]
@@ -212,6 +216,12 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
                 values=[f"{datetime_to_iso_string(interval_start)}/{datetime_to_iso_string(interval_end)}"],
                 trs="Gregorian",
             ),
+            # TODO: Add vertical extent to the response when we get the values
+            # vertical=Vertical(
+            #    interval=[[vertical_extent[0], vertical_extent[-1]]],
+            #    values=[vertical_extent],
+            #    vrs="EPSG:5714",
+            # ),
             custom=[
                 Custom(
                     id="standard_name",

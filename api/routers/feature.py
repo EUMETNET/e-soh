@@ -173,6 +173,7 @@ async def get_dataset_metadata(request: Request):
 
     # need to get spatial extent.
     spatial_request = dstore.GetExtentsRequest()
+    # TODO: Add vertical extent to the response in datastore and add it to the jinja tempalate
     extent = await get_extents_request(spatial_request)
     dynamic_fields = {
         "spatial_extents": [
