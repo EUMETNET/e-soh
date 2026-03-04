@@ -447,3 +447,33 @@ def test_get_data_with_combination_durations_filtering():
 
         assert response.status_code == 200
         assert m_args.filter["period"].values == ["0", "60/600"]
+
+
+def test_get_area_with_incorrect_geometry():
+    response = client.get(
+        "/collections/observations/position?coords=POLYGON((22.12 59.86 2.0, 24.39 60.41, "
+        "24.39 60.41, 24.39 59.86, 22.12 59.86))"
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": {
+            "coords": "Invalid or unparseable wkt provided: "
+            "POLYGON((22.12 59.86 2.0, 24.39 60.41, 24.39 60.41, 24.39 59.86, 22.12 59.86))"
+        }
+    }
+
+
+def test_get_position_where_z_overrides_point_z():
+    with patch("routers.edr.get_obs_request") as mock_get_obs_request:
+
+        # Load with random test data for making a mock_obs_request
+        test_data = load_json("test/test_data/test_coverages_proto.json")
+        mock_get_obs_request.return_value = create_mock_obs_response(test_data)
+
+        response = client.get("/collections/observations/position/?coords=POINT(5.179705 52.0988218 15.0)&z=R5/0/5")
+
+        m_args = mock_get_obs_request.call_args[0][0]
+
+        assert response.status_code == 200
+        assert m_args.filter["camsl"].values == ["0", "500", "1000", "1500", "2000"]

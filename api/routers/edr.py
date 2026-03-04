@@ -442,7 +442,7 @@ async def get_data_area(
     )
 
     # TODO: This does not explicitly handle the case of a 3D polygon, but instead uses the ranges
-    # from poly.exterior.coords and creates a cube from the lowest to the highest z value.
+    # from poly.exterior.coords and creates a 3D flat polygon from the lowest to the highest z value.
     elevation = None
     if len(poly.exterior.coords[0]) == 3:
         z_values = [coord[2] for coord in poly.exterior.coords]
