@@ -83,7 +83,7 @@ class Properties(BaseModel):
         None,
         description="Identifies the end date/time date of the data being recorded, in RFC3339 format.",
     )
-    metadata_id: Optional[str] = Field(
+    metadata_id: str = Field(
         ...,
         description="Identifier for associated discovery metadata record to which the notification applies",
     )
