@@ -1,15 +1,19 @@
 datetime = {
     "range": {
         "summary": "Range",
-        "value": "2022-01-01T00:00Z/2023-01-01T00:00Z",
+        "value": "2026-01-01T00:00Z/2026-01-01T00:00Z",
     },
     "point": {
         "summary": "A point in time",
-        "value": "2022-01-01T00:00Z",
+        "value": "2026-01-01T00:00Z",
     },
-    "wildcard": {
+    "open start range": {
         "summary": "Open start range",
-        "value": "../2023-01-01T00:00Z",
+        "value": "../2026-01-01T00:00Z",
+    },
+    "timezone offset": {
+        "summary": "Timezone offset",
+        "value": "2026-01-01T00:00+02:00/2026-01-01T00:00+02:00",
     },
 }
 

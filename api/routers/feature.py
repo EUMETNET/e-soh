@@ -48,7 +48,7 @@ async def search_timeseries(
         str | None,
         Query(
             openapi_examples=openapi_examples.datetime,
-            description="E-SOH database only contains data from the last 24 hours",
+            description=openapi_descriptions.datetime,
         ),
     ] = None,
     id: Annotated[str | None, Query(description="E-SOH time series id")] = None,

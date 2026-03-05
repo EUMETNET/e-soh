@@ -3,7 +3,14 @@ bbox = (
     "westmost longitude, southmost latitude, eastmost longitude, northmost latitude. "
     "Longitude values must be in the range [-180, 180] and latitude values in the range [-90, 90]."
 )
-datetime = "Time range to query data from."
+datetime = (
+    "Time to query data from. This may be a single timestamp (a point) or an interval. "
+    "Expressions follow ISO 8601 (RFC 3339 recommended). Supported forms include a single "
+    "date-time or an interval `start/end`. Use `..` to indicate an unbounded side. "
+    "Common ISO 8601 variants accepted include omitting trailing zero components "
+    "(e.g. `2026-01-01T00:00Z` vs `2026-01-01T00:00:00Z`) and fractional seconds (e.g. `2026-01-01T00:00:00.123Z`). "
+    "A timezone indicator (`Z` or `±HH:MM`) is required. Date-only values without a time are not supported. "
+)
 parameter_name = (
     "Comma separated list of parameter names. Each consists of four components separated by colons."
     " The components are standard name, level in meters, aggregation method, and period. "
