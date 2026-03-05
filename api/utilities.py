@@ -158,19 +158,19 @@ async def add_request_parameters(
         request.filter["function"].values.extend(split_and_strip(methods))
 
     if durations:
-        request.filter["period"].values.extend(get_periods_or_range(durations))
+        request.filter["period"].values.extend(get_durations_or_range(durations))
 
 
-def get_periods_or_range(periods: str) -> list[str]:
+def get_durations_or_range(durations: str) -> list[str]:
     """
-    Function for getting the periods filter list as a list of period ranges or
-    periods
+    Function for getting the durations filter list as a list of duration ranges or
+    durations
     """
-    periods = split_and_strip(periods)
+    durations = split_and_strip(durations)
     try:
         return [
-            get_iso_8601_range(period) if "/" in period else str(iso_8601_duration_to_seconds(period))
-            for period in periods
+            get_iso_8601_range(duration) if "/" in duration else str(iso_8601_duration_to_seconds(duration))
+            for duration in durations
         ]
     except ValueError as err:
         raise HTTPException(status_code=400, detail=f"{err}")

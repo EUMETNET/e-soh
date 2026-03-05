@@ -109,7 +109,7 @@ level = {
     "10.0": {"summary": "10 meters above ground", "value": "10.0"},
 }
 
-period = {
+duration = {
     "PT1M": {"summary": "1 minute", "value": "PT1M"},
     "PT10M": {"summary": "10 minutes", "value": "PT10M"},
 }
