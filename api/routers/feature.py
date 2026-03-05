@@ -22,7 +22,7 @@ from shapely import geometry
 from utilities import get_datetime_range
 from utilities import split_and_strip
 from utilities import get_levels_values
-from utilities import get_periods_or_range
+from utilities import get_durations_or_range
 
 router = APIRouter(prefix="/collections/observations")
 
@@ -94,9 +94,9 @@ async def search_timeseries(
             openapi_examples=openapi_examples.level,
         ),
     ] = None,
-    period: Annotated[
+    duration: Annotated[
         str | None,
-        Query(description="Duration of collection period in ISO8601", openapi_examples=openapi_examples.period),
+        Query(description="Duration of collection period in ISO8601", openapi_examples=openapi_examples.duration),
     ] = None,
     method: Annotated[
         str | None,
@@ -127,7 +127,7 @@ async def search_timeseries(
             unit=dstore.Strings(values=split_and_strip(unit) if unit else None),
             instrument=dstore.Strings(values=split_and_strip(instrument) if instrument else None),
             level=dstore.Strings(values=get_levels_values(level) if level else None),
-            period=dstore.Strings(values=get_periods_or_range(period) if period else None),
+            period=dstore.Strings(values=get_durations_or_range(duration) if duration else None),
             function=dstore.Strings(values=split_and_strip(method) if method else None),
             camsl=dstore.Strings(values=get_levels_values(z) if z else None),
         ),
