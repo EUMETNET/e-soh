@@ -1,7 +1,7 @@
 bbox = (
     "Bounding box to query data from, specified as four comma-separated values: "
     "westmost longitude, southmost latitude, eastmost longitude, northmost latitude. "
-    "Longitude values must be in the range [-180, 180] and latitude values in the range [-90, 90]."
+    "Longitude values must be in the range [`-180`, `180`] and latitude values in the range [`-90`, `90`]."
 )
 datetime = (
     "Time to query data from. This may be a single timestamp (a point) or an interval. "
@@ -21,7 +21,7 @@ standard_name = "Comma separated list of parameter standard_name(s) to query."
 level = (
     "Define the vertical level(s) to return data from using either a comma separated list, "
     "a range or a repeating interval. <br /> Repeating intervals are defined in the format of "
-    "'__R__ *number of intervals / min-level / height to increment by*'."
+    "'__R__ *`number of intervals` / `min-level` / `height to increment by`*'."
 )
 method = "Comma separated list of parameter aggregation methods to query."
 duration = "Define the aggregation period(s) to return data from using either a comma separated list or " "a range."
