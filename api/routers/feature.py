@@ -17,6 +17,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import select_autoescape
 from openapi import openapi_examples
+from openapi import edr_query_parameter_descriptions as openapi_descriptions
 from response_classes import GeoJsonResponse
 from shapely import geometry
 from utilities import get_datetime_range
@@ -40,6 +41,7 @@ async def search_timeseries(
         str | None,
         Query(
             openapi_examples=openapi_examples.bbox,
+            description=openapi_descriptions.bbox,
         ),
     ] = None,
     datetime: Annotated[

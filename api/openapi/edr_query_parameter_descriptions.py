@@ -1,4 +1,8 @@
-bbox = "Bounding box to query data from. The bounding box is an area defined by two longitudes and two latitudes."
+bbox = (
+    "Bounding box to query data from, specified as four comma-separated values: "
+    "westmost longitude, southmost latitude, eastmost longitude, northmost latitude. "
+    "Longitude values must be in the range [-180, 180] and latitude values in the range [-90, 90]."
+)
 datetime = "Time range to query data from."
 parameter_name = (
     "Comma separated list of parameter names. Each consists of four components separated by colons."
