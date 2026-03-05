@@ -27,5 +27,16 @@ method = "Comma separated list of parameter aggregation methods to query."
 duration = "Define the aggregation period(s) to return data from using either a comma separated list or " "a range."
 wigos_id = "WIGOS Station Identifier (WSI) of the station to query data from."
 format = "Specify wanted return format."
-point = "Point to query all data within 10 meters, specified as Well-Known Text (WKT) point coordinates."
-area = "Area to query data from in Well-Known Text (WKT) polygon coordinates."
+point = (
+    "Point to query all data within 10 meters, specified as a Well-Known Text (WKT) `POINT`. "
+    "Coordinates are given as longitude then latitude (`lon` `lat`). "
+    "A `Z` value for height may optionally follow the latitude for 3D points: `POINT(lon lat z)`."
+)
+
+area = (
+    "Area to query data from, specified as a Well-Known Text (WKT) `POLYGON`. "
+    "Each coordinate is given as longitude then latitude (`lon` `lat`) and the polygon's linear ring must be closed "
+    "(i.e. the first and last coordinate *MUST* be identical). Edges are interpreted as *great-circle arcs* "
+    "on the sphere, and long edges follow the shortest path over the globe. "
+    "A `Z` value for height may optionally follow the latitude for 3D points: `POLYGON((lon lat z, ...))`."
+)
