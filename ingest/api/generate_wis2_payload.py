@@ -6,6 +6,7 @@ from api.model import Link
 from api.wis2_model import Wis2MessageSchema
 from api.wis2_model import PropertiesWIS2
 from api.wis2_model import Content
+from wis2.global_variables import WIS2_TOPIC
 
 
 def get_api_timeseries_query(location_id: str, baseURL: str) -> str:
@@ -16,10 +17,9 @@ def get_api_timeseries_query(location_id: str, baseURL: str) -> str:
 
 def generate_wis2_topic() -> str:
     """This function will generate the WIS2 complient toipc name"""
-    wis2_topic = os.getenv("WIS2_TOPIC")
-    if not wis2_topic:
+    if not WIS2_TOPIC:
         raise ValueError("WIS2_TOPIC env variable not set. Aborting publish to wis2")
-    return wis2_topic
+    return WIS2_TOPIC
 
 
 def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
@@ -47,7 +47,10 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
         conformsTo="http://wis.wmo.int/spec/wnm/1/conf/core",
         geometry={
             "type": "Point",
-            "coordinates": [message["geometry"]["coordinates"]["lon"], message["geometry"]["coordinates"]["lat"]],
+            "coordinates": [
+                message["geometry"]["coordinates"]["lon"],
+                message["geometry"]["coordinates"]["lat"],
+            ],
         },
         properties=PropertiesWIS2(
             producer=message["properties"]["naming_authority"],
