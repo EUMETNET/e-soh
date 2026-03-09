@@ -16,3 +16,5 @@ python-multipart~=0.0.9
 requests == 2.31.0
 isodate~=0.6.1
 prometheus-fastapi-instrumentator
+rodeo-bufr-tools ~= 0.3.3
+python-dateutil

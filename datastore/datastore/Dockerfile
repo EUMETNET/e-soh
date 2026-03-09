@@ -19,9 +19,9 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     protobuf-compiler libprotobuf-dev \
     # install protoc-gen-go
-    && go install google.golang.org/protobuf/cmd/protoc-gen-go@latest \
+    && go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.9 \
     # install protoc-gen-go-grpc
-    && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest \
+    && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0 \
     # install grpc healtcheck service \
     && arch=$(echo "$(uname)-$(dpkg --print-architecture)" | tr '[:upper:]' '[:lower:]') \
     && wget -q --output-document "/bin/grpc_health_probe" "https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${VERSION_GRPC_HEALTH_PROBE}/grpc_health_probe-${arch}" \

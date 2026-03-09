@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Annotated
 
 import datastore_pb2 as dstore
@@ -23,7 +24,7 @@ from utilities import split_and_strip
 
 router = APIRouter(prefix="/collections/observations")
 
-env = Environment(loader=FileSystemLoader("templates"), autoescape=select_autoescape())
+env = Environment(loader=FileSystemLoader(os.getenv("JINJA2_TEMPLATES", "templates")), autoescape=select_autoescape())
 
 
 @router.get(
@@ -174,10 +175,7 @@ async def get_dataset_metadata(request: Request):
             ]
         ],
         "temporal_extents": [
-            [
-                f"{extent.temporal_extent.start.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}",
-                f"{extent.temporal_extent.end.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}",
-            ],
+            [f"{extent.temporal_extent.start.ToDatetime().strftime('%Y-%m-%dT%H:%M:%SZ')}", ".."],
         ],
         "url_base": base_url,
         "url_conformance": base_url + "conformance",

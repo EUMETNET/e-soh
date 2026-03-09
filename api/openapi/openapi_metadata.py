@@ -1,16 +1,21 @@
-openapi_metadata = {
-    "title": "EDR Observations API Europe EUMETNET",
-    "description": (
-        "OGC EDR API data service for European meteoroligical observations from EUMETNET,"
-        " co-funded by the European Union."
-    ),
-    "contact": {
-        "name": "EUMETNET",
-        "url": "https://www.eumetnet.eu/about-us/",
-        "email": "eucos@metoffice.gov.uk",
-    },
-    "license_info": {
-        "name": "CC-BY-4.0",
-        "url": "https://creativecommons.org/licenses/by/4.0/",
-    },
-}
+import os
+import json
+
+with open(
+    os.getenv("OPENAPI_METADATA_PATH", "/app/openapi_default_files/openapi_metadata.json"),
+    "r",
+) as file:
+    openapi_metadata = json.load(file)
+    valid_keys = [
+        "title",
+        "version",
+        "summary",
+        "description",
+        "terms_of_service",
+        "contact",
+        "license_info",
+        "openapi_tags",
+    ]
+    unwanted = set(openapi_metadata) - set(valid_keys)
+    for unwanted_key in unwanted:
+        del openapi_metadata[unwanted_key]
