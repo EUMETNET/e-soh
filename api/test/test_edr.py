@@ -464,16 +464,30 @@ def test_get_area_with_incorrect_geometry():
     }
 
 
-def test_get_position_where_z_overrides_point_z():
+def test_get_position_z_filtering():
     with patch("routers.edr.get_obs_request") as mock_get_obs_request:
 
         # Load with random test data for making a mock_obs_request
         test_data = load_json("test/test_data/test_coverages_proto.json")
         mock_get_obs_request.return_value = create_mock_obs_response(test_data)
 
-        response = client.get("/collections/observations/position/?coords=POINT(5.179705 52.0988218 15.0)&z=R5/0/5")
+        response = client.get("/collections/observations/position/?coords=POINT(5.179705 52.0988218)&z=R5/0/5")
 
         m_args = mock_get_obs_request.call_args[0][0]
 
         assert response.status_code == 200
         assert m_args.filter["camsl"].values == ["0", "500", "1000", "1500", "2000"]
+
+
+def test_get_area_with_incorrect_3d_geometry():
+    response = client.get(
+        "/collections/observations/area?coords=POLYGON((22.12 59.86 2.0, 24.39 60.41 2.0, "
+        "24.39 60.41 2.0, 24.39 59.86 2.0, 22.12 59.86 2.0))&datetime=2022-12-31T00:00:00Z"
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": {
+            "coords": "3D polygons are not supported. Please provide vertical level using the z query parameter."
+        }
+    }

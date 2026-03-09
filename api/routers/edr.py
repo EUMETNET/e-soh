@@ -329,23 +329,21 @@ async def get_data_position(
             detail={"coords": f"Unexpected error occurred during wkt parsing: {coords}"},
         )
 
-    # TODO: Allow elevation in Point and update backend to use 3D spatial indexing?
     request = dstore.GetObsRequest(
         # 10 meters around the point
         spatial_circle=dstore.Circle(center=dstore.Point(lat=point.y, lon=point.x), radius=0.01),
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    # OGC EDR SPEC states:
-    # If a client request has a coords value which includes a height value and defines a z query parameter,
-    # the z query parameter will be the requested height value.
-    elevation = None
     if point.has_z:
-        elevation = str(point.z)
-    if z:
-        elevation = z
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "coords": "3D coordinates are not supported. Please provide vertical level using the z query parameter."
+            },
+        )
 
-    await add_request_parameters(request, parameter_name, datetime, elevation, standard_name, level, method, duration)
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -433,7 +431,6 @@ async def get_data_area(
             detail={"coords": f"Unexpected error occurred during wkt parsing: {coords}"},
         )
 
-    # TODO: Allow elevation in Polygon and update backend to use 3D spatial indexing?
     request = dstore.GetObsRequest(
         spatial_polygon=dstore.Polygon(
             points=[dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords]
@@ -441,19 +438,15 @@ async def get_data_area(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    # TODO: This does not explicitly handle the case of a 3D polygon, but instead uses the ranges
-    # from poly.exterior.coords and creates a 3D flat polygon from the lowest to the highest z value.
-    elevation = None
     if len(poly.exterior.coords[0]) == 3:
-        z_values = [coord[2] for coord in poly.exterior.coords]
-        elevation = f"{min(z_values)}/{max(z_values)}"
-    # OGC EDR SPEC states:
-    # If a client request has a coords value which includes a height value and defines a z query parameter,
-    # the z query parameter will be the requested height value.
-    if z:
-        elevation = z
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "coords": "3D polygons are not supported. Please provide vertical level using the z query parameter."
+            },
+        )
 
-    await add_request_parameters(request, parameter_name, datetime, elevation, standard_name, level, method, duration)
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
