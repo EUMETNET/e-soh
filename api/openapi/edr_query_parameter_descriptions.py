@@ -36,5 +36,5 @@ area = (
     "Area to query data from, specified as a Well-Known Text (WKT) `POLYGON`. "
     "Each coordinate is given as longitude then latitude (`lon` `lat`) in degrees and the polygon's linear ring must "
     "be closed (i.e. the first and last coordinate *MUST* be identical). Edges are interpreted as *great-circle arcs* "
-    "on the sphere, and long edges follow the shortest path over the globe. Only 2D polygons are supported."
+    "on the sphere, so long edges follow the shortest path over the globe. Only 2D polygons are supported."
 )
