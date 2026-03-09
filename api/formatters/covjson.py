@@ -125,7 +125,9 @@ def convert_to_covjson(observations):
         parameter_union = reduce(operator.ior, (c.parameters.root for c in coverages), {})
         return CoverageCollection(
             coverages=coverages, parameters=dict(sorted(parameter_union.items()))
-        ).model_dump_json()  # (mode="json")
+        ).model_dump_json(
+            exclude_none=True
+        )  # (mode="json")
 
 
 def _collect_data(ts_mdata, obs_mdata):
