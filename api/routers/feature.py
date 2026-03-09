@@ -54,7 +54,7 @@ async def search_timeseries(
     z: Annotated[
         str | None,
         Query(
-            description="Vertical level in meters above or below mean sea level",
+            description="Vertical level in meters above mean sea level",
             openapi_examples=openapi_examples.z,
         ),
     ] = None,
