@@ -220,3 +220,7 @@ qudt_units.json
 api/test/output/
 datastore/load-test/output/
 ingest/test/output/
+
+
+## Ignore UV lock files
+*uv.lock
