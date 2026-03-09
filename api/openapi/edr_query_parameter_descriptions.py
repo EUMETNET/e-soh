@@ -29,14 +29,12 @@ wigos_id = "WIGOS Station Identifier (WSI) of the station to query data from."
 format = "Specify wanted return format."
 point = (
     "Point to query all data within 10 meters, specified as a Well-Known Text (WKT) `POINT`. "
-    "Coordinates are given as longitude then latitude (`lon` `lat`). "
-    "A `Z` value for height may optionally follow the latitude for 3D points: `POINT(lon lat z)`."
+    "Coordinates are given as longitude then latitude (`lon` `lat`) in degrees. Only 2D points are supported."
 )
 
 area = (
     "Area to query data from, specified as a Well-Known Text (WKT) `POLYGON`. "
-    "Each coordinate is given as longitude then latitude (`lon` `lat`) and the polygon's linear ring must be closed "
-    "(i.e. the first and last coordinate *MUST* be identical). Edges are interpreted as *great-circle arcs* "
-    "on the sphere, and long edges follow the shortest path over the globe. "
-    "A `Z` value for height may optionally follow the latitude for 3D points: `POLYGON((lon lat z, ...))`."
+    "Each coordinate is given as longitude then latitude (`lon` `lat`) in degrees and the polygon's linear ring must "
+    "be closed (i.e. the first and last coordinate *MUST* be identical). Edges are interpreted as *great-circle arcs* "
+    "on the sphere, and long edges follow the shortest path over the globe. Only 2D polygons are supported."
 )
