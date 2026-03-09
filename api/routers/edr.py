@@ -17,6 +17,7 @@ from fastapi import HTTPException
 from fastapi import Path
 from fastapi import Query
 from fastapi import Request
+from fastapi.responses import Response
 from formatters.covjson import make_parameter
 from geojson_pydantic import Feature
 from geojson_pydantic import Point
@@ -174,7 +175,11 @@ async def get_locations(
 )
 async def get_data_location_id(
     location_id: Annotated[
-        str, Path(description=edr_query_parameter_descriptions.wigos_id, openapi_examples=openapi_examples.wigos_id)
+        str,
+        Path(
+            description=edr_query_parameter_descriptions.wigos_id,
+            openapi_examples=openapi_examples.wigos_id,
+        ),
     ],
     parameter_name: Annotated[
         str | None,
@@ -186,7 +191,10 @@ async def get_data_location_id(
     ] = None,
     datetime: Annotated[
         str | None,
-        Query(description=edr_query_parameter_descriptions.datetime, openapi_examples=openapi_examples.datetime),
+        Query(
+            description=edr_query_parameter_descriptions.datetime,
+            openapi_examples=openapi_examples.datetime,
+        ),
     ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
@@ -231,9 +239,9 @@ async def get_data_location_id(
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
-    response = formatters.formatters[f](observations)
+    response = formatters.formatters[f]["format_function"](observations)
 
-    return response
+    return Response(content=response, media_type=formatters.formatters[f]["response_format"])
 
 
 @router.get(
@@ -245,7 +253,11 @@ async def get_data_location_id(
 )
 async def get_data_position(
     coords: Annotated[
-        str, Query(description=edr_query_parameter_descriptions.point, openapi_examples=openapi_examples.point)
+        str,
+        Query(
+            description=edr_query_parameter_descriptions.point,
+            openapi_examples=openapi_examples.point,
+        ),
     ],
     parameter_name: Annotated[
         str | None,
@@ -324,9 +336,9 @@ async def get_data_position(
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
-    response = formatters.formatters[f](observations)
+    response = formatters.formatters[f]["format_function"](observations)
 
-    return response
+    return Response(content=response, media_type=formatters.formatters[f]["response_format"])
 
 
 @router.get(
@@ -338,7 +350,11 @@ async def get_data_position(
 )
 async def get_data_area(
     coords: Annotated[
-        str, Query(description=edr_query_parameter_descriptions.area, openapi_examples=openapi_examples.polygon)
+        str,
+        Query(
+            description=edr_query_parameter_descriptions.area,
+            openapi_examples=openapi_examples.polygon,
+        ),
     ],
     parameter_name: Annotated[
         str | None,
@@ -350,7 +366,10 @@ async def get_data_area(
     ] = None,
     datetime: Annotated[
         str | None,
-        Query(description=edr_query_parameter_descriptions.datetime, openapi_examples=openapi_examples.datetime),
+        Query(
+            description=edr_query_parameter_descriptions.datetime,
+            openapi_examples=openapi_examples.datetime,
+        ),
     ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
@@ -415,6 +434,6 @@ async def get_data_area(
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
-    response = formatters.formatters[f](observations)
+    response = formatters.formatters[f]["format_function"](observations)
 
-    return response
+    return Response(content=response, media_type=formatters.formatters[f]["response_format"])
