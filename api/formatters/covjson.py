@@ -77,7 +77,10 @@ def convert_to_covjson(observations):
         referencing = [
             ReferenceSystemConnectionObject(
                 coordinates=["x", "y"],
-                system=ReferenceSystem(type="GeographicCRS", id="http://www.opengis.net/def/crs/OGC/1.3/CRS84"),
+                system=ReferenceSystem(
+                    type="GeographicCRS",
+                    id="http://www.opengis.net/def/crs/OGC/1.3/CRS84",
+                ),
             ),
             ReferenceSystemConnectionObject(
                 coordinates=["t"],
@@ -106,7 +109,9 @@ def convert_to_covjson(observations):
             parameters[parameter_id] = make_parameter(data.ts_mdata)
 
             ranges[parameter_id] = NdArrayFloat(
-                values=values_no_nan, axisNames=["t", "x", "y"], shape=[len(values_no_nan), 1, 1]
+                values=values_no_nan,
+                axisNames=["t", "x", "y"],
+                shape=[len(values_no_nan), 1, 1],
             )
 
         custom_fields = {"metocean:wigosId": data.ts_mdata.platform}
@@ -118,7 +123,9 @@ def convert_to_covjson(observations):
         return coverages[0]
     else:
         parameter_union = reduce(operator.ior, (c.parameters.root for c in coverages), {})
-        return CoverageCollection(coverages=coverages, parameters=dict(sorted(parameter_union.items())))
+        return CoverageCollection(
+            coverages=coverages, parameters=dict(sorted(parameter_union.items()))
+        ).model_dump_json()  # (mode="json")
 
 
 def _collect_data(ts_mdata, obs_mdata):
