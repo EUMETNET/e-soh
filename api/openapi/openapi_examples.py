@@ -121,7 +121,7 @@ z = {
     "10.0": {"summary": "10 meters above mean sea level", "value": "10.0"},
     "5/200": {"summary": "Range from 5 to 200 meters above mean sea level", "value": "5/200"},
     "R10/5/10": {
-        "summary": "Repeating interval of 10 levels, starting at 5 meters above mean sea level, "
+        "summary": "Repeating interval of 10 altitude, starting at 5 meters above mean sea level, "
         "with an increment of 10 meters",
         "value": "R10/5/10",
     },

@@ -1,8 +1,8 @@
 bbox = "Bounding box to query data from. The bounding box is an area defined by two longitudes and two latitudes."
 datetime = "Time range to query data from."
 z = (
-    "Vertical level(s) to query data from in meters. Can be a comma separated list, a range or a repeating interval. "
-    "Repeating intervals are defined in the format of "
+    "Vertical level(s) to query data from in meters above mean sea level. Can be a comma separated list,"
+    " a range or a repeating interval. Repeating intervals are defined in the format of "
     "'__R__ *number of intervals / min-height / height to increment by*'."
 )
 parameter_name = (
