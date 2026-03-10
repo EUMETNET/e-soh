@@ -3,7 +3,6 @@
 import math
 import os
 import requests
-import json
 from multiprocessing import cpu_count, Pool
 from pathlib import Path
 from time import perf_counter
@@ -83,7 +82,6 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
                     pd.to_datetime(param_file["time"].data).to_pydatetime(),
                     param_file.data,
                 ):
-
                     ts = Timestamp()
                     ts.FromDatetime(time)
                     if not math.isnan(obs_value):  # Stations that don't have a parameter give them all as nan
@@ -105,7 +103,10 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
                                 "version": "4.0",
                                 "type": "Feature",
                                 "links": [
-                                    {"href": "Insert documentation about E-SOH datastore", "rel": "canonical"},
+                                    {
+                                        "href": "Insert documentation about E-SOH datastore",
+                                        "rel": "canonical",
+                                    },
                                 ],
                             }
                         )
@@ -118,7 +119,7 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
 
 def send_request_to_ingest(msg, url):
     try:
-        response = requests.post(url, data=json.dumps(msg))
+        response = requests.post(url, json=msg)
         response.raise_for_status()
         return response.status_code, response.json()
     except requests.RequestException as e:
@@ -138,7 +139,10 @@ def insert_data(observation_request_messages: List, url):
 
         for status_code, response in results:
             if status_code != 200:
-                print(status_code, response)
+                print(
+                    status_code,
+                    response,
+                )
                 return
     print(f"Finished observations bulk insert {perf_counter() - obs_insert_start}.")
 
