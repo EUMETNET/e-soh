@@ -44,7 +44,8 @@ parameter_name = {
     },
     "Wildcard": {
         "summary": "All air temperatures measured at 1.5m",
-        "value": "air_temperature:1.5:*:*",
+"summary": "All air temperatures measured at 2.0m",
+"value": "air_temperature:2.0:*:*",
     },
 }
 
