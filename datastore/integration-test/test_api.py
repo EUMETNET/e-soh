@@ -140,7 +140,8 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_durations_ran
 def test_from_a_single_collection_get_locations_within_bbox_with_levels_range_filtering():
     collection_id = "observations"
     bbox = "5.0,52.0,6.0,52.1"
-    actual_response = requests.get(url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}&levels=../10.0")
+    levels = "../10.0"
+    actual_response = requests.get(url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}&levels={levels}")
 
     expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
 
@@ -160,7 +161,7 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_parameter_nam
         url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}&parameter-name={parameters}"
     )
 
-    expected_json = load_json("response/data_locations_two_points_with_two_parameters.json")
+    expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
@@ -180,7 +181,7 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_methods_and_l
         url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}" f"&method={methods}&level={levels}"
     )
 
-    expected_json = load_json("response/data_locations_two_points_with_two_parameters.json")
+    expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
@@ -195,13 +196,12 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_duration_and_
     bbox = "5.0,52.0,6.0,52.1"
     durations = "PT10M, PT1M"
     standard_names = "air_temperature, wind_from_direction"
-    datetime = "2022-12-31T00:50:00Z/2022-12-31T02:10:00Z"
+    datetime = "2022-12-31T23:50:00Z/2023-01-01T02:10:00Z"
     actual_response = requests.get(
         url=BASE_URL + f"/collections/{collection_id}/locations?bbox={bbox}&standard_name={standard_names}"
         f"&duration={durations}&datetime={datetime}"
     )
-
-    expected_json = load_json("response/data_locations_two_points_with_five_parameters.json")
+    expected_json = load_json("response/data_locations_two_points_with_multiple_parameters.json")
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
