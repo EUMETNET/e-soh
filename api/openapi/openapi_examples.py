@@ -32,20 +32,15 @@ parameter_name = {
     "Default": {"value": ""},
     "List": {
         "summary": "Comma separated list",
-        "value": "wind_from_direction:2.0:mean:PT10M,"
+        "value": "wind_from_direction:10.0:mean:PT10M,"
         "wind_speed:10.0:mean:PT10M,"
         "relative_humidity:2.0:mean:PT1M,"
-        "air_pressure_at_sea_level:1.0:mean:PT1M,"
-"value": "wind_from_direction:10.0:mean:PT10M,"
-"wind_speed:10.0:mean:PT10M,"
-"relative_humidity:2.0:mean:PT1M,"
-"air_pressure:1.5:mean:PT1M,"
-"air_temperature:2.0:maximum:PT10M",
+        "air_pressure:1.5:mean:PT1M,"
+        "air_temperature:2.0:maximum:PT10M",
     },
     "Wildcard": {
-        "summary": "All air temperatures measured at 1.5m",
-"summary": "All air temperatures measured at 2.0m",
-"value": "air_temperature:2.0:*:*",
+        "summary": "All air temperatures measured at 2.0m",
+        "value": "air_temperature:2.0:*:*",
     },
 }
 
