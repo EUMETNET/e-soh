@@ -390,10 +390,10 @@ class Properties(BaseModel):
 class Link(BaseModel):
     href: str = Field(..., examples=["http://data.example.com/buildings/123"])
     rel: str = Field(..., examples=["alternate"])
-    type: Optional[str] = Field(None, examples=["application/geo+json"])
-    hreflang: Optional[str | None] = Field(None, examples=["en"])
-    title: Optional[str | None] = Field(None, examples=["Trierer Strasse 70, 53115 Bonn"])
-    length: Optional[int] = None
+    type: str = Field(None, examples=["application/geo+json"])
+    hreflang: str | None = Field(None, examples=["en"])
+    title: str | None = Field(None, examples=["Trierer Strasse 70, 53115 Bonn"])
+    length: int | None = None
 
 
 class JsonMessageSchema(BaseModel):

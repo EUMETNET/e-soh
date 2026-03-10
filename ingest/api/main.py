@@ -79,6 +79,7 @@ async def post_json(
     publishWIS2: bool = False,
 ) -> Response:
     status = "Successfully ingested"
+    logger.debug("Starting to process incoming request for JSON ingest.")
     if isinstance(request, list):
         hash_list = [i.__hash__() for i in request]
         unique_request = [request[hash_list.index(i)] for i in set(hash_list)]

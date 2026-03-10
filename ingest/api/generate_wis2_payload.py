@@ -8,6 +8,7 @@ from api.wis2_model import PropertiesWIS2
 from api.wis2_model import Content
 from api.global_variables import WIS2_TOPIC
 from api.global_variables import WIS2_DATA_ID
+from api.global_variables import WIS2_METADATA_RECORD_ID
 
 
 def get_api_timeseries_query(location_id: str, baseURL: str) -> str:
@@ -56,9 +57,7 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
         properties=PropertiesWIS2(
             producer=message["properties"]["naming_authority"],
             data_id=WIS2_DATA_ID or message["properties"]["data_id"],
-            metadata_id=os.getenv(
-                "WIS2_METADATA_RECORD_ID", None
-            ),  # Need to figure out how we generate this? Is it staic or dynamic?
+            metadata_id=WIS2_METADATA_RECORD_ID,  # Need to figure out how we generate this? Is it staic or dynamic?
             datetime=message["properties"]["datetime"],
             pubtime=message["properties"]["pubtime"],
             content=Content(
