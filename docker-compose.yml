@@ -119,12 +119,13 @@ services:
       - MQTT_PROTOCOL_VERSION=${MQTT_PROTOCOL_VERSION:-5}
       - MQTT_TOPIC_PREPEND=${MQTT_TOPIC_PREPEND:-'TEMP_TOPIC'}
       - WIS2_TOPIC=${WIS2_TOPIC:-'TEMP_TOPIC'}
+      - WIS2_METADATA_RECORD_ID=test_metadata_id
       - WIS2_MQTT_HOST=${MQTT_HOST:-mqtt_wis2}
       - WIS2_MQTT_USERNAME=${MQTT_USERNAME:-}
       - WIS2_MQTT_PASSWORD=${MQTT_PASSWORD:-}
       - WIS2_MQTT_TLS=${MQTT_TLS:-False}
       - WIS2_MQTT_PORT=${MQTT_PORT:-1884}
-      - INGEST_LOGLEVEL
+      - INGEST_LOGLEVEL=INFO
       - GUNICORN_CMD_ARGS=--bind 0.0.0.0:8001 --workers=4 --access-logfile -
     depends_on:
       store:
