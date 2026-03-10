@@ -142,6 +142,18 @@
                         }
                     }
                 },
+                "radius": {
+                    "link": {
+                        "href": "http://localhost:8008/collections/observations/radius",
+                        "rel": "data",
+                        "variables": {
+                            "query_type": "radius",
+                            "output_format": [
+                                "CoverageJSON"
+                            ]
+                        }
+                    }
+                },
                 "area": {
                     "link": {
                         "href": "http://localhost:8008/collections/observations/area",

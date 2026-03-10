@@ -114,7 +114,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox():
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
-        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+        actual_response,
+        expected_json,
+        exclude_regex_paths=exclude_properties_timeseries,
     )
 
 
@@ -129,7 +131,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_durations_ran
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
-        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+        actual_response,
+        expected_json,
+        exclude_regex_paths=exclude_properties_timeseries,
     )
 
 
@@ -142,7 +146,9 @@ def test_from_a_single_collection_get_locations_within_bbox_with_levels_range_fi
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
-        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+        actual_response,
+        expected_json,
+        exclude_regex_paths=exclude_properties_timeseries,
     )
 
 
@@ -158,7 +164,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_parameter_nam
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
-        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+        actual_response,
+        expected_json,
+        exclude_regex_paths=exclude_properties_timeseries,
     )
 
 
@@ -176,7 +184,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_methods_and_l
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
-        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+        actual_response,
+        expected_json,
+        exclude_regex_paths=exclude_properties_timeseries,
     )
 
 
@@ -195,7 +205,9 @@ def test_from_a_single_collection_get_locations_within_a_bbox_with_duration_and_
 
     assert actual_response.status_code == 200
     actual_response_is_expected_response(
-        actual_response, expected_json, exclude_regex_paths=exclude_properties_timeseries
+        actual_response,
+        expected_json,
+        exclude_regex_paths=exclude_properties_timeseries,
     )
 
 
@@ -505,7 +517,7 @@ def test_items_dont_set_bbox_or_platform():
 def test_items_no_data_return():
     collection_id = "observations"
     bbox = "-49.394531,22.593726,-36.386719,31.503629"
-    actual_response = requests.get(url=BASE_URL + f"/collections/{collection_id}/items" f"?bbox={bbox}")
+    actual_response = requests.get(url=BASE_URL + f"/collections/{collection_id}/items?bbox={bbox}")
 
     assert actual_response.status_code == 404
     expected_json = load_json("response/items_no_data_found.json")
@@ -517,3 +529,40 @@ def test_get_dataset():
     actual_response = requests.get(url=BASE_URL + f"/collections/{collection_id}/dataset")
 
     assert actual_response.status_code == 200
+
+
+def test_radius_get_one_position():
+    collection_id = "observations"
+    datetime_str = "2022-01-01T00:00Z/2023-01-01T00:00Z"
+    coords = "POINT(5.179705 52.0988218)"
+    radius = "1"
+    parameter_name = "air_temperature:1.5:*:*"
+    actual_response = requests.get(
+        url=BASE_URL
+        + f"/collections/{collection_id}/radius?coords={coords}&within={radius}&"
+        + f"parameter-name={parameter_name}&datetime={datetime_str}"
+    )
+
+    assert actual_response.status_code == 200
+    assert actual_response.headers["Content-Type"] == "application/prs.coverage+json"
+    expected_json = load_json("response/data_radius_one_location_one_parameter.json")
+    actual_response_is_expected_response(actual_response, expected_json)
+
+
+def test_radius_get_multiple_position():
+    collection_id = "observations"
+
+    datetime_str = "2022-01-01T00:00Z/2023-01-01T00:00Z"
+    parameter_name = "air_temperature:1.5:*:*"
+    coords = "POINT(5.179705 52.0988218)"
+    radius = "40"
+    actual_response = requests.get(
+        url=BASE_URL
+        + f"/collections/{collection_id}/radius?coords={coords}&within={radius}&"
+        + f"parameter-name={parameter_name}&datetime={datetime_str}"
+    )
+
+    assert actual_response.status_code == 200
+    assert actual_response.headers["Content-Type"] == "application/prs.coverage+json"
+    expected_json = load_json("response/data_radius_multiple_location_one_parameter.json")
+    actual_response_is_expected_response(actual_response, expected_json)
