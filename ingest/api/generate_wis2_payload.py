@@ -6,7 +6,7 @@ from api.model import Link
 from api.wis2_model import Wis2MessageSchema
 from api.wis2_model import PropertiesWIS2
 from api.wis2_model import Content
-from wis2.global_variables import WIS2_TOPIC
+from api.global_variables import WIS2_TOPIC
 
 
 def get_api_timeseries_query(location_id: str, baseURL: str) -> str:
