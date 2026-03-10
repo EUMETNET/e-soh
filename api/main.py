@@ -18,6 +18,7 @@ from routers import edr
 from routers import feature
 from utilities import create_url_from_request
 from fastapi.middleware.cors import CORSMiddleware
+from middleware.x_forwarded_headers import ForwardedHostAndPrefixMiddleware
 
 
 all_collections = collections_metadata.keys()
@@ -51,6 +52,10 @@ if (cors_origins := os.getenv("CORS_ORIGINS", None)) is not None:
         allow_headers=[] if cors_headers is None else cors_headers.split(","),
     )
 add_metrics(app)
+
+trusted = os.getenv("FORWARDED_ALLOW_IPS", "127.0.0.1,::1,localhost,192.168.127.0/24")
+trusted_hosts = [h.strip() for h in trusted.split(",") if h.strip()]
+app.add_middleware(ForwardedHostAndPrefixMiddleware, trusted_hosts=trusted_hosts)
 
 
 @app.get(
