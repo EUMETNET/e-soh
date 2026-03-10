@@ -62,7 +62,10 @@ class Integrity(BaseModel):
 
 
 class Properties(BaseModel):
-    datetime: Annotated[pkg_datetime.datetime | pkg_datetime.date | None, PlainSerializer(serialize_timestamp)] = Field(
+    datetime: Annotated[
+        pkg_datetime.datetime | pkg_datetime.date | None,
+        PlainSerializer(serialize_timestamp),
+    ] = Field(
         None,
         description="Identifies the date/time of the data being recorded, in RFC3339 format.",
     )
@@ -101,7 +104,10 @@ class Properties(BaseModel):
     @model_validator(mode="after")
     def calc_integrity(self):
         if self.content:  # If content is set, calculate the integrity check.
-            self.integrity = Integrity(method="sha256", value=hashlib.sha256(self.content.value.encode()).hexdigest())
+            self.integrity = Integrity(
+                method="sha256",
+                value=hashlib.sha256(self.content.value.encode()).hexdigest(),
+            )
         return self
 
 
@@ -119,7 +125,7 @@ class PropertiesWIS2(Properties):
 class Wis2MessageSchema(BaseModel):
     id: UUID4
     type: Literal["Feature"] = "Feature"
-    conformsTo: Literal["http://wis.wmo.int/spec/wnm/1/conf/core"] = "http://wis.wmo.int/spec/wnm/1/conf/core"
+    conformsTo: List[Literal["http://wis.wmo.int/spec/wnm/1/conf/core"]] = ["http://wis.wmo.int/spec/wnm/1/conf/core"]
     geometry: Point
     properties: PropertiesWIS2
     links: List[Link] = Field(..., min_length=1)

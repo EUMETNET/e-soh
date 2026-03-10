@@ -11,8 +11,10 @@ from api.global_variables import WIS2_DATA_ID
 from api.global_variables import WIS2_METADATA_RECORD_ID
 
 
-def get_api_timeseries_query(location_id: str, baseURL: str) -> str:
+def get_api_timeseries_query(location_id: str, baseURL: str, paramaters: dict[str, str] = {}) -> str:
     query = "/collections/observations/locations/" + location_id
+    if paramaters:
+        query = query + "?" + "&".join([f"{i}={j}" for i, j in paramaters.items() if j])
     baseURL = os.getenv("EDR_API_URL", baseURL)
     return baseURL + query
 
@@ -46,7 +48,7 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
     wis2_payload = Wis2MessageSchema(
         type="Feature",
         id=message["id"],
-        conformsTo="http://wis.wmo.int/spec/wnm/1/conf/core",
+        conformsTo=["http://wis.wmo.int/spec/wnm/1/conf/core"],
         geometry={
             "type": "Point",
             "coordinates": [
@@ -70,7 +72,14 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
         links=(
             [
                 Link(
-                    href=get_api_timeseries_query(message["properties"]["platform"], request_url),
+                    href=get_api_timeseries_query(
+                        message["properties"]["platform"],
+                        request_url,
+                        paramaters={
+                            "standard_name": message["properties"]["content"].get("standard_name", ""),
+                            "datetime": message["properties"].get("datetime", ""),
+                        },
+                    ),
                     rel="canonical",
                     type="application/prs.coverage+json",
                 )
