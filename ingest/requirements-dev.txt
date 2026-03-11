@@ -14,8 +14,6 @@ anyio==4.12.1
     #   starlette
 asttokens==3.0.1
     # via stack-data
-attrs==25.4.0
-    # via jsonschema
 certifi==2026.1.4
     # via
     #   httpcore
@@ -76,8 +74,6 @@ isodate==0.7.2
     # via esoh-ingest (pyproject.toml)
 jedi==0.19.2
     # via ipython
-jsonschema==4.17.3
-    # via esoh-ingest (pyproject.toml)
 matplotlib-inline==0.2.1
     # via ipython
 nodeenv==1.10.0
@@ -131,8 +127,6 @@ pygments==2.19.2
     #   ipython
     #   ipython-pygments-lexers
     #   pytest
-pyrsistent==0.20.0
-    # via jsonschema
 pytest==8.4.2
     # via
     #   esoh-ingest (pyproject.toml)
