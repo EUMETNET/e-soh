@@ -8,7 +8,16 @@ from utilities import convert_cm_to_m
 
 
 def _make_properties(ts, base_url):
-    ts_metadata = {key.name: value for key, value in ts.ts_mdata.ListFields() if value}
+    ts_metadata = {}
+    for k, v in ts.ts_mdata.ListFields():
+        # Needs a special case for links, as they are a repeated field and need to be converted to a list of dicts
+        if k.name == "links":
+            ts_metadata["links"] = [
+                {field.name: getattr(link, field.name) for field in link.DESCRIPTOR.fields if getattr(link, field.name)}
+                for link in v
+            ]
+        else:
+            ts_metadata[k.name] = v
 
     ts_metadata["platform_vocabulary"] = (
         "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=" + ts.ts_mdata.platform
