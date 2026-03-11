@@ -54,4 +54,5 @@ dev = [
   "pre-commit",
   "pytest-cov~=5.0",
   "pytest-timeout~=2.3",
+  "jsonschema~=4.17.0",
 ]
