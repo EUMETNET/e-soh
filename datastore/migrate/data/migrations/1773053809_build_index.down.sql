@@ -1,0 +1,1 @@
+DROP INDEX time_series_api_idx;
