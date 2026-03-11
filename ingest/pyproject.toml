@@ -4,15 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 dependencies = [
-  "xarray == 2023.7.0",
-  "netCDF4 ~= 1.6.4",
-  "numpy ~= 1.25.2",
+  "gunicorn ~= 25.0.0",
+  "uvicorn ~= 0.41.0",
+  "fastapi ~= 0.135.0",
+  "requests ~= 2.32.0",
+  "numpy ~= 1.23.0",
+  "isodate ~= 0.7.2",
+  "python-dateutil ~= 2.9.0",
   "paho-mqtt ~= 2.1.0",
-  "jsonschema ~= 4.19.0",
   "pybind11 ~= 2.11.1",
-  "protobuf ~= 4.25.3",
-  "grpcio ~= 1.62.1",
-  "pydantic_geojson",
+  "protobuf ~= 6.33.0",
+  "prometheus-fastapi-instrumentator ~= 7.0.0",
+  "grpcio ~= 1.78.0",
+  "grpcio-tools ~= 1.78.0",
+  "geojson-pydantic ~= 2.0.0",
+  "rodeo-bufr-tools ~= 0.4.2",
 ]
 name = "esoh-ingest"
 description = "This project is made for parsing and publishing metadata to the E-SOH project."
