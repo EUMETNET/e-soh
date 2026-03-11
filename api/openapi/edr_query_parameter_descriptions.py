@@ -31,10 +31,16 @@ point = (
     "Point to query all data within 10 meters, specified as a Well-Known Text (WKT) `POINT`. "
     "Coordinates are given as longitude then latitude (`lon` `lat`) in degrees. Only 2D points are supported."
 )
-
+point_radius = (
+    "Point to query data from within a specified radius,"
+    " specified as Well-Known Text (WKT) point coordinates."
+    "Coordinates are given as longitude then latitude (`lon` `lat`) in degrees. Only 2D points are supported."
+)
 area = (
     "Area to query data from, specified as a Well-Known Text (WKT) `POLYGON`. "
     "Each coordinate is given as longitude then latitude (`lon` `lat`) in degrees and the polygon's linear ring must "
     "be closed (i.e. the first and last coordinate *MUST* be identical). Edges are interpreted as *great-circle arcs* "
     "on the sphere, so long edges follow the shortest path over the globe. Only 2D polygons are supported."
 )
+radius_within = "Defines the radius of area to query around the coordinates defined in the coords."
+radius_within_unit = "Unit of the radius defined in within."

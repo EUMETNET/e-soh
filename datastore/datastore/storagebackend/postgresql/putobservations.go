@@ -509,7 +509,27 @@ func upsertObs(
 	phVals := []interface{}{}
 	createInsertVals(tsInfos, &valsExpr, &phVals)
 
+	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load",
+	// with the following modifications:
+	// 1. Using ON CONFLICT UPDATE (instead of NOTHING), but only doing an update if at least one of the values
+	//    actually changed (to avoid table churn).
+	// 2. Use approach 5 of https://stackoverflow.com/a/12427434 to avoid having to provide types for the input VALUES
+	// 3. Deal with deadlocks by ordering the data
 	cmd := fmt.Sprintf(`
+		WITH input_rows AS (SELECT *
+			FROM (SELECT *
+				  FROM (VALUES ((NULL::observation).ts_id, (NULL::observation).obstime_instant,
+								(NULL::observation).id, (NULL::observation).geo_point_id,
+								(NULL::observation).pubtime, (NULL::observation).data_id,
+								(NULL::observation).history, (NULL::observation).processing_level,
+								(NULL::observation).quality_code, (NULL::observation).camsl,
+								(NULL::observation).value),  -- header column to get correct column types
+								%s  -- actual values
+					   ) t (ts_id, obstime_instant, id, geo_point_id, pubtime, data_id, history,
+							processing_level, quality_code, camsl, value)
+				  OFFSET 1) t  -- drop null row
+			ORDER BY ts_id, obstime_instant  -- ORDER BY for consistent order to avoid deadlocks
+		)
 		INSERT INTO observation (
 			ts_id,
 			obstime_instant,
@@ -522,7 +542,7 @@ func upsertObs(
 			quality_code,
 			camsl,
 			value)
-		VALUES %s
+		SELECT * FROM input_rows
 		ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE
 		SET
 	    	id = EXCLUDED.id,

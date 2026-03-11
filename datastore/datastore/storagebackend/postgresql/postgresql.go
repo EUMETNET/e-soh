@@ -321,7 +321,7 @@ func addWhereCondMatchAnyPatternForInt64(
 			whereExprOR = append(whereExprOR, "TRUE")
 		} else { // fall back to regular string matching
 			index++
-			expr := fmt.Sprintf("(lower(%s::text) LIKE lower($%d))", colName, index)
+			expr := fmt.Sprintf("(%s::text ILIKE $%d)", colName, index)
 			whereExprOR = append(whereExprOR, expr)
 			*phVals = append(*phVals, strings.ReplaceAll(ptn, "*", "%"))
 		}
@@ -347,7 +347,7 @@ func addWhereCondMatchAnyPatternForString(
 	index := len(*phVals)
 	for _, ptn := range patterns {
 		index++
-		expr := fmt.Sprintf("(lower(%s) LIKE lower($%d))", colName, index)
+		expr := fmt.Sprintf("(%s ILIKE $%d)", colName, index)
 		whereExprOR = append(whereExprOR, expr)
 		*phVals = append(*phVals, strings.ReplaceAll(ptn, "*", "%"))
 	}

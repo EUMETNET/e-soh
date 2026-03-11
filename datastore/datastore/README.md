@@ -161,6 +161,23 @@ The following environment variables are supported:
 **TODO:** Ensure that these variables are [passed properly](https://docs.docker.com/compose/environment-variables/set-environment-variables/) to the relevant `docker compose`
 commands. Any secrets should be passed using a [special mechanism](https://docs.docker.com/compose/use-secrets/), etc.
 
+## Optimise PostgreSQL settings for better performance
+
+The default settings for PostgreSQL are not optimal for modern system, especially if the storage is SSD.
+We recommend the following settings for that case:
+```text
+# Settings below are for a DB "server" with 16 GB of memory, and nothing else running on it.
+shared_buffers = 4GB  # Should be 25% of memory on the DB "server"
+random_page_cost = 1.1
+effective_io_concurrency = 200
+effective_cache_size = 12GB  # Should be 75% of memory on the DB "server"
+work_mem = 16MB
+```
+
+If you are using the provided `docker-compose.yml` file, these settings are already set through the
+`database/extra.conf` file. You should still adjust the `shared_buffers` and `effective_cache_size`
+based on the memory (exclusively) available to the database container.
+
 ## Testing the datastore service with gRPCurl
 
 The datastore service can be tested with [gRPCurl](https://github.com/fullstorydev/grpcurl). Below are a few examples:
