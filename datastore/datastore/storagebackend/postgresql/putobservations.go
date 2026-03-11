@@ -327,7 +327,7 @@ func getObsTime(obsMdata *datastore.ObsMetadata) (*timestamppb.Timestamp, error)
 type GeoPoint struct {
 	lon   float64
 	lat   float64
-	camsl *int64
+	camsl *int32
 }
 
 // getGeoPointIDs returns a map of GeoPoint to ID of the row in table geo_point that matches point,
@@ -405,12 +405,12 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 		gpIDmap := map[GeoPoint]int64{}
 		var id int64
 		var point postgis.PointS
-		var camsl0 sql.NullInt64
+		var camsl0 sql.NullInt32
 		for rows.Next() {
 			rows.Scan(&id, &point, &camsl0)
-			var camsl *int64 // default nil
+			var camsl *int32 // default nil
 			if camsl0.Valid {
-				camsl = &camsl0.Int64
+				camsl = &camsl0.Int32
 			}
 			gpIDmap[GeoPoint{point.X, point.Y, camsl}] = id
 		}

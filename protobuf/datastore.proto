@@ -136,7 +136,7 @@ message ObsMetadata {
     Point geo_point = 1 [json_name = "geo_point"];
     Polygon geo_polygon = 2 [json_name = "geo_polygon"];
   }
-  optional int64 camsl = 11; // centimeters above mean sea level
+  optional int32 camsl = 11; // centimeters above mean sea level
   // Case 1 - stationary data: camsl of the station ground position
   // Case 2 - mobile data: camsl of the sensor itself
   // NOTE: in Case 1, the absolute vertical location of the sensor would be camsl + level where
@@ -357,7 +357,7 @@ message GetLocsRequest {
 
 message LocMetadata {
   Point geo_point = 1;
-  optional int64 camsl = 5; // centimeters above mean sea level - see description in ObsMetadata
+  optional int32 camsl = 5; // centimeters above mean sea level - see description in ObsMetadata
   string platform = 2;
   string platform_name = 3 [json_name = "platform_name"];
   repeated string parameter_names = 4 [json_name = "parameter_names"];

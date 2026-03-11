@@ -1,4 +1,4 @@
-ALTER TABLE geo_point ADD COLUMN camsl BIGINT;
+ALTER TABLE geo_point ADD COLUMN camsl INTEGER;
 
 -- drop UNIQUE constraint of 'point' column
 -- WARNING: we assume that the constraint name is the correct one (it was never explicitly set)

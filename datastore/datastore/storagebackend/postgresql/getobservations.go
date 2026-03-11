@@ -350,7 +350,7 @@ func scanObsRow(rows *sql.Rows) (*datastore.ObsMetadata, int64, error) {
 		pubTime        sql.NullTime
 		value          sql.NullString
 		point          postgis.PointS
-		camsl          sql.NullInt64
+		camsl          sql.NullInt32
 	)
 
 	// initialize colValPtrs with non-reflectable metadata
@@ -397,7 +397,7 @@ func scanObsRow(rows *sql.Rows) (*datastore.ObsMetadata, int64, error) {
 		obsMdata.Pubtime = timestamppb.New(pubTime.Time)
 	}
 	if camsl.Valid {
-		obsMdata.Camsl = &camsl.Int64
+		obsMdata.Camsl = &camsl.Int32
 	}
 
 	var err error
