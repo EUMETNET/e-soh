@@ -59,6 +59,14 @@ point = {
     "METNO": {"summary": "Point in Oslo", "value": "POINT(10.72 59.9423)"},
 }
 
+within = {
+    "10 meters": {"value": "0.01"},
+    "100 meters": {"value": "0.1"},
+    "1 Kilometer": {"value": "1"},
+}
+
+within_unit = {"Default": {"value": "Kilometers"}}
+
 polygon = {
     "Netherlands": {
         "summary": "Area in central Netherlands",
@@ -74,7 +82,10 @@ polygon = {
 naming_authority = {
     "Met.no": {"summary": "Norwegian Meteorological Institute", "value": "no.met"},
     "FMI:": {"summary": "Finnish Meteorological Institute", "value": "fi.fmi"},
-    "KNMI": {"summary": "Royal Netherlands Meteorological Institute", "value": "nl.knmi"},
+    "KNMI": {
+        "summary": "Royal Netherlands Meteorological Institute",
+        "value": "nl.knmi",
+    },
 }
 
 institution = {
@@ -82,7 +93,10 @@ institution = {
         "summary": "Norwegian Meteorological Institute",
         "value": "Norwegian Meteorological Institute (MET Norway)",
     },
-    "FMI:": {"summary": "Finnish Meteorological Institute", "value": "Finnish Meteorological Institute (FMI)"},
+    "FMI:": {
+        "summary": "Finnish Meteorological Institute",
+        "value": "Finnish Meteorological Institute (FMI)",
+    },
     "KNMI": {
         "summary": "Royal Netherlands Meteorological Institute",
         "value": "Royal Netherlands Meteorological Institute (KNMI)",
@@ -91,10 +105,16 @@ institution = {
 
 standard_name = {
     "air_temperature": {"summary": "Air temperature", "value": "air_temperature"},
-    "wind_from_direction": {"summary": "Wind direction", "value": "wind_from_direction"},
+    "wind_from_direction": {
+        "summary": "Wind direction",
+        "value": "wind_from_direction",
+    },
     "wind_speed": {"summary": "Wind speed", "value": "wind_speed"},
     "relative_humidity": {"summary": "Relative humidity", "value": "relative_humidity"},
-    "air_pressure_at_sea_level": {"summary": "Air pressure at sea level", "value": "air_pressure_at_sea_level"},
+    "air_pressure_at_sea_level": {
+        "summary": "Air pressure at sea level",
+        "value": "air_pressure_at_sea_level",
+    },
 }
 
 unit = {
@@ -114,4 +134,7 @@ period = {
     "PT10M": {"summary": "10 minutes", "value": "PT10M"},
 }
 
-method = {"mean": {"summary": "Mean", "value": "mean"}, "maximum": {"summary": "Maximum", "value": "maximum"}}
+method = {
+    "mean": {"summary": "Mean", "value": "mean"},
+    "maximum": {"summary": "Maximum", "value": "maximum"},
+}

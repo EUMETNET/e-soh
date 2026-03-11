@@ -17,4 +17,11 @@ duration = "Define the aggregation period(s) to return data from using either a 
 wigos_id = "WIGOS Station Identifier (WSI) of the station to query data from."
 format = "Specify wanted return format."
 point = "Point to query all data within 10 meters, specified as Well-Known Text (WKT) point coordinates."
+point_radius = (
+    "Point to query data from within a specified radius,"
+    " specified as Well-Known Text (WKT) point coordinates."
+    "Coordinates are given as longitude then latitude (`lon` `lat`) in degrees. Only 2D points are supported."
+)
 area = "Area to query data from in Well-Known Text (WKT) polygon coordinates."
+radius_within = "Defines the radius of area to query around the coordinates defined in the coords."
+radius_within_unit = "Unit of the radius defined in within."
