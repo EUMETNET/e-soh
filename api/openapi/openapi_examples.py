@@ -65,7 +65,7 @@ within = {
     "1 Kilometer": {"value": "1"},
 }
 
-within_unit = {"Deafult": {"value": "Kilometers"}}
+within_unit = {"Default": {"value": "Kilometers"}}
 
 polygon = {
     "Netherlands": {
