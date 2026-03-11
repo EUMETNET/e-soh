@@ -19,7 +19,8 @@ format = "Specify wanted return format."
 point = "Point to query all data within 10 meters, specified as Well-Known Text (WKT) point coordinates."
 point_radius = (
     "Point to query data from within a specified radius,"
-    " specified as Well-Known Text (WKT) point coordinates followed by the radius in meters."
+    " specified as Well-Known Text (WKT) point coordinates."
+    "Coordinates are given as longitude then latitude (`lon` `lat`) in degrees. Only 2D points are supported."
 )
 area = "Area to query data from in Well-Known Text (WKT) polygon coordinates."
 radius_within = "Defines the radius of area to query around the coordinates defined in the coords."
