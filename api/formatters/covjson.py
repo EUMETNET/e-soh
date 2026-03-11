@@ -120,7 +120,7 @@ def convert_to_covjson(observations):
     if len(coverages) == 0:
         raise HTTPException(status_code=404, detail="Requested data not found.")
     elif len(coverages) == 1:
-        return coverages[0]
+        return coverages[0].model_dump_json(exclude_none=True)
     else:
         parameter_union = reduce(operator.ior, (c.parameters.root for c in coverages), {})
         return CoverageCollection(
