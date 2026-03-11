@@ -521,6 +521,10 @@ async def get_data_radius(
             openapi_examples=openapi_examples.datetime,
         ),
     ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
+    ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
     ] = formatters.Formats.covjson,
@@ -573,12 +577,20 @@ async def get_data_radius(
             detail={"coords": f"Unexpected error occurred during wkt parsing: {coords}"},
         )
 
+    if point.has_z:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "coords": "3D coordinates are not supported. Please provide vertical level using the z query parameter."
+            },
+        )
+
     request = dstore.GetObsRequest(
         spatial_circle=dstore.Circle(center=dstore.Point(lat=point.y, lon=point.x), radius=within),
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
