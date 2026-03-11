@@ -14,7 +14,7 @@ from api.global_variables import WIS2_METADATA_RECORD_ID
 def get_api_timeseries_query(location_id: str, baseURL: str, parameters: dict[str, str] = {}) -> str:
     query = "/collections/observations/locations/" + location_id
     if parameters:
-        query = query + "?" + "&".join([f"{i}={j}" for i, j in paramaters.items() if j])
+        query = query + "?" + "&".join([f"{i}={j}" for i, j in parameters.items() if j])
     baseURL = os.getenv("EDR_API_URL", baseURL)
     return baseURL + query
 
@@ -75,7 +75,7 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
                     href=get_api_timeseries_query(
                         message["properties"]["platform"],
                         request_url,
-                        paramaters={
+                        parameters={
                             "standard_name": message["properties"]["content"].get("standard_name", ""),
                             "datetime": message["properties"].get("datetime", ""),
                         },
