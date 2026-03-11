@@ -1,6 +1,10 @@
 import os
 import json
 
+from dateutil.parser import parse
+from datetime import datetime
+from datetime import timezone
+
 
 from api.model import Link
 from api.wis2_model import Wis2MessageSchema
@@ -15,7 +19,7 @@ def get_api_timeseries_query(location_id: str, baseURL: str, parameters: dict[st
     query = "/collections/observations/locations/" + location_id
     if parameters:
         query = query + "?" + "&".join([f"{i}={j}" for i, j in parameters.items() if j])
-    baseURL = os.getenv("EDR_API_URL", baseURL)
+    baseURL = os.getenv("EDR_API_URL", baseURL).strip("/")
     return baseURL + query
 
 
@@ -77,7 +81,23 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
                         request_url,
                         parameters={
                             "standard_name": message["properties"]["content"].get("standard_name", ""),
-                            "datetime": message["properties"].get("datetime", ""),
+                            "datetime": (
+                                lambda dt: (
+                                    dt.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+                                    if isinstance(dt, datetime)
+                                    else (
+                                        parse(dt)
+                                        .astimezone(timezone.utc)
+                                        .isoformat(timespec="seconds")
+                                        .replace("+00:00", "Z")
+                                        if dt
+                                        else ""
+                                    )
+                                )
+                            )(message["properties"].get("datetime", "")),
+                            "level": message["properties"].get("level", ""),
+                            "method": message["properties"].get("method", ""),
+                            "duration": message["properties"].get("duration", ""),
                         },
                     ),
                     rel="canonical",
