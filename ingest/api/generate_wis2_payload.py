@@ -11,9 +11,9 @@ from api.global_variables import WIS2_DATA_ID
 from api.global_variables import WIS2_METADATA_RECORD_ID
 
 
-def get_api_timeseries_query(location_id: str, baseURL: str, paramaters: dict[str, str] = {}) -> str:
+def get_api_timeseries_query(location_id: str, baseURL: str, parameters: dict[str, str] = {}) -> str:
     query = "/collections/observations/locations/" + location_id
-    if paramaters:
+    if parameters:
         query = query + "?" + "&".join([f"{i}={j}" for i, j in paramaters.items() if j])
     baseURL = os.getenv("EDR_API_URL", baseURL)
     return baseURL + query
