@@ -533,19 +533,20 @@ def test_get_dataset():
 
 def test_radius_get_one_position():
     collection_id = "observations"
-    datetime_str = "2022-01-01T00:00Z/2023-01-01T00:00Z"
+    datetime_str = "2022-12-31T00:50:00Z/2022-12-31T02:10:00Z"
     coords = "POINT(5.179705 52.0988218)"
     radius = "1"
-    parameter_name = "air_temperature:1.5:*:*"
+    within_units = "Kilometers"
+    parameter_name = "air_temperature:1.5:maximum:PT10M"
     actual_response = requests.get(
         url=BASE_URL
-        + f"/collections/{collection_id}/radius?coords={coords}&within={radius}&"
-        + f"parameter-name={parameter_name}&datetime={datetime_str}"
+        + f"/collections/{collection_id}/radius?coords={coords}&within={radius}&within-units={within_units}"
+        + f"&datetime={datetime_str}&parameter-name={parameter_name}"
     )
 
     assert actual_response.status_code == 200
     assert actual_response.headers["Content-Type"] == "application/prs.coverage+json"
-    expected_json = load_json("response/data_radius_one_location_one_parameter.json")
+    expected_json = load_json("response/data_position_one_location_with_one_parameter.json")
     actual_response_is_expected_response(actual_response, expected_json)
 
 
