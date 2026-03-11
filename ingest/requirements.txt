@@ -62,6 +62,8 @@ pydantic-core==2.41.5
     # via pydantic
 python-dateutil==2.9.0.post0
     # via esoh-ingest (pyproject.toml)
+python-multipart==0.0.22
+    # via esoh-ingest (pyproject.toml)
 requests==2.32.5
     # via esoh-ingest (pyproject.toml)
 rodeo-bufr-tools==0.4.2

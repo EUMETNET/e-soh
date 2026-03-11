@@ -9,6 +9,7 @@ dependencies = [
   "fastapi ~= 0.135.0",
   "requests ~= 2.32.0",
   "numpy ~= 1.23.0",
+  "python-multipart ~= 0.0.5",
   "isodate ~= 0.7.2",
   "python-dateutil ~= 2.9.0",
   "paho-mqtt ~= 2.1.0",
@@ -45,7 +46,7 @@ build = ["cp310-manylinux_x86_64"]
 [tool.cibuildwheel.linux]
 before-all = "yum install -y rapidjson-devel"
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
   "ipython>=9.10.0",
   "httpx~=0.27.0",
