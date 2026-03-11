@@ -300,7 +300,7 @@ class Properties(BaseModel):
     )
     quality_code: Optional[int] = Field(
         None,
-        description=("The quality of the data. Indicate controlled vocabulary used in quality_code_vocabulary."),
+        description="The quality of the data. Indicate controlled vocabulary used in quality_code_vocabulary.",
     )
     quality_code_vocabulary: Optional[str] = Field(
         None,
