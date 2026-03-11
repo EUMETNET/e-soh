@@ -22,5 +22,5 @@ point_radius = (
     " specified as Well-Known Text (WKT) point coordinates followed by the radius in meters."
 )
 area = "Area to query data from in Well-Known Text (WKT) polygon coordinates."
-radius_within = "Defines the radius of area to query arround the coordiantes defined in the coords."
+radius_within = "Defines the radius of area to query around the coordinates defined in the coords."
 radius_within_unit = "Unit of the radius defined in within."
