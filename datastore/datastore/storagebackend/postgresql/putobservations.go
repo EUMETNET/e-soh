@@ -509,6 +509,12 @@ func upsertObs(
 	phVals := []interface{}{}
 	createInsertVals(tsInfos, &valsExpr, &phVals)
 
+	// This uses https://stackoverflow.com/a/42217872 under "Without concurrent write load",
+	// with the following modifications:
+	// 1. Using ON CONFLICT UPDATE (instead of NOTHING), but only doing an update if at least one of the values
+	//    actually changed (to avoid table churn).
+	// 2. Use approach 5 of https://stackoverflow.com/a/12427434 to avoid having to provide types for the input VALUES
+	// 3. Deal with deadlocks by ordering the data
 	cmd := fmt.Sprintf(`
 		WITH input_rows AS (SELECT *
 			FROM (SELECT *
@@ -558,8 +564,6 @@ func upsertObs(
 			observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code OR
 			observation.camsl IS DISTINCT FROM EXCLUDED.camsl
 	`, strings.Join(valsExpr, ","))
-
-	//fmt.Printf("%v", cmd)
 
 	_, err := db.Exec(cmd, phVals...)
 	if err != nil {
