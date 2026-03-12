@@ -1,15 +1,19 @@
 datetime = {
     "range": {
         "summary": "Range",
-        "value": "2022-01-01T00:00Z/2023-01-01T00:00Z",
+        "value": "2026-01-01T00:00Z/2026-01-01T00:00Z",
     },
     "point": {
         "summary": "A point in time",
-        "value": "2022-01-01T00:00Z",
+        "value": "2026-01-01T00:00Z",
     },
-    "wildcard": {
+    "open start range": {
         "summary": "Open start range",
-        "value": "../2023-01-01T00:00Z",
+        "value": "../2026-01-01T00:00Z",
+    },
+    "timezone offset": {
+        "summary": "Timezone offset",
+        "value": "2026-01-01T00:00+02:00/2026-01-01T00:00+02:00",
     },
 }
 
@@ -28,15 +32,15 @@ parameter_name = {
     "Default": {"value": ""},
     "List": {
         "summary": "Comma separated list",
-        "value": "wind_from_direction:2.0:mean:PT10M,"
+        "value": "wind_from_direction:10.0:mean:PT10M,"
         "wind_speed:10.0:mean:PT10M,"
         "relative_humidity:2.0:mean:PT1M,"
-        "air_pressure_at_sea_level:1.0:mean:PT1M,"
-        "air_temperature:1.5:maximum:PT10M",
+        "air_pressure:1.5:mean:PT1M,"
+        "air_temperature:2.0:maximum:PT10M",
     },
     "Wildcard": {
-        "summary": "All air temperatures measured at 1.5m",
-        "value": "air_temperature:1.5:*:*",
+        "summary": "All air temperatures measured at 2.0m",
+        "value": "air_temperature:2.0:*:*",
     },
 }
 
