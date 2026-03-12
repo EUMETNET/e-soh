@@ -472,8 +472,6 @@ func cleanup(db *sql.DB) error {
 				WHERE dl.id = del.id;
 		`, tableName, fkName, orderBy, tableName)
 
-		//log.Println(cmd)
-
 		_, err = db.Exec(cmd)
 		if err != nil {
 			return fmt.Errorf(
