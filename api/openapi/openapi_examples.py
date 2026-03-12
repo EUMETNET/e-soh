@@ -129,7 +129,7 @@ level = {
     "10.0": {"summary": "10 meters above ground", "value": "10.0"},
 }
 
-period = {
+duration = {
     "PT1M": {"summary": "1 minute", "value": "PT1M"},
     "PT10M": {"summary": "10 minutes", "value": "PT10M"},
 }
@@ -137,4 +137,15 @@ period = {
 method = {
     "mean": {"summary": "Mean", "value": "mean"},
     "maximum": {"summary": "Maximum", "value": "maximum"},
+}
+
+z = {
+    "Default": {"value": ""},
+    "10.0": {"summary": "10 meters above mean sea level", "value": "10.0"},
+    "5/200": {"summary": "Range from 5 to 200 meters above mean sea level", "value": "5/200"},
+    "R10/5/10": {
+        "summary": "Repeating interval of 10 altitude, starting at 5 meters above mean sea level, "
+        "with an increment of 10 meters",
+        "value": "R10/5/10",
+    },
 }

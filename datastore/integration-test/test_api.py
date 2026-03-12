@@ -567,3 +567,38 @@ def test_radius_get_multiple_position():
     assert actual_response.headers["Content-Type"] == "application/prs.coverage+json"
     expected_json = load_json("response/data_radius_multiple_location_one_parameter.json")
     actual_response_is_expected_response(actual_response, expected_json)
+
+
+def test_from_a_single_collection_get_a_single_position_with_no__data_in_requested_z():
+    collection_id = "observations"
+    coords = "POINT(5.179705 52.0988218)"
+    parameters = "air_temperature:1.5:maximum:PT10M"
+    datetime = "2022-12-31T00:50:00Z/2022-12-31T02:10:00Z"
+    z = "6.0"
+    actual_response = requests.get(
+        url=BASE_URL + f"/collections/{collection_id}/position"
+        f"?coords={coords}&parameter-name={parameters}&datetime={datetime}&z={z}"
+    )
+
+    expected_json = load_json("response/404_not_found.json")
+
+    assert actual_response.status_code == 404
+    actual_response_is_expected_response(actual_response, expected_json)
+
+
+def test_from_a_single_collection_get_an_area_with_z_filtering():
+    collection_id = "observations"
+    coords = "POLYGON((5.0 52.0, 6.0 52.0,6.0 52.1,5.0 52.1, 5.0 52.0))"
+    parameters = "relative_humidity:2.0:mean:PT1M ,   wind_speed:10.0:mean:PT10M"
+    datetime = "2022-12-31T22:50:00Z/.."
+    z = "40/50"
+    actual_response = requests.get(
+        url=BASE_URL + f"/collections/{collection_id}/area"
+        f"?coords={coords}&parameter-name={parameters}&datetime={datetime}&z={z}"
+    )
+
+    expected_json = load_json("response/data_area_one_location_with_two_parameters.json")
+
+    assert actual_response.status_code == 200
+    assert actual_response.headers["Content-Type"] == "application/prs.coverage+json"
+    actual_response_is_expected_response(actual_response, expected_json)

@@ -21,6 +21,8 @@ from response_classes import GeoJsonResponse
 from shapely import geometry
 from utilities import get_datetime_range
 from utilities import split_and_strip
+from utilities import get_levels_values
+from utilities import get_durations_or_range
 
 router = APIRouter(prefix="/collections/observations")
 
@@ -47,6 +49,13 @@ async def search_timeseries(
         Query(
             openapi_examples=openapi_examples.datetime,
             description="E-SOH database only contains data from the last 24 hours",
+        ),
+    ] = None,
+    z: Annotated[
+        str | None,
+        Query(
+            description="Vertical level in meters above mean sea level",
+            openapi_examples=openapi_examples.z,
         ),
     ] = None,
     id: Annotated[str | None, Query(description="E-SOH time series id")] = None,
@@ -85,9 +94,9 @@ async def search_timeseries(
             openapi_examples=openapi_examples.level,
         ),
     ] = None,
-    period: Annotated[
+    duration: Annotated[
         str | None,
-        Query(description="Duration of collection period in ISO8601", openapi_examples=openapi_examples.period),
+        Query(description="Duration of collection period in ISO8601", openapi_examples=openapi_examples.duration),
     ] = None,
     method: Annotated[
         str | None,
@@ -117,9 +126,10 @@ async def search_timeseries(
             standard_name=dstore.Strings(values=split_and_strip(standard_name) if standard_name else None),
             unit=dstore.Strings(values=split_and_strip(unit) if unit else None),
             instrument=dstore.Strings(values=split_and_strip(instrument) if instrument else None),
-            level=dstore.Strings(values=split_and_strip(level) if level else None),
-            period=dstore.Strings(values=split_and_strip(period) if period else None),
+            level=dstore.Strings(values=get_levels_values(level) if level else None),
+            period=dstore.Strings(values=get_durations_or_range(duration) if duration else None),
             function=dstore.Strings(values=split_and_strip(method) if method else None),
+            camsl=dstore.Strings(values=get_levels_values(z) if z else None),
         ),
         spatial_polygon=(
             dstore.Polygon(points=[dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords])
@@ -163,6 +173,7 @@ async def get_dataset_metadata(request: Request):
 
     # need to get spatial extent.
     spatial_request = dstore.GetExtentsRequest()
+    # TODO: Add vertical extent to the response in datastore and add it to the jinja tempalate
     extent = await get_extents_request(spatial_request)
     dynamic_fields = {
         "spatial_extents": [

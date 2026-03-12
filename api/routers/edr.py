@@ -46,6 +46,7 @@ response_fields_needed_for_data_api = [
     "unit",
     "obstime_instant",
     "value",
+    "camsl",
 ]
 
 
@@ -73,6 +74,10 @@ async def get_locations(
             description=edr_query_parameter_descriptions.datetime,
             openapi_examples=openapi_examples.datetime,
         ),
+    ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
     ] = None,
     parameter_name: Annotated[
         str | None,
@@ -121,7 +126,7 @@ async def get_locations(
             [dstore.Point(lat=coord[1], lon=coord[0]) for coord in poly.exterior.coords],
         )
 
-    await add_request_parameters(loc_request, parameter_name, datetime, standard_name, level, method, duration)
+    await add_request_parameters(loc_request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_locations_request(loc_request)
     locations = grpc_response.locations
@@ -147,6 +152,8 @@ async def get_locations(
                     + "collections/observations/items?platform="
                     + loc.platform,
                 },
+                # TODO: loc_request does not return elevation for locations currently
+                # so for now we just leave it out entirely untill #256 is done
                 geometry=Point(
                     type="Point",
                     coordinates=(loc.geo_point.lon, loc.geo_point.lat),
@@ -197,6 +204,10 @@ async def get_data_location_id(
             openapi_examples=openapi_examples.datetime,
         ),
     ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
+    ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
     ] = formatters.Formats.covjson,
@@ -236,7 +247,7 @@ async def get_data_location_id(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -274,6 +285,10 @@ async def get_data_position(
             description=edr_query_parameter_descriptions.datetime,
             openapi_examples=openapi_examples.datetime,
         ),
+    ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
     ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
@@ -333,7 +348,15 @@ async def get_data_position(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    if point.has_z:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "coords": "3D coordinates are not supported. Please provide vertical level using the z query parameter."
+            },
+        )
+
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -371,6 +394,10 @@ async def get_data_area(
             description=edr_query_parameter_descriptions.datetime,
             openapi_examples=openapi_examples.datetime,
         ),
+    ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
     ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
@@ -431,7 +458,15 @@ async def get_data_area(
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    if len(poly.exterior.coords[0]) == 3:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "coords": "3D polygons are not supported. Please provide vertical level using the z query parameter."
+            },
+        )
+
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
@@ -486,6 +521,10 @@ async def get_data_radius(
             openapi_examples=openapi_examples.datetime,
         ),
     ] = None,
+    z: Annotated[
+        str | None,
+        Query(description=edr_query_parameter_descriptions.z, openapi_examples=openapi_examples.z),
+    ] = None,
     f: Annotated[
         formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
     ] = formatters.Formats.covjson,
@@ -538,12 +577,20 @@ async def get_data_radius(
             detail={"coords": f"Unexpected error occurred during wkt parsing: {coords}"},
         )
 
+    if point.has_z:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "coords": "3D coordinates are not supported. Please provide vertical level using the z query parameter."
+            },
+        )
+
     request = dstore.GetObsRequest(
         spatial_circle=dstore.Circle(center=dstore.Point(lat=point.y, lon=point.x), radius=within),
         included_response_fields=response_fields_needed_for_data_api,
     )
 
-    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+    await add_request_parameters(request, parameter_name, datetime, z, standard_name, level, method, duration)
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations

@@ -6,29 +6,28 @@
         "axes": {
             "x": {
                 "values": [
-                    5.1797058644882
+                    5.8723225499118
                 ]
             },
             "y": {
                 "values": [
-                    52.098821802977
+                    52.0548617826
                 ]
             },
             "z": {
                 "values": [
-                    1.9
+                    48.16
                 ]
             },
             "t": {
                 "values": [
-                    "2022-12-31T00:00:00Z",
-                    "2022-12-31T00:10:00Z",
-                    "2022-12-31T00:20:00Z",
-                    "2022-12-31T00:30:00Z",
-                    "2022-12-31T00:40:00Z",
-                    "2022-12-31T00:50:00Z",
-                    "2022-12-31T01:00:00Z",
-                    "2022-12-31T01:10:00Z"
+                    "2022-12-31T22:50:00Z",
+                    "2022-12-31T23:00:00Z",
+                    "2022-12-31T23:10:00Z",
+                    "2022-12-31T23:20:00Z",
+                    "2022-12-31T23:30:00Z",
+                    "2022-12-31T23:40:00Z",
+                    "2022-12-31T23:50:00Z"
                 ]
             }
         },
@@ -64,33 +63,6 @@
         ]
     },
     "parameters": {
-        "air_temperature:1.5:maximum:PT10M": {
-            "type": "Parameter",
-            "description": {
-                "en": "Air temperature at 1.5m, aggregated over PT10M with method 'maximum'"
-            },
-            "observedProperty": {
-                "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
-                "label": {
-                    "en": "Air temperature"
-                }
-            },
-            "unit": {
-                "label": {
-                    "en": "Cel"
-                },
-                "symbol": {
-                    "type": "https://qudt.org/vocab/unit/DEG_C",
-                    "value": "°C"
-                }
-            },
-            "metocean:measurementType": {
-                "method": "maximum",
-                "duration": "PT10M"
-            },
-            "metocean:standard_name": "air_temperature",
-            "metocean:level": 1.5
-        },
         "relative_humidity:2.0:mean:PT1M": {
             "type": "Parameter",
             "description": {
@@ -118,61 +90,35 @@
             "metocean:standard_name": "relative_humidity",
             "metocean:level": 2.0
         },
-        "wind_from_direction:2.0:mean:PT10M": {
+        "wind_speed:10.0:mean:PT10M": {
             "type": "Parameter",
             "description": {
-                "en": "Wind from direction at 2.0m, aggregated over PT10M with method 'mean'"
+                "en": "Wind speed at 10.0m, aggregated over PT10M with method 'mean'"
             },
             "observedProperty": {
-                "id": "https://vocab.nerc.ac.uk/standard_name/wind_from_direction",
+                "id": "https://vocab.nerc.ac.uk/standard_name/wind_speed",
                 "label": {
-                    "en": "Wind from direction"
+                    "en": "Wind speed"
                 }
             },
             "unit": {
                 "label": {
-                    "en": "deg"
+                    "en": "m/s"
                 },
                 "symbol": {
-                    "type": "https://qudt.org/vocab/unit/DEG",
-                    "value": "°"
+                    "type": "https://qudt.org/vocab/unit/M-PER-SEC",
+                    "value": "m/s"
                 }
             },
             "metocean:measurementType": {
                 "method": "mean",
                 "duration": "PT10M"
             },
-            "metocean:standard_name": "wind_from_direction",
-            "metocean:level": 2.0
+            "metocean:standard_name": "wind_speed",
+            "metocean:level": 10.0
         }
     },
     "ranges": {
-        "air_temperature:1.5:maximum:PT10M": {
-            "type": "NdArray",
-            "dataType": "float",
-            "axisNames": [
-                "t",
-                "x",
-                "y",
-                "z"
-            ],
-            "shape": [
-                8,
-                1,
-                1,
-                1
-            ],
-            "values": [
-                12.1,
-                12.1,
-                12.2,
-                12.1,
-                12.1,
-                12.1,
-                12.1,
-                12.0
-            ]
-        },
         "relative_humidity:2.0:mean:PT1M": {
             "type": "NdArray",
             "dataType": "float",
@@ -183,23 +129,22 @@
                 "z"
             ],
             "shape": [
-                8,
+                7,
                 1,
                 1,
                 1
             ],
             "values": [
-                95.0,
-                94.0,
-                95.0,
-                95.0,
-                95.0,
-                95.0,
-                94.0,
-                94.0
+                56.0,
+                56.0,
+                55.0,
+                58.0,
+                56.0,
+                56.0,
+                57.0
             ]
         },
-        "wind_from_direction:2.0:mean:PT10M": {
+        "wind_speed:10.0:mean:PT10M": {
             "type": "NdArray",
             "dataType": "float",
             "axisNames": [
@@ -209,22 +154,21 @@
                 "z"
             ],
             "shape": [
-                8,
+                7,
                 1,
                 1,
                 1
             ],
             "values": [
-                224.3,
-                226.0,
-                228.3,
-                230.3,
-                234.9,
-                237.9,
-                235.4,
-                240.0
+                10.68,
+                8.84,
+                9.09,
+                8.64,
+                8.72,
+                9.59,
+                10.7
             ]
         }
     },
-    "metocean:wigosId": "0-20000-0-06260"
+    "metocean:wigosId": "0-20000-0-06275"
 }

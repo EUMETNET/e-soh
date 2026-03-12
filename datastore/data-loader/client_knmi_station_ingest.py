@@ -64,6 +64,7 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
                     "summary": file["iso_dataset"].attrs["abstract"],
                     "keywords_vocabulary": file.attrs["references"],
                     "source": file.attrs["source"],
+                    "hamsl": height,
                     "creator_name": "KNMI",
                     "creator_email": file["iso_dataset"].attrs["email_dataset"],
                     "creator_url": file["iso_dataset"].attrs["url_metadata"],

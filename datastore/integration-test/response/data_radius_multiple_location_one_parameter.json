@@ -17,6 +17,11 @@
                             51.857593837453
                         ]
                     },
+                    "z": {
+                        "values": [
+                            0.66
+                        ]
+                    },
                     "t": {
                         "values": [
                             "2022-12-31T00:00:00Z",
@@ -179,6 +184,15 @@
                     },
                     {
                         "coordinates": [
+                            "z"
+                        ],
+                        "system": {
+                            "type": "VerticalCRS",
+                            "id": "http://www.opengis.net/def/crs/EPSG/0/5715"
+                        }
+                    },
+                    {
+                        "coordinates": [
                             "t"
                         ],
                         "system": {
@@ -251,10 +265,12 @@
                     "axisNames": [
                         "t",
                         "x",
-                        "y"
+                        "y",
+                        "z"
                     ],
                     "shape": [
                         144,
+                        1,
                         1,
                         1
                     ],
@@ -411,10 +427,12 @@
                     "axisNames": [
                         "t",
                         "x",
-                        "y"
+                        "y",
+                        "z"
                     ],
                     "shape": [
                         144,
+                        1,
                         1,
                         1
                     ],
@@ -584,6 +602,11 @@
                             51.969031121385
                         ]
                     },
+                    "z": {
+                        "values": [
+                            -0.71
+                        ]
+                    },
                     "t": {
                         "values": [
                             "2022-12-31T00:00:00Z",
@@ -746,6 +769,15 @@
                     },
                     {
                         "coordinates": [
+                            "z"
+                        ],
+                        "system": {
+                            "type": "VerticalCRS",
+                            "id": "http://www.opengis.net/def/crs/EPSG/0/5715"
+                        }
+                    },
+                    {
+                        "coordinates": [
                             "t"
                         ],
                         "system": {
@@ -818,10 +850,12 @@
                     "axisNames": [
                         "t",
                         "x",
-                        "y"
+                        "y",
+                        "z"
                     ],
                     "shape": [
                         144,
+                        1,
                         1,
                         1
                     ],
@@ -978,10 +1012,12 @@
                     "axisNames": [
                         "t",
                         "x",
-                        "y"
+                        "y",
+                        "z"
                     ],
                     "shape": [
                         144,
+                        1,
                         1,
                         1
                     ],
@@ -1151,6 +1187,11 @@
                             52.098821802977
                         ]
                     },
+                    "z": {
+                        "values": [
+                            1.9
+                        ]
+                    },
                     "t": {
                         "values": [
                             "2022-12-31T00:00:00Z",
@@ -1313,6 +1354,15 @@
                     },
                     {
                         "coordinates": [
+                            "z"
+                        ],
+                        "system": {
+                            "type": "VerticalCRS",
+                            "id": "http://www.opengis.net/def/crs/EPSG/0/5715"
+                        }
+                    },
+                    {
+                        "coordinates": [
                             "t"
                         ],
                         "system": {
@@ -1385,10 +1435,12 @@
                     "axisNames": [
                         "t",
                         "x",
-                        "y"
+                        "y",
+                        "z"
                     ],
                     "shape": [
                         144,
+                        1,
                         1,
                         1
                     ],
@@ -1545,10 +1597,12 @@
                     "axisNames": [
                         "t",
                         "x",
-                        "y"
+                        "y",
+                        "z"
                     ],
                     "shape": [
                         144,
+                        1,
                         1,
                         1
                     ],

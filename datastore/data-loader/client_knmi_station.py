@@ -101,6 +101,7 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
                             id=str(uuid.uuid4()),
                             geo_point=dstore.Point(lat=latitude, lon=longitude),
                             obstime_instant=ts,
+                            camsl=int(float(height) * 100),  # Store height as centimeters in camsl field
                             value=str(obs_value),  # TODO: Store float in DB
                         )
                         observations.append(dstore.Metadata1(ts_mdata=ts_mdata, obs_mdata=obs_mdata))

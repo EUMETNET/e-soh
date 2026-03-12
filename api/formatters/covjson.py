@@ -27,7 +27,7 @@ from constants.qudt_unit_dict import qudt_unit_dict
 
 # mime_type = "application/prs.coverage+json"
 
-Dom = namedtuple("Dom", ["lat", "lon", "times"])
+Dom = namedtuple("Dom", ["lat", "lon", "z", "times"])
 Data = namedtuple("Data", ["dom", "values", "ts_mdata"])
 
 
@@ -73,11 +73,15 @@ def convert_to_covjson(observations):
 
     # Need to sort before using groupBy. Also sort on parameter_name to get consistently sorted output
     data.sort(key=lambda x: (x.dom, x.ts_mdata.parameter_name))
-    for (lat, lon, times), group in groupby(data, lambda x: x.dom):
+    for (lat, lon, z, times), group in groupby(data, lambda x: x.dom):
         referencing = [
             ReferenceSystemConnectionObject(
                 coordinates=["x", "y"],
                 system=ReferenceSystem(type="GeographicCRS", id="http://www.opengis.net/def/crs/OGC/1.3/CRS84"),
+            ),
+            ReferenceSystemConnectionObject(
+                coordinates=["z"],
+                system=ReferenceSystem(type="VerticalCRS", id="http://www.opengis.net/def/crs/EPSG/0/5715"),
             ),
             ReferenceSystemConnectionObject(
                 coordinates=["t"],
@@ -89,6 +93,7 @@ def convert_to_covjson(observations):
             axes=Axes(
                 x=ValuesAxis[float](values=[lon]),
                 y=ValuesAxis[float](values=[lat]),
+                z=ValuesAxis[float](values=[z]),
                 t=ValuesAxis[AwareDatetime](values=times),
             ),
             referencing=referencing,
@@ -106,7 +111,7 @@ def convert_to_covjson(observations):
             parameters[parameter_id] = make_parameter(data.ts_mdata)
 
             ranges[parameter_id] = NdArrayFloat(
-                values=values_no_nan, axisNames=["t", "x", "y"], shape=[len(values_no_nan), 1, 1]
+                values=values_no_nan, axisNames=["t", "x", "y", "z"], shape=[len(values_no_nan), 1, 1, 1]
             )
 
         custom_fields = {"metocean:wigosId": data.ts_mdata.platform}
@@ -124,9 +129,12 @@ def convert_to_covjson(observations):
 def _collect_data(ts_mdata, obs_mdata):
     lat = obs_mdata[0].geo_point.lat  # HACK: For now assume they all have the same position
     lon = obs_mdata[0].geo_point.lon
+    # HACK: For now assume they all have the same elevation
+    # Unset int64 defaults to 0, which is a valid elevation for pointseries
+    z = convert_cm_to_m(obs_mdata[0].camsl)
     tuples = (
         (o.obstime_instant.ToDatetime(tzinfo=timezone.utc), float(o.value)) for o in obs_mdata
-    )  # HACK: str -> float
+    )  # HACK: str -> float))
     (times, values) = zip(*tuples)
 
-    return Data(Dom(lat, lon, times), values, ts_mdata)
+    return Data(Dom(lat, lon, z, times), values, ts_mdata)
