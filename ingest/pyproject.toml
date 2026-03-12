@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm", "pybind11~=2.6.1", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+dependencies = [
+  "gunicorn ~= 25.0.0",
+  "uvicorn ~= 0.41.0",
+  "fastapi ~= 0.135.0",
+  "requests ~= 2.32.0",
+  "numpy ~= 1.23.0",
+  "python-multipart ~= 0.0.5",
+  "isodate ~= 0.7.2",
+  "python-dateutil ~= 2.9.0",
+  "paho-mqtt ~= 2.1.0",
+  "pybind11 ~= 2.11.1",
+  "protobuf ~= 6.33.0",
+  "prometheus-fastapi-instrumentator ~= 7.0.0",
+  "grpcio ~= 1.78.0",
+  "grpcio-tools ~= 1.78.0",
+  "geojson-pydantic ~= 2.0.0",
+  "rodeo-bufr-tools ~= 0.4.5",
+]
+name = "esoh-ingest"
+description = "This project is made for parsing and publishing metadata to the E-SOH project."
+version = "0.0.2"
+requires-python = "~=3.11.0"
+classifiers = ["Programming Language :: Python :: 3"]
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"ingest.schemas" = ["ingest/schemas/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+
+
+[tool.cibuildwheel]
+build-frontend = "build"
+build = ["cp310-manylinux_x86_64"]
+
+
+[tool.cibuildwheel.linux]
+before-all = "yum install -y rapidjson-devel"
+
+[project.optional-dependencies]
+dev = [
+  "ipython>=9.10.0",
+  "httpx~=0.27.0",
+  "pytest~=8.1",
+  "pre-commit",
+  "pytest-cov~=5.0",
+  "pytest-timeout~=2.3",
+]
