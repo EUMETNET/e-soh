@@ -455,14 +455,22 @@ func cleanup(db *sql.DB) error {
 		return nil
 	}
 
-	rmUnrefRows := func(tableName, fkName string) error {
+	rmUnrefRows := func(tableName, fkName string, orderBy string) error {
 
+		// See https://stackoverflow.com/a/78309306
 		cmd := fmt.Sprintf(`
-			DELETE FROM %s t
-			WHERE NOT EXISTS (
-				SELECT FROM observation WHERE %s = t.id
+			WITH delete_batch AS (
+				SELECT id FROM %s as t
+				WHERE NOT EXISTS (
+					SELECT FROM observation WHERE %s = t.id
+				)
+				ORDER BY %s  -- Ordering avoids the deadlock
+				FOR UPDATE  -- This avoids a lock slipping in between the SELECT and the DELETE
 			)
-		`, tableName, fkName)
+			DELETE FROM %s AS dl
+				USING delete_batch as del
+				WHERE dl.id = del.id;
+		`, tableName, fkName, orderBy, tableName)
 
 		_, err = db.Exec(cmd)
 		if err != nil {
@@ -484,13 +492,14 @@ func cleanup(db *sql.DB) error {
 	}
 
 	// remove time series that are no longer referenced by any observation
-	err = rmUnrefRows("time_series", "ts_id")
+	err = rmUnrefRows("time_series", "ts_id", "naming_authority, platform, "+
+		"standard_name, level, function, period, instrument")
 	if err != nil {
 		return fmt.Errorf("rmUnrefRows(time_series) failed: %v", err)
 	}
 
 	// remove geo points that are no longer referenced by any observation
-	err = rmUnrefRows("geo_point", "geo_point_id")
+	err = rmUnrefRows("geo_point", "geo_point_id", "point")
 	if err != nil {
 		return fmt.Errorf("rmUnrefRows(geo_point) failed: %v", err)
 	}
