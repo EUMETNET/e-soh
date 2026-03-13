@@ -1,21 +1,23 @@
 -- Example generated SQL for upserting 2 points (constructed in getGeoPointIDs)
  WITH input_rows AS (
          SELECT * FROM (
-                 (SELECT point FROM geo_point LIMIT 0)  -- only copies column names and types
+                 (SELECT point, camsl FROM geo_point LIMIT 0)  -- only copies column names and types
                  UNION ALL
-                 VALUES (ST_MakePoint($1, $2)::geography),(ST_MakePoint($3, $4)::geography)
-         ) t ORDER BY point  -- ORDER BY for consistent order to avoid deadlocks
+                 VALUES
+                        (ST_MakePoint($1, $2)::geography, $3::integer),
+                        (ST_MakePoint($4, $5)::geography, $6::integer)
+         ) t ORDER BY point, camsl  -- ORDER BY for consistent order to avoid deadlocks
  )
                         , ins AS (
-         INSERT INTO geo_point (point)
+         INSERT INTO geo_point (point, camsl)
                  SELECT * FROM input_rows
-                 ON CONFLICT (point) DO NOTHING
-                 RETURNING id, point
+                 ON CONFLICT (point, camsl) DO NOTHING
+                 RETURNING id, point, camsl
  )
- SELECT id, point FROM ins
+ SELECT id, point, camsl FROM ins
  UNION
- SELECT c.id, point FROM input_rows
- JOIN geo_point c USING (point);
+ SELECT c.id, point, camsl FROM input_rows
+ JOIN geo_point c USING (point, camsl);
 
 
 -- Example generated SQL for upserting 2 timeseries (constructed in getUpsertStatement)
