@@ -79,7 +79,7 @@ services:
     environment:
       - DSHOST=store
       - DSPORT=50050
-      - FORWARDED_ALLOW_IPS=${FORWARDED_ALLOW_IPS:-127.0.0.1}
+      - TRUSTED_PROXIES=${TRUSTED_PROXIES:-127.0.0.0/8,::1}
       - GUNICORN_CMD_ARGS=--bind 0.0.0.0:8000 --workers=4 --access-logfile -
     depends_on:
       store:

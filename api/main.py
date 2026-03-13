@@ -53,7 +53,7 @@ if (cors_origins := os.getenv("CORS_ORIGINS", None)) is not None:
     )
 add_metrics(app)
 
-trusted = os.getenv("FORWARDED_ALLOW_IPS", "127.0.0.1,::1")
+trusted = os.getenv("TRUSTED_PROXIES", "127.0.0.0/8,::1")
 trusted_hosts = [h.strip() for h in trusted.split(",") if h.strip()]
 app.add_middleware(ForwardedHostAndPrefixMiddleware, trusted_hosts=trusted_hosts)
 
