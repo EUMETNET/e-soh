@@ -54,7 +54,7 @@ def datetime_to_iso_string(value: datetime) -> str:
     iso_8601_str = value.isoformat()
     tz_offset_utc = "+00:00"
     if iso_8601_str.endswith(tz_offset_utc):
-        return f"{iso_8601_str[:-len(tz_offset_utc)]}Z"
+        return f"{iso_8601_str[: -len(tz_offset_utc)]}Z"
     else:
         return iso_8601_str
 
@@ -193,7 +193,11 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
         title=collections_metadata[collection_id]["title"],
         links=[
             Link(href=f"{base_url}/observations", rel="self" if is_self else "data"),
-            Link(href=collections_metadata[collection_id]["license"]["url"], rel="license", type="text/html"),
+            Link(
+                href=collections_metadata[collection_id]["license"]["url"],
+                rel="license",
+                type="text/html",
+            ),
         ],
         extent=Extent(
             spatial=Spatial(
@@ -259,6 +263,13 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
                     href=f"{base_url}/observations/area",
                     rel="data",
                     variables=Variables(query_type="area", output_format=["CoverageJSON"]),
+                )
+            ),
+            radius=EDRQuery(
+                link=EDRQueryLink(
+                    href=f"{base_url}/observations/radius",
+                    rel="data",
+                    variables=Variables(query_type="radius", output_format=["CoverageJSON"]),
                 )
             ),
         ),

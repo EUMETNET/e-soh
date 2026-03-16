@@ -19,6 +19,7 @@
 | `WIS2_MQTT_TLS`                 | `True`                     | Whether to use TLS (True/False) for the MQTT connection. Defaults to `True`.|
 | `WIS2_METADATA_RECORD_ID`                 |    | The ID of the WIS2 global metadata ID for this data service.|
 | `WIS2_TOPIC`  | | The WIS2 MQTT topic the messages should be published under. |
+| `WIS2_DATA_ID` | | The data_id to be set in the WIS2 notification. If unset, the data id from the ingest message wil be used. |
 | `EDR_API_URL`                 |                     | If the EDR API is hosted on a different URL then the ingest API, set this to the correct URL for the EDR API.|
 | `PROMETHEUS_MULTIPROC_DIR` | `/tmp/metrics`             | Directory for Prometheus multiprocess mode metrics. Defaults to `/tmp/metrics`. |
 | `INGEST_LOGLEVEL`          |                            | Logging level for the ingestion process.                                     |

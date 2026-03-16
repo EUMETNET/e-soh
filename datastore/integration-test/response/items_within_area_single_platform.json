@@ -11,6 +11,12 @@
                 ]
             },
             "properties": {
+                "links": [
+                    {
+                        "href": "Insert documentation about E-SOH datastore",
+                        "rel": "canonical"
+                    }
+                ],
                 "title": "Wind Direction 10 Min Average",
                 "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",
                 "keywords": "temperature, pressure, relative humidity, visibility, wind speed, wind direction, wind gust",
@@ -48,6 +54,12 @@
                 ]
             },
             "properties": {
+                "links": [
+                    {
+                        "href": "Insert documentation about E-SOH datastore",
+                        "rel": "canonical"
+                    }
+                ],
                 "title": "Wind Gust at 10m 10 Min Maximum",
                 "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",
                 "keywords": "temperature, pressure, relative humidity, visibility, wind speed, wind direction, wind gust",
@@ -85,6 +97,12 @@
                 ]
             },
             "properties": {
+                "links": [
+                    {
+                        "href": "Insert documentation about E-SOH datastore",
+                        "rel": "canonical"
+                    }
+                ],
                 "title": "Wind Speed at 10m 10 Min Average",
                 "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",
                 "keywords": "temperature, pressure, relative humidity, visibility, wind speed, wind direction, wind gust",

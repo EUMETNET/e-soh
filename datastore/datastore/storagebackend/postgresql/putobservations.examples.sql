@@ -117,49 +117,74 @@ FROM input_rows
 
 
 -- Example generated SQL for upserting 2 observations (constructed in upsertObs)
-INSERT INTO observation (ts_id,
-                         obstime_instant,
-                         id,
-                         geo_point_id,
-                         pubtime,
-                         data_id,
-                         history,
-                         processing_level,
-                         quality_code,
-                         value)
-VALUES ($1,
-        to_timestamp($2),
-        $3,
-        $4,
-        to_timestamp($5),
-        $6,
-        $7,
-        $8,
-        $9,
-        $10),
-       ($12,
-        to_timestamp($13),
-        $14,
-        $15,
-        to_timestamp($16),
-        $17,
-        $18,
-        $19,
-        $20,
-        $21)
+WITH input_rows AS (SELECT *
+     FROM (SELECT *
+           FROM (VALUES ((NULL::observation).ts_id, (NULL::observation).obstime_instant,
+                         (NULL::observation).id, (NULL::observation).geo_point_id,
+                         (NULL::observation).pubtime, (NULL::observation).data_id,
+                         (NULL::observation).history, (NULL::observation).processing_level,
+                         (NULL::observation).quality_code, (NULL::observation).camsl,
+                         (NULL::observation).value), -- header column to get correct column types
+                      (
+                      $1,
+                      to_timestamp($2),
+                      $3,
+                      $4,
+                      to_timestamp($5),
+                      $6,
+                      $7,
+                      $8,
+                      $9,
+                      $10,
+                      $11
+                      ),(
+                      $12,
+                      to_timestamp($13),
+                      $14,
+                      $15,
+                      to_timestamp($16),
+                      $17,
+                      $18,
+                      $19,
+                      $20,
+                      $21,
+                      $22
+                      ) -- actual values
+                ) t (ts_id, obstime_instant, id, geo_point_id, pubtime, data_id, history,
+                     processing_level, quality_code, camsl, value)
+           OFFSET 1) t  -- drop null row
+     ORDER BY ts_id, obstime_instant  -- ORDER BY for consistent order to avoid deadlocks
+)
+INSERT INTO observation (
+      ts_id,
+      obstime_instant,
+      id,
+      geo_point_id,
+      pubtime,
+      data_id,
+      history,
+      processing_level,
+      quality_code,
+      camsl,
+      value)
+SELECT * FROM input_rows
 ON CONFLICT ON CONSTRAINT observation_pkey DO UPDATE
-    SET id               = EXCLUDED.id,
-        geo_point_id     = EXCLUDED.geo_point_id,
-        pubtime          = EXCLUDED.pubtime,
-        data_id          = EXCLUDED.data_id,
-        history          = EXCLUDED.history,
-        processing_level = EXCLUDED.processing_level,
-        quality_code     = EXCLUDED.quality_code,
-        value            = EXCLUDED.value
-WHERE observation.id IS DISTINCT FROM EXCLUDED.id
-   OR observation.geo_point_id IS DISTINCT FROM EXCLUDED.geo_point_id
-   OR observation.pubtime IS DISTINCT FROM EXCLUDED.pubtime
-   OR observation.data_id IS DISTINCT FROM EXCLUDED.data_id
-   OR observation.history IS DISTINCT FROM EXCLUDED.history
-   OR observation.processing_level IS DISTINCT FROM EXCLUDED.processing_level
-   OR observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code
+SET
+      id = EXCLUDED.id,
+      geo_point_id = EXCLUDED.geo_point_id,
+      pubtime = EXCLUDED.pubtime,
+      data_id = EXCLUDED.data_id,
+      history = EXCLUDED.history,
+      processing_level = EXCLUDED.processing_level,
+      quality_code = EXCLUDED.quality_code,
+      camsl = EXCLUDED.camsl,
+      value = EXCLUDED.value
+WHERE
+      observation.id IS DISTINCT FROM EXCLUDED.id OR
+      observation.geo_point_id IS DISTINCT FROM EXCLUDED.geo_point_id OR
+      observation.pubtime IS DISTINCT FROM EXCLUDED.pubtime OR
+      observation.data_id IS DISTINCT FROM EXCLUDED.data_id OR
+      observation.history IS DISTINCT FROM EXCLUDED.history OR
+      observation.processing_level IS DISTINCT FROM EXCLUDED.processing_level OR
+      observation.quality_code IS DISTINCT FROM EXCLUDED.quality_code OR
+      observation.camsl IS DISTINCT FROM EXCLUDED.camsl

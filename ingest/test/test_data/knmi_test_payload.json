@@ -1,0 +1,46 @@
+{
+    "properties": {
+        "platform": "0-20000-0-06229",
+        "instrument": "dd",
+        "platform_name": "TEXELHORS WP",
+        "title": "Wind Direction 10 Min Average",
+        "Conventions": "CF-1.8",
+        "license": "CC BY 4.0",
+        "level": "2.0",
+        "period": "PT10M",
+        "function": "mean",
+        "parameter_name": "wind_from_direction:2.0:mean:PT10M",
+        "naming_authority": "nl.knmi",
+        "keywords": "temperature, pressure, relative humidity, visibility, wind speed, wind direction, wind gust",
+        "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",
+        "keywords_vocabulary": "http://data.knmi.nl",
+        "source": "Royal Netherlands Meteorological Institute (KNMI)",
+        "creator_name": "KNMI",
+        "creator_email": "datacentrum@knmi.nl",
+        "creator_url": "http://data.knmi.nl",
+        "creator_type": "institution",
+        "institution": "Royal Netherlands Meteorological Institute (KNMI)",
+        "content": {
+            "encoding": "utf-8",
+            "standard_name": "wind_from_direction",
+            "unit": "deg",
+            "value": "214.9"
+        },
+        "datetime": "2022-12-31T23:50:00Z"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinates": {
+            "lon": 4.7198757949653,
+            "lat": 52.995015806182
+        }
+    },
+    "version": "4.0",
+    "type": "Feature",
+    "links": [
+        {
+            "href": "Insert documentation about E-SOH datastore",
+            "rel": "canonical"
+        }
+    ]
+}

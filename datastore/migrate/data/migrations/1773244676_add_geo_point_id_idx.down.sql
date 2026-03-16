@@ -1,0 +1,1 @@
+DROP INDEX geo_point_id_idx;
