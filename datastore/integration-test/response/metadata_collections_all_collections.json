@@ -35,12 +35,12 @@
                 "temporal": {
                     "interval": [
                         [
-                            "2022-12-31T00:00:00Z",
+                            "2022-12-30T00:00:00Z",
                             "2022-12-31T23:50:00Z"
                         ]
                     ],
                     "values": [
-                        "2022-12-31T00:00:00Z/2022-12-31T23:50:00Z"
+                        "2022-12-30T00:00:00Z/2022-12-31T23:50:00Z"
                     ],
                     "trs": "Gregorian"
                 },
@@ -76,11 +76,12 @@
                         "id": "level",
                         "interval": [
                             [
-                                0.0,
+                                -9.34,
                                 10.0
                             ]
                         ],
                         "values": [
+                            -9.34,
                             0.0,
                             0.1,
                             1.0,
@@ -97,14 +98,15 @@
                         "interval": [
                             [
                                 "maximum",
-                                "point"
+                                "root_mean_square"
                             ]
                         ],
                         "values": [
                             "maximum",
                             "mean",
                             "minimum",
-                            "point"
+                            "point",
+                            "root_mean_square"
                         ],
                         "reference": "Time aggregation functions"
                     },
@@ -113,7 +115,7 @@
                         "interval": [
                             [
                                 "PT0S",
-                                "PT24H"
+                                "P365D"
                             ]
                         ],
                         "values": [
@@ -123,7 +125,8 @@
                             "PT6H",
                             "PT12H",
                             "PT14H",
-                            "PT24H"
+                            "PT24H",
+                            "P365D"
                         ],
                         "reference": "https://en.wikipedia.org/wiki/ISO_8601#Durations"
                     }
@@ -208,10 +211,10 @@
                     "metocean:standard_name": "air_pressure_at_mean_sea_level",
                     "metocean:level": 1.0
                 },
-                "air_temperature:0.1:minimum:PT10M": {
+                "air_temperature:-9.34:root_mean_square:P365D": {
                     "type": "Parameter",
                     "label": "Air temperature",
-                    "description": "Air temperature at 0.1m, aggregated over PT10M with method 'minimum'",
+                    "description": "Air temperature at -9.34m, aggregated over P365D with method 'root_mean_square'",
                     "unit": {
                         "label": "Cel",
                         "symbol": {
@@ -224,11 +227,11 @@
                         "label": "Air temperature"
                     },
                     "measurementType": {
-                        "method": "minimum",
-                        "duration": "PT10M"
+                        "method": "root_mean_square",
+                        "duration": "P365D"
                     },
                     "metocean:standard_name": "air_temperature",
-                    "metocean:level": 0.1
+                    "metocean:level": -9.34
                 },
                 "air_temperature:0.0:minimum:PT12H": {
                     "type": "Parameter",
@@ -295,6 +298,28 @@
                     },
                     "metocean:standard_name": "air_temperature",
                     "metocean:level": 0.0
+                },
+                "air_temperature:0.1:minimum:PT10M": {
+                    "type": "Parameter",
+                    "label": "Air temperature",
+                    "description": "Air temperature at 0.1m, aggregated over PT10M with method 'minimum'",
+                    "unit": {
+                        "label": "Cel",
+                        "symbol": {
+                            "value": "°C",
+                            "type": "https://qudt.org/vocab/unit/DEG_C"
+                        }
+                    },
+                    "observedProperty": {
+                        "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
+                        "label": "Air temperature"
+                    },
+                    "measurementType": {
+                        "method": "minimum",
+                        "duration": "PT10M"
+                    },
+                    "metocean:standard_name": "air_temperature",
+                    "metocean:level": 0.1
                 },
                 "air_temperature:1.5:maximum:PT10M": {
                     "type": "Parameter",

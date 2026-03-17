@@ -1,0 +1,53 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    5.1797058644882,
+                    52.098821802977
+                ]
+            },
+            "properties": {
+                "name": "DE BILT AWS",
+                "detail": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06260",
+                "parameter-name": [
+                    "air_temperature:-9.34:root_mean_square:P365D"
+                ],
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260"
+            },
+            "id": "0-20000-0-06260"
+        }
+    ],
+    "parameters": {
+        "air_temperature:-9.34:root_mean_square:P365D": {
+            "type": "Parameter",
+            "description": {
+                "en": "Air temperature at -9.34m, aggregated over P365D with method 'root_mean_square'"
+            },
+            "observedProperty": {
+                "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
+                "label": {
+                    "en": "Air temperature"
+                }
+            },
+            "unit": {
+                "label": {
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "value": "°C",
+                    "type": "https://qudt.org/vocab/unit/DEG_C"
+                }
+            },
+            "metocean:measurementType": {
+                "method": "root_mean_square",
+                "duration": "P365D"
+            },
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": -9.34
+        }
+    }
+}
