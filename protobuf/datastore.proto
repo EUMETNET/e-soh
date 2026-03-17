@@ -90,6 +90,7 @@ message Link {
 message TSMetadata {
   // --- BEGIN non-reflectable metadata -----------------
   repeated Link links = 1;
+  repeated string alt_platforms = 31;
   // --- END non-reflectable metadata -----------------
 
   // --- BEGIN reflectable metadata (of type int64 or string) -----------------
@@ -211,7 +212,7 @@ message GetObsRequest {
   Polygon spatial_polygon = 3; // if specified, only observations in this polygon may be returned
   Circle spatial_circle = 4; // if specified, only observations in this circle may be returned
 
-  // search wrt. TSMetadata.links
+  // search on TSMetadata.links or TSMetadata.alt_platforms
   // TODO - needs special handling
 
   // --- END filters for non-reflectable metadata -------------------------
@@ -273,6 +274,7 @@ message GetObsRequest {
   //     * a reflectable string field in TSMetadata (like 'keywords') or ObsMetadata (like
   //       'history')
   //     * 'links' (non-reflectable field in TSMedatata)
+  //     * 'alt_platforms' (non-reflectable field in TSMedatata)
   //     * 'geo_point' (non-reflectable field in ObsMetadata)
   //     * 'obstime_instant' (--- '' ---)
   //     * 'pubtime' (--- '' ---)
