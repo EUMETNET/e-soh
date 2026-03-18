@@ -383,8 +383,8 @@ func getGeoPointIDs(db *sql.DB, observations []*datastore.Metadata1) (map[GeoPoi
 	)
 	SELECT id, point, camsl FROM ins
 	UNION
-	SELECT c.id, point, camsl FROM input_rows
-	JOIN geo_point c USING (point, camsl)
+	SELECT c.id, i.point, i.camsl FROM input_rows i, geo_point c WHERE
+		i.point = c.point AND i.camsl IS NOT DISTINCT FROM c.camsl;
 	`, strings.Join(valsExpr, ","))
 
 	for range 3 { // try at most 3 times
