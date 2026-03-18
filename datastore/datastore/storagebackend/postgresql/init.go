@@ -241,7 +241,7 @@ func init() { // automatically called once on program startup (on first import o
 	for _, field := range reflect.VisibleFields(reflect.TypeOf(datastore.TSMetadata{})) {
 		if field.IsExported() && ((field.Type.Kind() == reflect.Int64) ||
 			(field.Type.Kind() == reflect.String)) {
-			// TODO: support non-reflectable types, like the 'links' attribute
+			// TODO: support non-reflectable types, like the 'links' and 'alt_platforms' attributes
 			goName := field.Name
 			pbName := common.ToSnakeCase(goName)
 			tspb2go[pbName] = goName
@@ -258,6 +258,7 @@ func init() { // automatically called once on program startup (on first import o
 		supIncRespFields.Set(f)
 	}
 	supIncRespFields.Set("links")
+	supIncRespFields.Set("alt_platforms")
 	// --- END TSMetadata fields -------------------
 	// --- BEGIN ObsMetadata fields -------------------
 	for _, f := range obsInt64MdataCols {

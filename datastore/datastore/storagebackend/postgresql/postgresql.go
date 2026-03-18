@@ -5,12 +5,13 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
-	_ "github.com/lib/pq"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 // PostgreSQL is an implementation of the StorageBackend interface that
@@ -149,6 +150,7 @@ func getTSColNames() []string {
 		"link_type",
 		"link_hreflang",
 		"link_title",
+		"alt_platforms",
 	}
 
 	// extend cols with reflectable metadata of type int64
@@ -228,7 +230,7 @@ func createSetFilter(colName string, vals []string) string {
 func addWhereCondMatchAnyPatternForInt64(
 	colName string, patterns []string, whereExpr *[]string, phVals *[]interface{}) {
 
-	if (patterns == nil) || (len(patterns) == 0) {
+	if len(patterns) == 0 {
 		return // nothing to do
 	}
 
