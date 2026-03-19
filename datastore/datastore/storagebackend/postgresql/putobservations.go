@@ -527,11 +527,11 @@ func upsertObs(
 								(NULL::observation).id, (NULL::observation).geo_point_id,
 								(NULL::observation).pubtime, (NULL::observation).data_id,
 								(NULL::observation).history, (NULL::observation).processing_level,
-								(NULL::observation).quality_code, (NULL::observation).camsl,
+								(NULL::observation).quality_code,
 								(NULL::observation).value),  -- header column to get correct column types
 								%s  -- actual values
 					   ) t (ts_id, obstime_instant, id, geo_point_id, pubtime, data_id, history,
-							processing_level, quality_code, camsl, value)
+							processing_level, quality_code, value)
 				  OFFSET 1) t  -- drop null row
 			ORDER BY ts_id, obstime_instant  -- ORDER BY for consistent order to avoid deadlocks
 		)
