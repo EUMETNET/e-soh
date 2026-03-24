@@ -221,5 +221,6 @@ api/test/output/
 datastore/load-test/output/
 ingest/test/output/
 
-# Ignore uv lock file
+
+## Ignore UV lock files
 *uv.lock

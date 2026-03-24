@@ -73,4 +73,13 @@ def build_grpc_messages(msg: str) -> None:
             )
             observation_data.geo_point.CopyFrom(point)
 
+    if "links" in msg:
+        for msg_link in msg["links"]:
+            ts_link = dstore.Link()
+            ts_link_fields = ts_link.DESCRIPTOR.fields_by_name.keys()
+            for f in ts_link_fields:
+                if f in msg_link:
+                    setattr(ts_link, f, msg_link[f])
+            ts_metadata.links.append(ts_link)
+
     return dstore.Metadata1(ts_mdata=ts_metadata, obs_mdata=observation_data)

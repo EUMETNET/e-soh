@@ -2,6 +2,8 @@
 from typing import Annotated
 from typing import Dict
 from typing import Set
+from typing import Literal
+
 
 import datastore_pb2 as dstore
 import formatters
@@ -436,4 +438,116 @@ async def get_data_area(
     observations = grpc_response.observations
     response = formatters.formatters[f]["format_function"](observations)
 
-    return Response(content=response, media_type=formatters.formatters[f]["response_format"])
+    return response
+
+
+@router.get(
+    "/radius",
+    tags=["Collection data queries"],
+    response_model=Coverage | CoverageCollection,
+    response_model_exclude_none=True,
+    response_class=CoverageJsonResponse,
+)
+async def get_data_radius(
+    coords: Annotated[
+        str,
+        Query(
+            description=edr_query_parameter_descriptions.point_radius,
+            openapi_examples=openapi_examples.point,
+        ),
+    ],
+    within: Annotated[
+        int | float,
+        Query(
+            alias="within",
+            description=edr_query_parameter_descriptions.radius_within,
+            openapi_examples=openapi_examples.within,
+        ),
+    ],
+    within_units: Annotated[
+        Literal["Kilometers"],
+        Query(
+            alias="within-units",
+            description=edr_query_parameter_descriptions.radius_within_unit,
+            openapi_examples=openapi_examples.within_unit,
+        ),
+    ] = "Kilometers",
+    parameter_name: Annotated[
+        str | None,
+        Query(
+            alias="parameter-name",
+            description=edr_query_parameter_descriptions.parameter_name,
+            openapi_examples=openapi_examples.parameter_name,
+        ),
+    ] = None,
+    datetime: Annotated[
+        str | None,
+        Query(
+            description=edr_query_parameter_descriptions.datetime,
+            openapi_examples=openapi_examples.datetime,
+        ),
+    ] = None,
+    f: Annotated[
+        formatters.Formats, Query(description=edr_query_parameter_descriptions.format)
+    ] = formatters.Formats.covjson,
+    standard_name: Annotated[
+        str | None,
+        Query(
+            description=edr_query_parameter_descriptions.standard_name,
+            openapi_examples=custom_dimension_examples.standard_name,
+        ),
+    ] = None,
+    level: Annotated[
+        str | None,
+        Query(
+            description=edr_query_parameter_descriptions.level,
+            openapi_examples=custom_dimension_examples.level,
+        ),
+    ] = None,
+    method: Annotated[
+        str | None,
+        Query(
+            description=edr_query_parameter_descriptions.method,
+            openapi_examples=custom_dimension_examples.method,
+        ),
+    ] = None,
+    duration: Annotated[
+        str | None,
+        Query(
+            description=edr_query_parameter_descriptions.duration,
+            openapi_examples=custom_dimension_examples.duration,
+        ),
+    ] = None,
+):
+    try:
+        point = wkt.loads(coords)
+        if point.geom_type != "Point":
+            raise TypeError
+    except GEOSException:
+        raise HTTPException(
+            status_code=400,
+            detail={"coords": f"Invalid or unparseable wkt provided: {coords}"},
+        )
+    except TypeError:
+        raise HTTPException(
+            status_code=400,
+            detail={"coords": f"Invalid geometric type: {point.geom_type}"},
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail={"coords": f"Unexpected error occurred during wkt parsing: {coords}"},
+        )
+
+    request = dstore.GetObsRequest(
+        spatial_circle=dstore.Circle(center=dstore.Point(lat=point.y, lon=point.x), radius=within),
+        included_response_fields=response_fields_needed_for_data_api,
+    )
+
+    await add_request_parameters(request, parameter_name, datetime, standard_name, level, method, duration)
+
+    grpc_response = await get_obs_request(request)
+    observations = grpc_response.observations
+    response = formatters.formatters[f](observations)
+
+    return response
