@@ -42,5 +42,9 @@
             "href": "Insert documentation about E-SOH datastore",
             "rel": "canonical"
         }
+    ],
+    "alt_platforms": [
+        "alternate WIGOS ID #1",
+        "alternate WIGOS ID #2"
     ]
 }

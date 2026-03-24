@@ -108,6 +108,10 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
                                         "rel": "canonical",
                                     },
                                 ],
+                                "alt_platforms": [
+                                    "alternate WIGOS ID #1",
+                                    "alternate WIGOS ID #2",
+                                ],
                             }
                         )
 

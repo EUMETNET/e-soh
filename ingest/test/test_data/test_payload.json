@@ -46,6 +46,10 @@
                 "rel": "canonical"
             }
         ],
+        "alt_platforms": [
+            "alternate WIGOS ID #1",
+            "alternate WIGOS ID #2"
+        ],
         "geometry": {
             "type": "Point",
             "coordinates": {

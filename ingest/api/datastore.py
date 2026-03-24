@@ -82,4 +82,8 @@ def build_grpc_messages(msg: str) -> None:
                     setattr(ts_link, f, msg_link[f])
             ts_metadata.links.append(ts_link)
 
+    if "alt_platforms" in msg:
+        for ap in msg["alt_platforms"]:
+            ts_metadata.alt_platforms.append(ap)
+
     return dstore.Metadata1(ts_mdata=ts_metadata, obs_mdata=observation_data)

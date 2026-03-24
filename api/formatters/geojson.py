@@ -16,6 +16,9 @@ def _make_properties(ts, base_url):
                 {field.name: getattr(link, field.name) for field in link.DESCRIPTOR.fields if getattr(link, field.name)}
                 for link in v
             ]
+        # Needs a special case for alt_platforms, as they are a repeated field
+        elif k.name == "alt_platforms":
+            ts_metadata[k.name] = v[:]
         else:
             ts_metadata[k.name] = v
 
