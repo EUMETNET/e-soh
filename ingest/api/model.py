@@ -401,7 +401,12 @@ class JsonMessageSchema(BaseModel):
     geometry: Geometry
     properties: Properties
     links: List[Link] = Field(..., min_length=1)
-    alt_platforms: List[str] = Field(..., min_length=0, examples=["ALT-PLATFORM-EXAMPLE-#1"])
+    alt_platforms: List[str] = Field(
+        ...,
+        min_length=0,
+        max_length=10,
+        examples=["ALT-PLATFORM-EXAMPLE-#1"],
+    )
     version: str
 
     def __hash__(self):
