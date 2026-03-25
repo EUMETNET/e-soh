@@ -230,10 +230,7 @@ class Properties(BaseModel):
     )
     platform_vocabulary: Optional[str] = Field(
         None,
-        description=(
-            "Controlled vocabulary for the names used in the 'platform' or 'alt_platforms' "
-            "attributes."
-        ),
+        description="Controlled vocabulary for the names used in the 'platform' or 'alt_platforms' attributes.",
     )
     instrument: Optional[str] = Field(
         None,
