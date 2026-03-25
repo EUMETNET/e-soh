@@ -49,6 +49,10 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
 
                 properties = {
                     "platform": platform,
+                    "alt_platforms": [
+                        "0-0-0-0",
+                        "0-0-0-1",
+                    ],
                     "instrument": param_id,
                     "platform_name": station_name,
                     "title": param_file.long_name,
@@ -107,10 +111,6 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
                                         "href": "Insert documentation about E-SOH datastore",
                                         "rel": "canonical",
                                     },
-                                ],
-                                "alt_platforms": [
-                                    "alternate WIGOS ID #1",
-                                    "alternate WIGOS ID #2",
                                 ],
                             }
                         )

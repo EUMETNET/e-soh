@@ -221,9 +221,19 @@ class Properties(BaseModel):
         ),
     )
     platform_name: Optional[str] = Field(None, description=("Human readable name for the platform."))
+    alt_platforms: Optional[List[str]] = Field(
+        ...,
+        description="WIGOS IDs of any alternate platforms for this data set or product.",
+        min_length=0,
+        max_length=10,
+        examples=["0-0-0-0", "0-0-0-1"],
+    )
     platform_vocabulary: Optional[str] = Field(
         None,
-        description="Controlled vocabulary for the names used in the 'platform' attribute.",
+        description=(
+            "Controlled vocabulary for the names used in the 'platform' or 'alt_platforms' "
+            "attributes."
+        ),
     )
     instrument: Optional[str] = Field(
         None,
@@ -359,14 +369,24 @@ class Properties(BaseModel):
 
     @model_validator(mode="after")
     def validate_wigos_id(self):
-        blocks = self.platform.split("-")
-        assert len(blocks) == 4, f"Not enough blocks in input 'platform', '{self.platform}'"
-        for i in blocks[:-1]:
-            assert (
-                i.isdigit() and 0 <= int(i) <= 65534
-            ), f"In input 'platform', '{self.platform}', one of  4 blocks is not a valid numerical or out of range."
 
-        assert 0 < len(blocks[-1]) <= 16, f"In input 'platform', '{self.platform}', last block of WIGOS is to long"
+        def val_wigos_id(name, wid):
+            blocks = wid.split("-")
+            assert len(blocks) == 4, f"Number of blocks in input '{name}' != 4: '{wid}'"
+            j = 0
+            for b in blocks[:-1]:
+                assert (
+                    b.isdigit() and 0 <= int(b) <= 65534
+                ), f"Block {j} in input '{name}' is not a valid integer in range [0,65534]: '{wid}'"
+                j = j + 1
+
+            assert 0 < len(blocks[-1]) <= 16, f"In input '{name}', last block of WIGOS is too long: '{wid}'"
+
+        val_wigos_id("platform", self.platform)
+        i = 0
+        for ap in self.alt_platforms:
+            val_wigos_id(f"alt_platforms[{i}]", ap)
+            i = i + 1
 
         return self
 
@@ -401,12 +421,6 @@ class JsonMessageSchema(BaseModel):
     geometry: Geometry
     properties: Properties
     links: List[Link] = Field(..., min_length=1)
-    alt_platforms: List[str] = Field(
-        ...,
-        min_length=0,
-        max_length=10,
-        examples=["ALT-PLATFORM-EXAMPLE-#1"],
-    )
     version: str
 
     def __hash__(self):

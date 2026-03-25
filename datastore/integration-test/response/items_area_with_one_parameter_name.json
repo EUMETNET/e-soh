@@ -15,8 +15,8 @@
             }
         ],
         "alt_platforms": [
-            "alternate WIGOS ID #1",
-            "alternate WIGOS ID #2"
+            "0-0-0-0",
+            "0-0-0-1"
         ],
         "title": "Air Temperature Minimum last 12 Hours",
         "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",

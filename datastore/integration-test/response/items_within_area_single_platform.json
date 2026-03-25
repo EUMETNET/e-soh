@@ -18,8 +18,8 @@
                     }
                 ],
                 "alt_platforms": [
-                    "alternate WIGOS ID #1",
-                    "alternate WIGOS ID #2"
+                    "0-0-0-0",
+                    "0-0-0-1"
                 ],
                 "title": "Wind Direction 10 Min Average",
                 "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",
@@ -65,8 +65,8 @@
                     }
                 ],
                 "alt_platforms": [
-                    "alternate WIGOS ID #1",
-                    "alternate WIGOS ID #2"
+                    "0-0-0-0",
+                    "0-0-0-1"
                 ],
                 "title": "Wind Gust at 10m 10 Min Maximum",
                 "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",
@@ -112,8 +112,8 @@
                     }
                 ],
                 "alt_platforms": [
-                    "alternate WIGOS ID #1",
-                    "alternate WIGOS ID #2"
+                    "0-0-0-0",
+                    "0-0-0-1"
                 ],
                 "title": "Wind Speed at 10m 10 Min Average",
                 "summary": "Most recent 10 minute in situ observations of the Dutch meteorological observation network",
