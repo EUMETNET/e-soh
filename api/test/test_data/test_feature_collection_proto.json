@@ -7,6 +7,10 @@
             },
             "platform": "0-20000-0-06260",
             "platform_name": "DE BILT AWS",
+            "alt_platforms": [
+                "0-0-0-0",
+                "0-0-0-1"
+            ],
             "parameter_names": [
                 "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                 "air_temperature:0.1:minimum:PT10M"
@@ -19,6 +23,10 @@
             },
             "platform": "0-20000-0-06275",
             "platform_name": "DEELEN",
+            "alt_platforms": [
+                "0-0-0-0",
+                "0-0-0-1"
+            ],
             "parameter_names": [
                 "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                 "air_temperature:0.1:minimum:PT10M"
