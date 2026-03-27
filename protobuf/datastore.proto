@@ -343,6 +343,7 @@ message LocMetadata {
   Point geo_point = 1;
   string platform = 2;
   string platform_name = 3 [json_name = "platform_name"];
+  repeated string alt_platforms = 5 [json_name = "alt_platforms"];
   repeated string parameter_names = 4 [json_name = "parameter_names"];
 }
 
