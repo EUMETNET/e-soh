@@ -20,7 +20,11 @@
                     "air_temperature:2.0:mean:PT1M",
                     "wind_from_direction:2.0:mean:PT10M"
                 ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260"
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260",
+                "alt_platforms": [
+                    "0-0-0-0",
+                    "0-0-0-1"
+                ]
             },
             "id": "0-20000-0-06260"
         },
@@ -43,7 +47,11 @@
                     "air_temperature:2.0:mean:PT1M",
                     "wind_from_direction:2.0:mean:PT10M"
                 ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275"
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275",
+                "alt_platforms": [
+                    "0-0-0-0",
+                    "0-0-0-1"
+                ]
             },
             "id": "0-20000-0-06275"
         }

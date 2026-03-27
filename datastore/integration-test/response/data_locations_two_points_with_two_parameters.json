@@ -17,7 +17,11 @@
                     "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                     "air_temperature:0.1:minimum:PT10M"
                 ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260"
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260",
+                "alt_platforms": [
+                    "0-0-0-0",
+                    "0-0-0-1"
+                ]
             },
             "id": "0-20000-0-06260"
         },
@@ -37,7 +41,11 @@
                     "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
                     "air_temperature:0.1:minimum:PT10M"
                 ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275"
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275",
+                "alt_platforms": [
+                    "0-0-0-0",
+                    "0-0-0-1"
+                ]
             },
             "id": "0-20000-0-06275"
         }

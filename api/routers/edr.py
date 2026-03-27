@@ -146,6 +146,9 @@ async def get_locations(
                     "timeseries-link": str(request.base_url)
                     + "collections/observations/items?platform="
                     + loc.platform,
+                    "alt_platforms": (
+                        sorted(loc.alt_platforms) if loc.alt_platforms else None
+                    ),  # or omit from response altogether?
                 },
                 geometry=Point(
                     type="Point",
