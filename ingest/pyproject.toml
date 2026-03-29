@@ -19,7 +19,7 @@ dependencies = [
   "grpcio ~= 1.78.0",
   "grpcio-tools ~= 1.78.0",
   "geojson-pydantic ~= 2.0.0",
-  "rodeo-bufr-tools ~= 0.4.5",
+  "rodeo-bufr-tools ~= 0.4.8",
 ]
 name = "esoh-ingest"
 description = "This project is made for parsing and publishing metadata to the E-SOH project."

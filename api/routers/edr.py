@@ -19,6 +19,7 @@ from fastapi import HTTPException
 from fastapi import Path
 from fastapi import Query
 from fastapi import Request
+from fastapi.responses import Response
 from formatters.covjson import make_parameter
 from geojson_pydantic import Feature
 from geojson_pydantic import Point
@@ -240,9 +241,9 @@ async def get_data_location_id(
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
-    response = formatters.formatters[f](observations)
+    response = formatters.formatters[f]["format_function"](observations)
 
-    return response
+    return Response(content=response, media_type=formatters.formatters[f]["response_format"])
 
 
 @router.get(
@@ -337,9 +338,9 @@ async def get_data_position(
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
-    response = formatters.formatters[f](observations)
+    response = formatters.formatters[f]["format_function"](observations)
 
-    return response
+    return Response(content=response, media_type=formatters.formatters[f]["response_format"])
 
 
 @router.get(
@@ -435,9 +436,9 @@ async def get_data_area(
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
-    response = formatters.formatters[f](observations)
+    response = formatters.formatters[f]["format_function"](observations)
 
-    return response
+    return Response(content=response, media_type=formatters.formatters[f]["response_format"])
 
 
 @router.get(
@@ -547,6 +548,6 @@ async def get_data_radius(
 
     grpc_response = await get_obs_request(request)
     observations = grpc_response.observations
-    response = formatters.formatters[f](observations)
+    response = formatters.formatters[f]["format_function"](observations)
 
-    return response
+    return Response(content=response, media_type=formatters.formatters[f]["response_format"])

@@ -3,6 +3,7 @@
 import math
 import os
 import requests
+import json
 from multiprocessing import cpu_count, Pool
 from pathlib import Path
 from time import perf_counter
@@ -119,7 +120,7 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
 
 def send_request_to_ingest(msg, url):
     try:
-        response = requests.post(url, json=msg)
+        response = requests.post(url, data=json.dumps(msg))
         response.raise_for_status()
         return response.status_code, response.json()
     except requests.RequestException as e:
