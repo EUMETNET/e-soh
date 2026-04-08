@@ -7,14 +7,15 @@ from collections import namedtuple
 from datetime import datetime
 from datetime import UTC
 
-import datastore_pb2 as dstore
-import datastore_pb2_grpc as dstore_grpc
 import grpc
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from google.protobuf.timestamp_pb2 import Timestamp
 from variables import variable_info
+
+import datastore_pb2 as dstore
+import datastore_pb2_grpc as dstore_grpc
 
 # from apscheduler.executors.pool import ProcessPoolExecutor
 
@@ -60,7 +61,7 @@ def write_data(station):
     obs_ts.FromDatetime(obs_time)
     observations = []
     for var in range(0, vars_per_station):
-        (param_id, long_name, standard_name, unit) = variable_info[var]
+        param_id, long_name, standard_name, unit = variable_info[var]
         ts_mdata = dstore.TSMetadata(
             platform=station.id,
             instrument=param_id,
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     scheduler.add_executor(ThreadPoolExecutor())
     print(f"Now: {datetime.now()}", flush=True)
     for i in range(0, 5000):
-        (period, cron) = random.choice(crons)
+        period, cron = random.choice(crons)
         station_id = f"station{i:04d}"
         station = Station(station_id, random.uniform(50.0, 55.0), random.uniform(4.0, 8.0), period)
         # print(station_id, cron, period)

@@ -12,13 +12,13 @@ from edr_pydantic.collections import Collections
 from export_metrics import add_metrics
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
+from middleware.x_forwarded_headers import ForwardedHostAndPrefixMiddleware
 from openapi.collections_metadata import collections_metadata
 from openapi.openapi_metadata import openapi_metadata
 from routers import edr
 from routers import feature
 from utilities import create_url_from_request
-from fastapi.middleware.cors import CORSMiddleware
-from middleware.x_forwarded_headers import ForwardedHostAndPrefixMiddleware
 
 
 all_collections = collections_metadata.keys()

@@ -2,19 +2,21 @@
 # tested with Python 3.11
 import math
 import os
-import requests
-from multiprocessing import cpu_count, Pool
+from functools import partial
+from multiprocessing import cpu_count
+from multiprocessing import Pool
 from pathlib import Path
 from time import perf_counter
 from typing import List
 from typing import Tuple
-from functools import partial
 
 import pandas as pd
+import requests
 import xarray as xr
 from google.protobuf.timestamp_pb2 import Timestamp
 from parameters import knmi_parameter_names
-from utilities import generate_parameter_name, convert_unit_names
+from utilities import convert_unit_names
+from utilities import generate_parameter_name
 
 
 def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
@@ -153,6 +155,46 @@ def main():
     create_requests_start = perf_counter()
     file_path = Path(Path(__file__).parent / "test-data" / "KNMI" / "20221231.nc")
     observation_request_messages = netcdf_file_to_requests(file_path=file_path)
+    observation_request_messages.append(
+        [
+            {
+                "geometry": {"coordinates": {"lat": 52.098821802977, "lon": 5.1797058644882}, "type": "Point"},
+                "links": [{"href": "Insert documentation about E-SOH datastore", "rel": "canonical"}],
+                "properties": {
+                    "Conventions": "CF-1.8",
+                    "content": {
+                        "encoding": "utf-8",
+                        "standard_name": "air_temperature",
+                        "unit": "Cel",
+                        "value": "123.456",
+                    },
+                    "creator_email": "datacentrum@knmi.nl",
+                    "creator_name": "KNMI",
+                    "creator_type": "institution",
+                    "creator_url": "http://data.knmi.nl",
+                    "datetime": "2022-12-30T00:00:00Z",
+                    "function": "root_mean_square",
+                    "institution": "Royal Netherlands Meteorological Institute (KNMI)",
+                    "instrument": "accordion",
+                    "keywords": "temperature, pressure, relative humidity, visibility, wind speed, wind direction, "
+                    "wind gust",
+                    "keywords_vocabulary": "http://data.knmi.nl",
+                    "level": "-9.34",
+                    "license": "CC BY 4.0",
+                    "naming_authority": "nl.knmi",
+                    "parameter_name": "air_temperature:-9.34:point:P1Y",
+                    "period": "P365D",
+                    "platform": "0-20000-0-06260",
+                    "platform_name": "DE BILT AWS",
+                    "source": "Royal Netherlands Meteorological Institute (KNMI)",
+                    "summary": "A test value for the tests.",
+                    "title": "Test Value",
+                },
+                "type": "Feature",
+                "version": "4.0",
+            }
+        ]
+    )
     print("Finished creating the time series and observation requests " f"{perf_counter() - create_requests_start}.")
 
     insert_data(

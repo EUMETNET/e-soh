@@ -2,11 +2,12 @@
 import os
 from datetime import datetime
 
-import datastore_pb2 as dstore
-import datastore_pb2_grpc as dstore_grpc
 import grpc
 import pytest
 from google.protobuf.timestamp_pb2 import Timestamp
+
+import datastore_pb2 as dstore
+import datastore_pb2_grpc as dstore_grpc
 
 NUMBER_OF_PARAMETERS = 44
 NUMBER_OF_STATIONS = 55
@@ -47,7 +48,7 @@ def test_find_series_single_station_all_parameters(grpc_stub):
     response = grpc_stub.GetObservations(request)
 
     assert (
-        len([obs.ts_mdata.parameter_name for obs in response.observations]) == 30
+        len([obs.ts_mdata.parameter_name for obs in response.observations]) == 31
     )  # Station 06260 doesn't have all parameters
 
 
