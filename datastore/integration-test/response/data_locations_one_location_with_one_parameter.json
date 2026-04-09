@@ -6,54 +6,6 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    4.436389,
-                    52.139722
-                ]
-            },
-            "properties": {
-                "name": "VOORSCHOTEN AWS",
-                "detail": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06215",
-                "parameter-name": [
-                    "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
-                    "air_temperature:0.0:minimum:PT12H",
-                    "air_temperature:0.0:minimum:PT14H",
-                    "air_temperature:0.0:minimum:PT6H",
-                    "air_temperature:0.1:minimum:PT10M",
-                    "air_temperature:1.5:maximum:PT10M",
-                    "air_temperature:1.5:minimum:PT10M",
-                    "air_temperature:2.0:maximum:PT12H",
-                    "air_temperature:2.0:maximum:PT24H",
-                    "air_temperature:2.0:maximum:PT6H",
-                    "air_temperature:2.0:mean:PT1M",
-                    "air_temperature:2.0:minimum:PT12H",
-                    "air_temperature:2.0:minimum:PT14H",
-                    "air_temperature:2.0:minimum:PT6H",
-                    "cloud_area_fraction:2.0:point:PT0S",
-                    "cloud_base_altitude:2.0:point:PT0S",
-                    "dew_point_temperature:1.5:mean:PT1M",
-                    "duration_of_sunshine:2.0:point:PT0S",
-                    "lwe_precipitation_rate:2.5:mean:PT10M",
-                    "rainfall_amount:2.0:point:PT0S",
-                    "rainfall_amount:2.0:point:PT12H",
-                    "rainfall_amount:2.0:point:PT24H",
-                    "rainfall_amount:2.0:point:PT6H",
-                    "rainfall_rate:2.0:mean:PT10M",
-                    "relative_humidity:2.0:mean:PT1M",
-                    "surface_downwelling_shortwave_flux_in_air:2.0:mean:PT10M",
-                    "visibility_in_air:2.5:mean:PT10M",
-                    "wind_from_direction:2.0:mean:PT10M",
-                    "wind_speed:10.0:mean:PT10M",
-                    "wind_speed_of_gust:10.0:maximum:PT10M"
-                ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06215"
-            },
-            "id": "0-20000-0-06215"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
                     5.1797058644882,
                     52.098821802977
                 ]
@@ -63,6 +15,7 @@
                 "detail": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06260",
                 "parameter-name": [
                     "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
+                    "air_temperature:-9.34:root_mean_square:P365D",
                     "air_temperature:0.0:minimum:PT12H",
                     "air_temperature:0.0:minimum:PT14H",
                     "air_temperature:0.0:minimum:PT6H",
@@ -93,65 +46,9 @@
                     "wind_speed:10.0:mean:PT10M",
                     "wind_speed_of_gust:10.0:maximum:PT10M"
                 ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260",
-                "alt_platforms": [
-                    "0-0-0-0",
-                    "0-0-0-1"
-                ]
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260"
             },
             "id": "0-20000-0-06260"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    5.8723225499118,
-                    52.0548617826
-                ]
-            },
-            "properties": {
-                "name": "DEELEN",
-                "detail": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06275",
-                "parameter-name": [
-                    "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
-                    "air_temperature:0.0:minimum:PT12H",
-                    "air_temperature:0.0:minimum:PT14H",
-                    "air_temperature:0.0:minimum:PT6H",
-                    "air_temperature:0.1:minimum:PT10M",
-                    "air_temperature:1.5:maximum:PT10M",
-                    "air_temperature:1.5:minimum:PT10M",
-                    "air_temperature:2.0:maximum:PT12H",
-                    "air_temperature:2.0:maximum:PT24H",
-                    "air_temperature:2.0:maximum:PT6H",
-                    "air_temperature:2.0:mean:PT1M",
-                    "air_temperature:2.0:minimum:PT12H",
-                    "air_temperature:2.0:minimum:PT14H",
-                    "air_temperature:2.0:minimum:PT6H",
-                    "cloud_area_fraction:2.0:point:PT0S",
-                    "cloud_base_altitude:2.0:point:PT0S",
-                    "dew_point_temperature:1.5:mean:PT1M",
-                    "duration_of_sunshine:2.0:point:PT0S",
-                    "lwe_precipitation_rate:1.8:mean:PT10M",
-                    "rainfall_amount:2.0:point:PT0S",
-                    "rainfall_amount:2.0:point:PT12H",
-                    "rainfall_amount:2.0:point:PT24H",
-                    "rainfall_amount:2.0:point:PT6H",
-                    "rainfall_rate:2.0:mean:PT10M",
-                    "relative_humidity:2.0:mean:PT1M",
-                    "surface_downwelling_shortwave_flux_in_air:2.0:mean:PT10M",
-                    "visibility_in_air:1.8:mean:PT10M",
-                    "wind_from_direction:2.0:mean:PT10M",
-                    "wind_speed:10.0:mean:PT10M",
-                    "wind_speed_of_gust:10.0:maximum:PT10M"
-                ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275",
-                "alt_platforms": [
-                    "0-0-0-0",
-                    "0-0-0-1"
-                ]
-            },
-            "id": "0-20000-0-06275"
         }
     ],
     "parameters": {
@@ -181,6 +78,33 @@
             },
             "metocean:standard_name": "air_pressure_at_mean_sea_level",
             "metocean:level": 1.0
+        },
+        "air_temperature:-9.34:root_mean_square:P365D": {
+            "type": "Parameter",
+            "description": {
+                "en": "Air temperature at -9.34m, aggregated over P365D with method 'root_mean_square'"
+            },
+            "observedProperty": {
+                "id": "https://vocab.nerc.ac.uk/standard_name/air_temperature",
+                "label": {
+                    "en": "Air temperature"
+                }
+            },
+            "unit": {
+                "label": {
+                    "en": "Cel"
+                },
+                "symbol": {
+                    "value": "°C",
+                    "type": "https://qudt.org/vocab/unit/DEG_C"
+                }
+            },
+            "metocean:measurementType": {
+                "method": "root_mean_square",
+                "duration": "P365D"
+            },
+            "metocean:standard_name": "air_temperature",
+            "metocean:level": -9.34
         },
         "air_temperature:0.0:minimum:PT12H": {
             "type": "Parameter",

@@ -5,11 +5,7 @@ from typing import Set
 from typing import Literal
 
 
-import datastore_pb2 as dstore
 import formatters
-from openapi import custom_dimension_examples
-from openapi import openapi_examples
-from openapi import edr_query_parameter_descriptions
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.coverage import CoverageCollection
 from covjson_pydantic.parameter import Parameter
@@ -22,9 +18,12 @@ from fastapi import Request
 from formatters.covjson import make_parameter
 from geojson_pydantic import Feature
 from geojson_pydantic import Point
-from grpc_getter import get_obs_request
 from grpc_getter import get_locations_request
+from grpc_getter import get_obs_request
 from grpc_getter import get_ts_ag_request
+from openapi import custom_dimension_examples
+from openapi import edr_query_parameter_descriptions
+from openapi import openapi_examples
 from response_classes import CoverageJsonResponse
 from response_classes import GeoJsonResponse
 from shapely import geometry
@@ -32,6 +31,8 @@ from shapely import wkt
 from shapely.errors import GEOSException
 from utilities import add_request_parameters
 from utilities import validate_bbox
+
+import datastore_pb2 as dstore
 
 router = APIRouter(prefix="/collections/observations")
 

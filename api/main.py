@@ -12,12 +12,13 @@ from edr_pydantic.collections import Collections
 from export_metrics import add_metrics
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
+from middleware.x_forwarded_headers import ForwardedHostAndPrefixMiddleware
 from openapi.collections_metadata import collections_metadata
 from openapi.openapi_metadata import openapi_metadata
 from routers import edr
 from routers import feature
 from utilities import create_url_from_request
-from fastapi.middleware.cors import CORSMiddleware
 
 
 all_collections = collections_metadata.keys()
@@ -51,6 +52,10 @@ if (cors_origins := os.getenv("CORS_ORIGINS", None)) is not None:
         allow_headers=[] if cors_headers is None else cors_headers.split(","),
     )
 add_metrics(app)
+
+trusted = os.getenv("TRUSTED_PROXIES", "127.0.0.0/8,::1")
+trusted_hosts = [h.strip() for h in trusted.split(",") if h.strip()]
+app.add_middleware(ForwardedHostAndPrefixMiddleware, trusted_hosts=trusted_hosts)
 
 
 @app.get(

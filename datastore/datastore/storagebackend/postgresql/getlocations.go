@@ -37,22 +37,33 @@ func getLocs(
 
 	// define and execute query
 	query := fmt.Sprintf(`
-		SELECT DISTINCT ON (ts_id)
-			point,
-			platform,
-			platform_name,
-			alt_platforms,
-			parameter_name
-		FROM observation
-		JOIN time_series on observation.ts_id = time_series.id
-		JOIN geo_point ON observation.geo_point_id = geo_point.id
-		WHERE %s AND %s AND %s AND %s
-		ORDER BY ts_id, obstime_instant DESC;
+		WITH platforms AS (
+			SELECT DISTINCT ON (platform)
+				platform
+			FROM time_series
+				JOIN observation ON observation.ts_id = time_series.id
+				JOIN geo_point ON observation.geo_point_id = geo_point.id
+			-- time AND geolocation AND integer parameters AND string parameters
+			WHERE %s AND %s AND %s AND %s
+			ORDER BY platform, obstime_instant DESC
+		)
+		SELECT point, platform, platform_name, parameter_name FROM (  -- just to deal with final sorting
+			SELECT DISTINCT ON (ts_id)
+				point, platform, platform_name, parameter_name
+			FROM time_series
+				JOIN observation ON observation.ts_id = time_series.id
+				JOIN geo_point ON observation.geo_point_id = geo_point.id
+			WHERE platform in (SELECT platform from platforms)
+				AND %s
+			ORDER BY ts_id, platform, obstime_instant DESC
+		) t ORDER BY platform, parameter_name;
 		`,
 		timeFilter,
 		geoFilter,
 		int64MdataFilter,
-		stringMdataFilter)
+		stringMdataFilter,
+		timeFilter,
+	)
 
 	rows, err := db.Query(query, phVals...)
 	if err != nil {

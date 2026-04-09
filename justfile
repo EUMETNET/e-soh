@@ -5,7 +5,7 @@ default:
 set positional-arguments
 
 # Run all docker services. After running the database needs cleanup, run just destroy
-all: lint build unit ingest-unit services monitoring load integration performance client
+all: lint build unit ingest-unit services monitoring ingest-load integration performance client
 
 # Build and run the default docker services
 up: build services
