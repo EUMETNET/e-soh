@@ -16,7 +16,8 @@
                 "parameter-name": [
                     "air_temperature:-9.34:root_mean_square:P365D"
                 ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260"
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06260",
+                "alt_platforms": null
             },
             "id": "0-20000-0-06260"
         }

@@ -47,9 +47,9 @@ func getLocs(
 			WHERE %s AND %s AND %s AND %s
 			ORDER BY platform, obstime_instant DESC
 		)
-		SELECT point, platform, platform_name, parameter_name FROM (  -- just to deal with final sorting
+		SELECT point, platform, platform_name, alt_platforms, parameter_name FROM (  -- just to deal with final sorting
 			SELECT DISTINCT ON (ts_id)
-				point, platform, platform_name, parameter_name
+				point, platform, platform_name, alt_platforms, parameter_name
 			FROM time_series
 				JOIN observation ON observation.ts_id = time_series.id
 				JOIN geo_point ON observation.geo_point_id = geo_point.id

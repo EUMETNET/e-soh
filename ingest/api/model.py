@@ -222,7 +222,7 @@ class Properties(BaseModel):
     )
     platform_name: Optional[str] = Field(None, description=("Human readable name for the platform."))
     alt_platforms: Optional[List[str]] = Field(
-        ...,
+        None,
         description="WIGOS IDs of any alternate platforms for this data set or product.",
         min_length=0,
         max_length=10,
@@ -380,10 +380,11 @@ class Properties(BaseModel):
             assert 0 < len(blocks[-1]) <= 16, f"In input '{name}', last block of WIGOS is too long: '{wid}'"
 
         val_wigos_id("platform", self.platform)
-        i = 0
-        for ap in self.alt_platforms:
-            val_wigos_id(f"alt_platforms[{i}]", ap)
-            i = i + 1
+        if self.alt_platforms:
+            i = 0
+            for ap in self.alt_platforms:
+                val_wigos_id(f"alt_platforms[{i}]", ap)
+                i = i + 1
 
         return self
 

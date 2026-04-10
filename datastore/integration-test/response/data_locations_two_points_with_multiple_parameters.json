@@ -45,7 +45,11 @@
                     "wind_speed:10.0:mean:PT10M",
                     "wind_speed_of_gust:10.0:maximum:PT10M"
                 ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06215"
+                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06215",
+                "alt_platforms": [
+                    "0-0-0-0",
+                    "0-0-0-1"
+                ]
             },
             "id": "0-20000-0-06215"
         },
@@ -100,58 +104,6 @@
                 ]
             },
             "id": "0-20000-0-06260"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    5.8723225499118,
-                    52.0548617826
-                ]
-            },
-            "properties": {
-                "name": "DEELEN",
-                "detail": "https://oscar.wmo.int/surface/rest/api/search/station?wigosId=0-20000-0-06275",
-                "parameter-name": [
-                    "air_pressure_at_mean_sea_level:1.0:mean:PT1M",
-                    "air_temperature:0.0:minimum:PT12H",
-                    "air_temperature:0.0:minimum:PT14H",
-                    "air_temperature:0.0:minimum:PT6H",
-                    "air_temperature:0.1:minimum:PT10M",
-                    "air_temperature:1.5:maximum:PT10M",
-                    "air_temperature:1.5:minimum:PT10M",
-                    "air_temperature:2.0:maximum:PT12H",
-                    "air_temperature:2.0:maximum:PT24H",
-                    "air_temperature:2.0:maximum:PT6H",
-                    "air_temperature:2.0:mean:PT1M",
-                    "air_temperature:2.0:minimum:PT12H",
-                    "air_temperature:2.0:minimum:PT14H",
-                    "air_temperature:2.0:minimum:PT6H",
-                    "cloud_area_fraction:2.0:point:PT0S",
-                    "cloud_base_altitude:2.0:point:PT0S",
-                    "dew_point_temperature:1.5:mean:PT1M",
-                    "duration_of_sunshine:2.0:point:PT0S",
-                    "lwe_precipitation_rate:1.8:mean:PT10M",
-                    "rainfall_amount:2.0:point:PT0S",
-                    "rainfall_amount:2.0:point:PT12H",
-                    "rainfall_amount:2.0:point:PT24H",
-                    "rainfall_amount:2.0:point:PT6H",
-                    "rainfall_rate:2.0:mean:PT10M",
-                    "relative_humidity:2.0:mean:PT1M",
-                    "surface_downwelling_shortwave_flux_in_air:2.0:mean:PT10M",
-                    "visibility_in_air:1.8:mean:PT10M",
-                    "wind_from_direction:2.0:mean:PT10M",
-                    "wind_speed:10.0:mean:PT10M",
-                    "wind_speed_of_gust:10.0:maximum:PT10M"
-                ],
-                "timeseries-link": "http://localhost:8008/collections/observations/items?platform=0-20000-0-06275",
-                "alt_platforms": [
-                    "0-0-0-0",
-                    "0-0-0-1"
-                ]
-            },
-            "id": "0-20000-0-06275"
         }
     ],
     "parameters": {
