@@ -19,6 +19,9 @@ COPY "requirements.txt" "${DOCKER_PATH}/api/"
 COPY "./src/" "${DOCKER_PATH}/src/"
 
 RUN pip install --no-cache-dir --upgrade -r "${DOCKER_PATH}/api/requirements.txt"
+# Use local rodeo-bufr-tools
+COPY rodeo_bufr_tools-0.4.8.dev0+g0b29dc93f.d20260610-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl /tmp/
+RUN pip install /tmp/rodeo_bufr_tools-0.4.8.dev0+g0b29dc93f.d20260610-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
 
 WORKDIR /
 
