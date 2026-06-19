@@ -47,6 +47,7 @@ response_fields_needed_for_data_api = [
     "unit",
     "obstime_instant",
     "value",
+    "alt_platforms",
 ]
 
 

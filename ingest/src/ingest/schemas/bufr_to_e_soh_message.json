@@ -13,6 +13,7 @@
         "function": "point",
         "period": "PT0S",
         "platform": "",
+        "alt_platforms": [],
         "content": {
             "encoding": "utf-8",
             "standard_name": "",
