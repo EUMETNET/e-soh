@@ -79,6 +79,9 @@ services:
     environment:
       - DSHOST=store
       - DSPORT=50050
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - CORS_HEADERS=${CORS_HEADERS}
+      - GRPC_MAX_MESSAGE_SIZE=-1
       - TRUSTED_PROXIES=${TRUSTED_PROXIES:-127.0.0.0/8,::1}
       - GUNICORN_CMD_ARGS=--bind 0.0.0.0:8000 --workers=4 --access-logfile -
     depends_on:

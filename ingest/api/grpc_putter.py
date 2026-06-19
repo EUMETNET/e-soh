@@ -87,6 +87,7 @@ async def putObsRequest(put_obs_request):
 
     # NOTE: at this point, the overall set of observations has been completely
     # inserted in the store only if no errors occurred in the above loop
-    logger.debug("RPC call succeeded. len {0} total insert {1} total calls {2}"
-                 .format(len(obs), tot_inserted, tot_calls))
+    logger.debug(
+        "RPC call succeeded. len {0} total insert {1} total calls {2}".format(len(obs), tot_inserted, tot_calls)
+    )
     # return len(obs), tot_inserted, tot_calls
