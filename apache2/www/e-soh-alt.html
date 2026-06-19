@@ -144,11 +144,9 @@
             <option value="air_temperature%3A%2A%3A%2A%3A%2A">Air temperature</option>
             <option value="dew_point_temperature%3A%2A%3A%2A%3A%2A">Dew Point Temperature</option>
             <option value="relative_humidity%3A%2A%3A%2A%3A%2A">Relative Humidity</option>
-            <option value="wind_speed:10.0:point:PT10M">Wind Speed</option>
-            <option value="wind_from_direction:10.0:point:PT10M">Wind Direction</option>
-            <option value="air_pressure:0.0:point:PT0S">Air Perssure</option>
-            <option value="air_pressure_at_mean_sea_level%3A%2A%3A%2A%3A%2A">Air Pressure at Mean Sea Level</option>
-            <option value="precipitation_amount%3A%2A%3A%2A%3A%2A">Precipitation Amount 1hour</option>
+            <option value="wind_speed%3A%2A%3A%2A%3A%2A">Wind Speed</option>
+            <option value="wind_from_direction%3A%2A%3A%2A%3A%2A">Wind Direction</option>
+            <option value="air_pressure%3A%2A%3A%2A%3A%2A">Air Perssure</option>
         </select><br>
         <label for="mst">Keep stations</label>
         <input type="checkbox" id="mst" name="mst" value="mst"><br>
@@ -255,7 +253,7 @@
             var b = 1;
             var c2k = 0.0;
 
-            val = parseFloat(sval);
+            var val = parseFloat(sval);
 
             switch (unit) {
 
@@ -283,7 +281,29 @@
                     // console.log(b);
                     //g = parseInt(255/100*val,10);
                     break;
-                case "m s-1":
+                case "m/s":
+                    var col_index = parseInt(val*0.9);
+                    if (col_index <= 0) col_index = 0;
+                    else if (col_index >= cs_temp.length) col_index = cs_temp.length - 1;
+                    r = cs_temp[col_index][0];
+                    g = cs_temp[col_index][1];
+                    b = cs_temp[col_index][2];
+                    break;
+                case "deg":
+                    var col_index = parseInt(val*0.1);
+                    if (col_index <= 0) col_index = 0;
+                    else if (col_index >= cs_temp.length) col_index = cs_temp.length - 1;
+                    r = cs_temp[col_index][0];
+                    g = cs_temp[col_index][1];
+                    b = cs_temp[col_index][2];
+                    break;
+                case "hPa":
+                    var col_index = parseInt(cs_temp.length - val/10);
+                    if (col_index <= 0) col_index = 0;
+                    else if (col_index >= cs_temp.length) col_index = cs_temp.length - 1;
+                    r = cs_temp[col_index][0];
+                    g = cs_temp[col_index][1];
+                    b = cs_temp[col_index][2];
                     break;
             }
 
