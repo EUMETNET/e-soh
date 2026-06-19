@@ -67,13 +67,18 @@ def make_parameter(ts_mdata):
 
 
 def convert_to_covjson(observations):
+    # Collect data for all geo_points
+    data = []
+    for md in observations:
+        data.extend(_collect_data(md.ts_mdata, md.obs_mdata))
+
+    # Ensure data is grouped by lat, lon, and times
+    data.sort(key=lambda x: (x.dom.lat, x.dom.lon, x.ts_mdata.parameter_name))
+
     # Collect data
     coverages = []
-    data = [_collect_data(md.ts_mdata, md.obs_mdata) for md in observations]
 
-    # Need to sort before using groupBy. Also sort on parameter_name to get consistently sorted output
-    data.sort(key=lambda x: (x.dom, x.ts_mdata.parameter_name))
-    for (lat, lon, times), group in groupby(data, lambda x: x.dom):
+    for (lat, lon, times), group in groupby(data, lambda x: (x.dom.lat, x.dom.lon, x.dom.times)):
         referencing = [
             ReferenceSystemConnectionObject(
                 coordinates=["x", "y"],
@@ -96,23 +101,23 @@ def convert_to_covjson(observations):
 
         parameters = {}
         ranges = {}
-        for data in group:
-            if all(math.isnan(v) for v in data.values):
-                continue  # Drop ranges if completely nan.
-                # TODO: Drop the whole coverage if it becomes empty?
-            values_no_nan = [v if not math.isnan(v) else None for v in data.values]
+        for entry in group:
+            if all(math.isnan(v) for v in entry.values):
+                continue  # Skip ranges with only NaN values
 
-            parameter_id = data.ts_mdata.parameter_name
-            parameters[parameter_id] = make_parameter(data.ts_mdata)
+            values_no_nan = [v if not math.isnan(v) else None for v in entry.values]
+            parameter_id = entry.ts_mdata.parameter_name
+            parameters[parameter_id] = make_parameter(entry.ts_mdata)
 
             ranges[parameter_id] = NdArrayFloat(
                 values=values_no_nan, axisNames=["t", "x", "y"], shape=[len(values_no_nan), 1, 1]
             )
 
-        custom_fields = {"metocean:wigosId": data.ts_mdata.platform}
+        alt_platforms = ",".join(entry.ts_mdata.alt_platforms)
+        custom_fields = {"metocean:wigosId": entry.ts_mdata.platform, "metocean:alt_platforms": alt_platforms}
         coverages.append(Coverage(domain=domain, parameters=parameters, ranges=ranges, **custom_fields))
 
-    if len(coverages) == 0:
+    if not coverages:
         raise HTTPException(status_code=404, detail="Requested data not found.")
     elif len(coverages) == 1:
         return coverages[0]
@@ -122,11 +127,12 @@ def convert_to_covjson(observations):
 
 
 def _collect_data(ts_mdata, obs_mdata):
-    lat = obs_mdata[0].geo_point.lat  # HACK: For now assume they all have the same position
-    lon = obs_mdata[0].geo_point.lon
-    tuples = (
-        (o.obstime_instant.ToDatetime(tzinfo=timezone.utc), float(o.value)) for o in obs_mdata
-    )  # HACK: str -> float
-    (times, values) = zip(*tuples)
+    data_entries = []
+    for obs in obs_mdata:
+        lat = obs.geo_point.lat
+        lon = obs.geo_point.lon
+        time = obs.obstime_instant.ToDatetime(tzinfo=timezone.utc)
+        value = float(obs.value)  # Ensure the value is converted to float
+        data_entries.append(Data(Dom(lat, lon, [time]), [value], ts_mdata))
 
-    return Data(Dom(lat, lon, times), values, ts_mdata)
+    return data_entries
