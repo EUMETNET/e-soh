@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <TITLE>E-ESO Map</TITLE>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Quick Start - Leaflet</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            height: 70vh;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        form label {
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        form input,
+        form select,
+        form button {
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        .time-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .time-buttons button {
+            padding: 10px 15px;
+            font-size: 14px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .time-buttons button:hover {
+            background-color: #218838;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            form {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            form input,
+            form select,
+            form button {
+                width: 100%;
+            }
+
+            .time-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <center>
+        <h1>E-SOH Map</h1>
+    </center>
+        <div class="form-container">
+
+    <form id="api_params" action="javascript:updateMap()">
+        <label for="wg">WIGOS ID</label>
+        <input type="text" id="wg" name="wg" value="0-*-*-*">
+        = 0-*-2024-*<br>
+        <label for="dt">Time</label>
+        <input type="text" id="dt" name="dt" size="40"><br>
+        <label for="me">Measure Type</label>
+        <select id="me" name="me_list" form="api_params">
+            <option value="air_temperature%3A%2A%3A%2A%3A%2A">Air temperature</option>
+            <option value="dew_point_temperature%3A%2A%3A%2A%3A%2A">Dew Point Temperature</option>
+            <option value="relative_humidity%3A%2A%3A%2A%3A%2A">Relative Humidity</option>
+            <option value="wind_speed:10.0:point:PT10M">Wind Speed</option>
+            <option value="wind_from_direction:10.0:point:PT10M">Wind Direction</option>
+            <option value="air_pressure:0.0:point:PT0S">Air Perssure</option>
+            <option value="air_pressure_at_mean_sea_level%3A%2A%3A%2A%3A%2A">Air Pressure at Mean Sea Level</option>
+            <option value="precipitation_amount%3A%2A%3A%2A%3A%2A">Precipitation Amount 1hour</option>
+        </select><br>
+        <label for="mst">Keep stations</label>
+        <input type="checkbox" id="mst" name="mst" value="mst"><br>
+        <button type="submit">Update Map</button>
+    </form>
+    </div>
+<div class="time-buttons">
+    <button onclick="shiftMinutes(-10)">-10 mins</button>
+    <button onclick="shiftMinutes(-60)">-1 hour</button>
+    <button onclick="shiftMinutes(60)">+1 hour</button>
+    <button onclick="shiftMinutes(10)">+10 mins</button>
+
+</div>
+ <div id="map"></div>
+
+    <script>
+
+        var now = new Date();
+        var l_hour = now
+        l_hour.setMinutes(l_hour.getMinutes() - 60);
+        l_hour.setMinutes(0);
+        l_hour.setSeconds(0);
+        l_hour.setMilliseconds(0);
+
+        var l_prev = new Date(l_hour);
+        l_prev.setMinutes(l_prev.getMinutes() - 10);
+
+        const cs_temp = new Array([228, 240, 255], [220, 233, 250], [211, 226, 247], [203, 219, 244], [192, 212, 237], [184, 205, 234], [175, 198, 230],
+            [167, 191, 227], [156, 184, 223], [147, 177, 215], [139, 164, 205], [127, 155, 195], [117, 145, 185], [96, 123, 166], [86, 113, 156],
+            [77, 101, 145], [65, 92, 135], [57, 81, 127], [47, 71, 117], [38, 67, 111], [37, 79, 119], [39, 91, 128], [39, 103, 138], [40, 117, 147],
+            [67, 129, 144], [100, 141, 137], [135, 154, 132], [171, 168, 125], [194, 171, 117], [193, 157, 97], [195, 138, 83], [190, 112, 76],
+            [175, 77, 76], [159, 41, 76], [135, 32, 62], [110, 21, 49], [86, 12, 37], [63, 1, 22])
+
+        document.getElementById("dt").value = l_prev.toISOString() + "/" + l_hour.toISOString();
+
+        var esohApiUrl = "http://localhost:8008/"
+        //var esohApiUrl = "http://127.0.0.1:8008/"
+
+        function shiftMinutes(mins) {
+            var dt_interval = document.getElementById("dt").value;
+            var dt_index = dt_interval.indexOf("/");
+            if (dt_index >= 0) {
+                console.log("DT INTERVAL: " + dt_interval);
+                var dt_start = new Date(dt_interval.substr(0, dt_index));
+                var dt_end = new Date(dt_interval.substr(dt_index + 1));
+                dt_start.setMinutes(dt_start.getMinutes() + mins);
+                dt_end.setMinutes(dt_end.getMinutes() + mins);
+                document.getElementById("dt").value = dt_start.toISOString() + "/" + dt_end.toISOString();
+            }
+            else {
+                var dt_val = new Date(document.getElementById("dt").value);
+                console.log("DT: " + dt_val);
+
+                dt_val.setMinutes(dt_val.getMinutes() + mins)
+                document.getElementById("dt").value = dt_val.toISOString();
+            }
+            updateMap();
+        }
+
+
+        const map = L.map('map').setView([30.0, 0.00], 2);
+        var markerGroup = L.layerGroup().addTo(map);
+
+        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        var geojsonMarkerOptions = {
+            radius: 8,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+
+
+        function Get(esohUrl) {
+            console.log("URL:" + esohUrl);
+            var Httpreq = new XMLHttpRequest(); // a new request
+            try {
+                Httpreq.open("GET", esohUrl, false);
+                Httpreq.send(null);
+            }
+            catch (err) {
+                return "";
+            }
+
+            return Httpreq.responseText;
+        }
+
+        var popup = L.popup()
+
+        function markerOnClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the marker " + e.latlng.toString())
+                .openOn(map);
+        }
+        function getColor(sval, unit) {
+            var r = 1;
+            var g = 255;
+            var b = 1;
+            var c2k = 0.0;
+
+            val = parseFloat(sval);
+
+            switch (unit) {
+
+                case "Cel":
+                    c2k = 273.16;
+                case "K":
+
+                    var col_index = parseInt((val + c2k - 190.0) / 4.0 + 1.0, 10);
+                    if (col_index < 0) col_index = 0;
+                    else if (col_index >= cs_temp.length) col_index = cs_temp.length - 1;
+
+                    r = cs_temp[col_index][0];
+                    g = cs_temp[col_index][1];
+                    b = cs_temp[col_index][2];
+                    break;
+                case "%":
+                    //b = parseInt(255/100*val,10);
+                    var umax = 36;
+                    var col_index = parseInt(umax - (val / 6.0), 10);
+                    if (col_index < 0) col_index = 0;
+                    else if (col_index >= cs_temp.length) col_index = cs_temp.length - 1;
+                    r = cs_temp[col_index][0];
+                    g = cs_temp[col_index][1];
+                    b = cs_temp[col_index][2];
+                    // console.log(b);
+                    //g = parseInt(255/100*val,10);
+                    break;
+                case "m s-1":
+                    break;
+            }
+
+
+            // console.log(r.toString(16).padStart(2,'0')+g.toString(16).padStart(2,'0')+b.toString(16).padStart(2,'0'));
+            return "#" + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
+        }
+
+        function createUrl(iform) {
+            //console.log("func createURL");
+            var wg_val = document.getElementById("wg").value;
+            var dt_val = document.getElementById("dt").value;
+            var me_val = document.getElementById("me").value;
+            var url = esohApiUrl + "collections/observations/locations/" + wg_val + "?parameter-name=" + me_val + "&datetime=" + dt_val + "&f=CoverageJSON"
+            return url;
+        }
+
+        function refreshMap(ed) {
+            //console.log("func start refresh Map");
+            var me_val = document.getElementById("me").value;
+            var lat = parseFloat(ed.domain.axes.y.values);
+            var lon = parseFloat(ed.domain.axes.x.values);
+            var tim = ed.domain.axes.t.values.toString();
+            var mv = []
+            for (const mes_val1 in ed.ranges) {
+                mv.push(mes_val1);
+            }
+            mv.sort();
+            mv.reverse();
+
+            //	for (const mes_val in ed.ranges)
+            for (let i = 0; i < mv.length; i++) {
+                mes_val = mv[i];
+                var val = ed.ranges[mes_val].values.toString();
+                var disp_val = val;
+                var unit = ed.parameters[mes_val].unit.label.en.toString();
+                var disp_unit = unit;
+                var mes_arr = mes_val.toString().split(":");
+                var radius_val = (parseFloat(mes_arr[1] / 100) + 3.0) * 1000.0;
+                radius_val = 10;
+                var rodeo_ID = ed["metocean:wigosId"];
+		        var alt_platforms = ed["metocean:alt_platforms"];
+                // console.log(rodeo_ID);
+                if (unit == "percent") disp_unit = "%";
+                if (unit == "degree") disp_unit = " \u00B0";
+                if (unit == "m s-1") disp_unit = "m/s";
+                if (unit == "K") {
+                    disp_val = val - 273.16;
+                    disp_val = disp_val.toFixed(1);
+                    disp_unit = " \u00B0C"
+                }
+                if (unit == "degC" || unit == "Cel" ) {
+                    disp_val = parseFloat(val).toFixed(1);
+                    disp_unit = " \u00B0C"
+                }
+
+
+                /*        var marker = L.marker([lat, lon]).bindTooltip(tim + " " + val + unit,
+                            {
+                                permanent: false,
+                                direction: 'right'
+                            }).on('click',markerOnClick).addTo(markerGroup)
+                */
+                var color = getColor(val, unit);
+                var circle = L.circle([lat, lon], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.6,
+                    radius: radius_val
+
+			    }).bindTooltip(tim + " " + disp_val + disp_unit + "<BR> " + rodeo_ID + "<BR>" + alt_platforms + "<BR>" + "[" + val + " " + unit + " " + mes_val + "]").addTo(markerGroup);
+            }
+        }
+
+        function updateMap() {
+
+            if (!more_st) markerGroup.clearLayers();
+
+            //console.log("func updateMap");
+            url = createUrl();
+
+            var st_num = 0;
+            var start = new Date();
+            var api_result = Get(url);
+            var end = new Date();
+            if (api_result.length > 0) {
+                var json_data = JSON.parse(api_result);
+                //console.log("Get URL: " + url );
+                var esoh_data = json_data;
+                var more_st = document.getElementById("mst").checked;
+
+
+                if (esoh_data['type'] == 'CoverageCollection') {
+                    for (ed of json_data.coverages) {
+                        refreshMap(ed);
+                        st_num++;
+                    }
+                }
+                else {
+                    refreshMap(esoh_data);
+                }
+                console.log("Stations: " + st_num.toString() + " Query time:" + ((end - start) / 1000.0).toString() + " sec");
+            }
+            else {
+                console.log("No data");
+            }
+        }
+
+        function markerOnClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the marker " + e.latlng.toString())
+                .openOn(map);
+        }
+
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+        }
+
+        map.on('click', onMapClick);
+
+        updateMap();
+
+    </script>
+
+
+
+</body>
+
+</html>

@@ -273,6 +273,13 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards:rw
     depends_on:
       - prometheus
+  apache2:
+    profiles: ["apache2"]
+    image: ubuntu/apache2
+    ports:
+      - "8888:80"
+    volumes:
+      - ./apache2/www:/var/www/html:ro
 
 volumes:
   ts-data:
