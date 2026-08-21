@@ -9,7 +9,10 @@
         "coordinates": {{ spatial_extents }}
     },
     "time": {
-        "interval": {{ temporal_extents|tojson }},
+        "interval": [
+            "T00Z",
+            "T23Z" 
+        ],
         "resolution": "PT10M"
     },
 "properties": {
@@ -117,12 +120,6 @@
         "href": {{ url_docs|tojson }},
         "rel": "related",
         "title": "E-SOH API documentation",
-        "type": "application/json"
-    },
-    {
-        "href": {{ url_conformance|tojson }},
-        "rel": "conformance",
-        "title": "E-SOH Conformance Declaration",
         "type": "application/json"
     },
     {
