@@ -248,28 +248,28 @@ async def get_collection_metadata(base_url: str, collection_id: str, is_self) ->
                 link=EDRQueryLink(
                     href=f"{base_url}/observations/position",
                     rel="data",
-                    variables=Variables(query_type="position", output_format=["CoverageJSON"]),
+                    variables=Variables(query_type="position", output_formats=["CoverageJSON"]),
                 )
             ),
             locations=EDRQuery(
                 link=EDRQueryLink(
                     href=f"{base_url}/observations/locations",
                     rel="data",
-                    variables=Variables(query_type="locations", output_format=["CoverageJSON"]),
+                    variables=Variables(query_type="locations", output_formats=["CoverageJSON"]),
                 )
             ),
             area=EDRQuery(
                 link=EDRQueryLink(
                     href=f"{base_url}/observations/area",
                     rel="data",
-                    variables=Variables(query_type="area", output_format=["CoverageJSON"]),
+                    variables=Variables(query_type="area", output_formats=["CoverageJSON"]),
                 )
             ),
             radius=EDRQuery(
                 link=EDRQueryLink(
                     href=f"{base_url}/observations/radius",
                     rel="data",
-                    variables=Variables(query_type="radius", output_format=["CoverageJSON"]),
+                    variables=Variables(query_type="radius", output_formats=["CoverageJSON"]),
                 )
             ),
         ),
