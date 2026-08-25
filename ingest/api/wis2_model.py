@@ -86,6 +86,22 @@ class Properties(BaseModel):
         None,
         description="Identifies the end date/time date of the data being recorded, in RFC3339 format.",
     )
+    standard_name: Optional[str] = Field(
+        None,
+        description="CF standard for the data included in this message.",
+    )
+    hamsl: Optional[float] = Field(
+        None,
+        description="The number of meters above mean sea level.",
+    )
+    function: Optional[str] = Field(
+        None,
+        description="Function used on the data during the aggregation period.",
+    )
+    period: Optional[str] = Field(
+        None,
+        description="Aggregation period for the measurement.",
+    )
     metadata_id: str = Field(
         ...,
         description="Identifier for associated discovery metadata record to which the notification applies",

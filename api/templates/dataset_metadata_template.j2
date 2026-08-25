@@ -123,6 +123,35 @@
         "type": "application/json"
     },
     {
+        "href": {{ url_mqtt_wis2|tojson }},
+        "rel": "items",
+        "type": "application/geo+json",
+        "title": "Eumetnet Surface Observations WIS2 Notification Service",
+        "channel": {{ wis2_topic|tojson }},
+        "filters": {
+          "wigos_station_identifier": {
+            "type": "string",
+            "title": "WIGOS station identifier"
+          },
+          "standard_name": {
+            "type": "string",
+            "title": "CF standard for the data included in this message."
+          },
+          "hamsl": {
+            "type": "string",
+            "title": "The number of meters above mean sea level."
+          },
+          "function": {
+            "type": "string",
+            "title": "Function used on the data during the aggregation period."
+          },
+          "period": {
+            "type": "string",
+            "title": "Aggregation period for the measurement."
+          }
+        }
+    },
+    {
       "rel": "related",
       "href": "https://www.eumetnet.eu/observations/observations-data-sharing-2/",
       "type": "text/html",

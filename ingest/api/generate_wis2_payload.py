@@ -1,5 +1,4 @@
 import os
-import json
 
 from dateutil.parser import parse
 from datetime import datetime
@@ -11,7 +10,6 @@ from api.wis2_model import Wis2MessageSchema
 from api.wis2_model import PropertiesWIS2
 from api.wis2_model import Content
 from api.global_variables import WIS2_TOPIC
-from api.global_variables import WIS2_DATA_ID
 from api.global_variables import WIS2_METADATA_RECORD_ID
 
 
@@ -34,20 +32,11 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
     """
     This function will generate the WIS2 complient payload based on the JSON schema for ESOH
     """
-    json_payload = json.dumps(
-        {
-            "type": "Feature",
-            "geometry": message["geometry"],
-            "properties": {
-                "observation": message["properties"]["content"]["value"],
-                "CF_standard_name": message["properties"]["content"]["standard_name"],
-                "unit": message["properties"]["content"]["unit"],
-            },
-        },
-        separators=(",", ":"),
-    )
-    json_payload = json_payload.encode("utf-8")
-    json_payload_bytes_size = len(json_payload)
+    standard_name = message["properties"]["content"].get("standard_name", "")
+    value = message["properties"]["content"]["value"]
+    value_size = len(value)
+    date_str = message["properties"]["datetime"].replace("+00:00", "Z").replace("-", "").replace(":", "")
+    data_id = WIS2_TOPIC.removeprefix("origin/a/") + "/" + message["properties"]["platform"] + "_" + date_str + "_" + standard_name
 
     wis2_payload = Wis2MessageSchema(
         type="Feature",
@@ -62,15 +51,19 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
         },
         properties=PropertiesWIS2(
             producer=message["properties"]["naming_authority"],
-            data_id=WIS2_DATA_ID or message["properties"]["data_id"],
+            data_id=data_id or message["properties"]["data_id"],
             metadata_id=WIS2_METADATA_RECORD_ID,  # Need to figure out how we generate this? Is it staic or dynamic?
             datetime=message["properties"]["datetime"],
             pubtime=message["properties"]["pubtime"],
+            standard_name=standard_name,
+            hamsl=message["properties"]["hamsl"],
+            function=message["properties"]["function"],
+            period=message["properties"]["period"],
             content=Content(
-                value=json_payload,
+                value=value,
                 unit=message["properties"]["content"]["unit"],
                 encoding="utf-8",
-                size=json_payload_bytes_size,
+                size=value_size,
             ),
         ),
         links=(
@@ -80,7 +73,7 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
                         message["properties"]["platform"],
                         request_url,
                         parameters={
-                            "standard_name": message["properties"]["content"].get("standard_name", ""),
+                            "standard_name": standard_name,
                             "datetime": (
                                 lambda dt: (
                                     dt.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
