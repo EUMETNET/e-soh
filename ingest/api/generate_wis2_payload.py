@@ -36,7 +36,7 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
     value = message["properties"]["content"]["value"]
     value_size = len(value)
     date_str = message["properties"]["datetime"].replace("+00:00", "Z").replace("-", "").replace(":", "")
-    data_id = ( 
+    data_id = (
         WIS2_TOPIC.removeprefix("origin/a/")
         + "/"
         + message["properties"]["platform"]
