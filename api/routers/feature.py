@@ -26,6 +26,8 @@ from utilities import split_and_strip
 router = APIRouter(prefix="/collections/observations")
 
 env = Environment(loader=FileSystemLoader(os.getenv("JINJA2_TEMPLATES", "templates")), autoescape=select_autoescape())
+WIS2_TOPIC = os.getenv("WIS2_TOPIC")
+WIS2_DATA_ID = os.getenv("WIS2_DATA_ID")
 
 
 @router.get(
@@ -162,6 +164,8 @@ async def get_time_series_by_id(
 @router.get("/dataset", tags=["E-SOH dataset"], include_in_schema=False)
 async def get_dataset_metadata(request: Request):
     base_url = str(request.base_url)
+    mqtt_url_woport = base_url.split(":")
+    url_mqtt_wis2 = "wss:" + mqtt_url_woport[1] + ":443/wis2mqtt"
 
     # need to get spatial extent.
     spatial_request = dstore.GetExtentsRequest()
@@ -182,6 +186,8 @@ async def get_dataset_metadata(request: Request):
         "url_base": base_url,
         "url_conformance": base_url + "conformance",
         "url_docs": base_url + "docs",
+        "url_mqtt_wis2": url_mqtt_wis2,
+        "wis2_topic": WIS2_TOPIC,
     }
 
     template = env.get_template("dataset_metadata_template.j2")
