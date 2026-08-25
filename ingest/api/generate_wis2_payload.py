@@ -63,6 +63,7 @@ def generate_wis2_payload(message: dict, request_url: str) -> Wis2MessageSchema:
             metadata_id=WIS2_METADATA_RECORD_ID,  # Need to figure out how we generate this? Is it staic or dynamic?
             datetime=message["properties"]["datetime"],
             pubtime=message["properties"]["pubtime"],
+            wigos_station_identifier=message["properties"]["platform"],
             standard_name=standard_name,
             hamsl=message["properties"]["hamsl"],
             function=message["properties"]["function"],

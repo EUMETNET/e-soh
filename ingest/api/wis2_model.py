@@ -86,6 +86,10 @@ class Properties(BaseModel):
         None,
         description="Identifies the end date/time date of the data being recorded, in RFC3339 format.",
     )
+    wigos_station_identifier: Optional[str] = Field(
+        None,
+        description="WIGOS-ID of the platform(s) (if exists), or a generated WIGOS-like ID.",
+    )
     standard_name: Optional[str] = Field(
         None,
         description="CF standard for the data included in this message.",
