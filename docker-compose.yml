@@ -273,6 +273,7 @@ services:
       - prometheus
 
   mdata2wis2:
+    profiles: ["wis2meta"]
     image: ghcr.io/eumetnet/openradardata/mdata2wis2:v0.1.3
     environment:
       - LOGLEVEL=INFO
