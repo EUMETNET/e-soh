@@ -139,7 +139,7 @@
                         "rel": "data",
                         "variables": {
                             "query_type": "position",
-                            "output_format": [
+                            "output_formats": [
                                 "CoverageJSON"
                             ]
                         }
@@ -151,7 +151,7 @@
                         "rel": "data",
                         "variables": {
                             "query_type": "radius",
-                            "output_format": [
+                            "output_formats": [
                                 "CoverageJSON"
                             ]
                         }
@@ -163,7 +163,7 @@
                         "rel": "data",
                         "variables": {
                             "query_type": "area",
-                            "output_format": [
+                            "output_formats": [
                                 "CoverageJSON"
                             ]
                         }
@@ -175,7 +175,7 @@
                         "rel": "data",
                         "variables": {
                             "query_type": "locations",
-                            "output_format": [
+                            "output_formats": [
                                 "CoverageJSON"
                             ]
                         }
