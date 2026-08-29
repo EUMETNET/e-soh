@@ -26,10 +26,9 @@ func getLocs(
 
 	// get values needed for query
 	phVals := []interface{}{} // placeholder values
-	timeFilter, geoFilter, int64MdataFilter, stringMdataFilter,
-		err := createObsQueryVals(
-		request.GetSpatialPolygon(), request.GetSpatialCircle(), request.GetFilter(), tspec,
-		&phVals)
+	timeFilter, geoFilter, int64MdataFilter, stringMdataFilter, err := createObsQueryVals(
+		request.GetSpatialPolygon(), request.GetSpatialCircle(), request.GetCamslRange(),
+		request.GetFilter(), tspec, &phVals)
 	if err != nil {
 		return nil, fmt.Errorf("createLocsQueryVals() failed: %v", err)
 	}

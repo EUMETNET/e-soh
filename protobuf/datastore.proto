@@ -136,6 +136,12 @@ message ObsMetadata {
     Point geo_point = 1 [json_name = "geo_point"];
     Polygon geo_polygon = 2 [json_name = "geo_polygon"];
   }
+  optional int32 camsl = 11; // centimeters above mean sea level
+  // Case 1 - stationary data: camsl of the station ground position
+  // Case 2 - mobile data: camsl of the sensor itself
+  // NOTE: in Case 1, the absolute vertical location of the sensor would be camsl + level where
+  //   level is the height above ground (hag) of the sensor. (Typical values for level are the WMO
+  //   standard 2m for temperature and 10m for wind.)
   oneof obstime {
     google.protobuf.Timestamp obstime_instant = 3 [json_name = "obstime_instant"];
     //TimeInterval obstime_interval = 4 [json_name = "obstime_interval"]; -- unsupported for now
@@ -149,12 +155,6 @@ message ObsMetadata {
   string history = 8;
   string processing_level = 9 [json_name = "processing_level"];
   int64 quality_code = 10 [json_name = "quality_code"];
-  int64 camsl = 11; // centimeters above mean sea level
-  // Case 1 - stationary data: camsl of the station ground position
-  // Case 2 - mobile data: camsl of the sensor itself
-  // NOTE: in Case 1, the absolute vertical location of the sensor would be camsl + level where
-  //   level is the height above ground (hag) of the sensor. (Typical values for level are the WMO
-  //   standard 2m for temperature and 10m for wind.)
   // --- END reflectable metadata -----------------
 
   string value = 12; // obs value (not metadata in a strict sense)
@@ -207,9 +207,25 @@ message GetObsRequest {
 
   // --- END temporal spec ----------------------------------
 
-  // spatial filter
+  // --- BEGIN spatial filter ---------------------------------------------
   Polygon spatial_polygon = 3; // if specified, only observations in this polygon may be returned
   Circle spatial_circle = 4; // if specified, only observations in this circle may be returned
+  string camsl_range = 8; // if specified, only observations within this CAMSL (centimeters above
+  // mean sea level) range may be returned.
+  // Syntax:
+  // (NOTE: lo and hi are both int32)
+  // Case 1 - 'lo/hi': matches all V where lo <= V <= hi.
+  //     Examples that match V = 10: '10/10', '-10/10', '9/10', '10/11'.
+  //
+  // Case 2 - '../hi': matches all V where V <= hi.
+  //     Examples that match V = 10: '../10' and '../11'.
+  //
+  // Case 3 - 'lo/..': matches all V where lo <= V.
+  //     Examples that match V = 10: '10/..', '9/..'.
+  //
+  // Case 4 - '../..': matches any V. NOTE: this is the default behavior and is thus never required
+  //     to be explicitly specified (it is supported for completeness/consistency).
+  // --- END spatial filter ---------------------------------------------
 
   // search wrt. TSMetadata.links
   // TODO - needs special handling
@@ -257,7 +273,7 @@ message GetObsRequest {
   //           default behavior and is thus never required to be explicitly specified (it is
   //           supported for completeness/consistency).
   //
-  //       Case 2.5: If P is not any of the integer interval forms of Case 2.1..4, then the value
+  //       Case 2.5: If P is none of the integer interval forms of Case 2.1..4, then the value
   //           V of F is converted to a string and matched against P just like in Case 1.
   //           Example: for F='level', V='10', the following values for P will match:
   //           '10', '1*', '*0', '*'.
@@ -274,6 +290,7 @@ message GetObsRequest {
   //       'history')
   //     * 'links' (non-reflectable field in TSMedatata)
   //     * 'geo_point' (non-reflectable field in ObsMetadata)
+  //     * 'camsl' (--- '' ---)
   //     * 'obstime_instant' (--- '' ---)
   //     * 'pubtime' (--- '' ---)
   //     * 'value' (non-reflection handleable string field in ObsMetadata)
@@ -334,11 +351,13 @@ message GetLocsRequest {
   TimeInterval temporal_interval = 1;
   Polygon spatial_polygon = 2;
   Circle spatial_circle = 3;
+  string camsl_range = 5;
   map<string, Strings> filter = 4;
 }
 
 message LocMetadata {
   Point geo_point = 1;
+  optional int32 camsl = 5; // centimeters above mean sea level - see description in ObsMetadata
   string platform = 2;
   string platform_name = 3 [json_name = "platform_name"];
   repeated string parameter_names = 4 [json_name = "parameter_names"];

@@ -12,10 +12,10 @@ up: build services
 # Build and run the default docker services and start up monitoring
 local: up monitoring
 # Build and run the unit, load and integration tests
-test: build unit ingest-load integration
+test: build services unit ingest-load integration
 
 # Build and run the ingest loader and integration tests
-ingest-test: build ingest-unit ingest-load integration
+ingest-test: build services ingest-unit ingest-load integration
 
 # ---------------------------------------------------------------------------- #
 #                                  utility                                     #
