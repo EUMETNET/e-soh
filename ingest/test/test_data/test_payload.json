@@ -46,6 +46,10 @@
                 "rel": "canonical"
             }
         ],
+        "alt_platforms": [
+            "0-0-0-0",
+            "0-0-0-1"
+        ],
         "geometry": {
             "type": "Point",
             "coordinates": {

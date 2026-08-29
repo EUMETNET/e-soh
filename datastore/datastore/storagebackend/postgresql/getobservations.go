@@ -90,6 +90,7 @@ func scanTSRow(rows *sql.Rows) (*datastore.TSMetadata, int64, error) {
 		linkType     pq.StringArray
 		linkHrefLang pq.StringArray
 		linkTitle    pq.StringArray
+		altPlatforms pq.StringArray
 	)
 
 	// initialize colValPtrs with non-reflectable metadata
@@ -100,6 +101,7 @@ func scanTSRow(rows *sql.Rows) (*datastore.TSMetadata, int64, error) {
 		&linkType,
 		&linkHrefLang,
 		&linkTitle,
+		&altPlatforms,
 	}
 
 	// extend colValPtrs with reflectable metadata of type int64
@@ -119,7 +121,9 @@ func scanTSRow(rows *sql.Rows) (*datastore.TSMetadata, int64, error) {
 		return nil, -1, fmt.Errorf("rows.Scan() failed: %v", err)
 	}
 
-	// initialize tsMdata with non-reflectable metadata
+	// --- BEGIN initialize tsMdata with non-reflectable metadata ---------------------------
+
+	// --- BEGIN 'links' --------------------------------------
 	links := []*datastore.Link{}
 	for i := 0; i < len(linkHref); i++ {
 		links = append(links, &datastore.Link{
@@ -133,6 +137,17 @@ func scanTSRow(rows *sql.Rows) (*datastore.TSMetadata, int64, error) {
 	tsMdata := datastore.TSMetadata{
 		Links: links,
 	}
+	// --- END 'links' --------------------------------------
+
+	// --- BEGIN 'alt_platforms' --------------------------------------
+	aps := []string{}
+	for i := 0; i < len(altPlatforms); i++ {
+		aps = append(aps, altPlatforms[i])
+	}
+	tsMdata.AltPlatforms = aps
+	// --- END 'alt_platforms' --------------------------------------
+
+	// --- END initialize tsMdata with non-reflectable metadata ---------------------------
 
 	var err error
 

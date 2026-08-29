@@ -10,6 +10,7 @@ import (
 	"slices"
 
 	"github.com/cridenour/go-postgis"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc/codes"
 )
@@ -46,9 +47,9 @@ func getLocs(
 			WHERE %s AND %s AND %s AND %s
 			ORDER BY platform, obstime_instant DESC
 		)
-		SELECT point, platform, platform_name, parameter_name FROM (  -- just to deal with final sorting
+		SELECT point, platform, platform_name, alt_platforms, parameter_name FROM (  -- just to deal with final sorting
 			SELECT DISTINCT ON (ts_id)
-				point, platform, platform_name, parameter_name
+				point, platform, platform_name, alt_platforms, parameter_name
 			FROM time_series
 				JOIN observation ON observation.ts_id = time_series.id
 				JOIN geo_point ON observation.geo_point_id = geo_point.id
@@ -75,6 +76,7 @@ func getLocs(
 	// per platform info
 	type pformInfo struct {
 		platformName string
+		altPlatforms map[string]struct{} // set of strings (i.e. distinct values!)
 		points       *[]postgis.PointS
 		paramNames   *[]string
 	}
@@ -88,10 +90,11 @@ func getLocs(
 			point        postgis.PointS
 			platform     string
 			platformName sql.NullString
+			altPlatforms []string
 			paramName    string
 		)
 
-		err = rows.Scan(&point, &platform, &platformName, &paramName)
+		err = rows.Scan(&point, &platform, &platformName, pq.Array(&altPlatforms), &paramName)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan() failed: %v", err)
 		}
@@ -100,14 +103,18 @@ func getLocs(
 		pi, found := pformInfos[platform]
 		if !found { // create the first one for this platform
 			pi = &pformInfo{
-				points:     &[]postgis.PointS{},
-				paramNames: &[]string{},
+				points:       &[]postgis.PointS{},
+				altPlatforms: map[string]struct{}{},
+				paramNames:   &[]string{},
 			}
 			pformInfos[platform] = pi
 		}
 
 		// aggregate info for this platform
 		pi.platformName = platformName.String
+		for _, ap := range altPlatforms {
+			pi.altPlatforms[ap] = struct{}{}
+		}
 		*pi.points = append(*(pi.points), point)
 		*pi.paramNames = append(*(pi.paramNames), paramName)
 	}
@@ -125,6 +132,13 @@ func getLocs(
 			return cmp.Compare(a.X, b.X) // ... and secondarily on longitude
 		})
 
+		// convert alt_platforms from set to sorted list
+		apList := []string{}
+		for k := range pformInfo.altPlatforms {
+			apList = append(apList, k)
+		}
+		slices.Sort(apList)
+
 		locs = append(locs, &datastore.LocMetadata{
 			GeoPoint: &datastore.Point{
 				Lon: point.X,
@@ -132,6 +146,7 @@ func getLocs(
 			},
 			Platform:       platform,
 			PlatformName:   pformInfo.platformName,
+			AltPlatforms:   apList,
 			ParameterNames: *pformInfo.paramNames,
 		})
 	}

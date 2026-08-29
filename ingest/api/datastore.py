@@ -28,7 +28,11 @@ def build_grpc_messages(msg: str) -> None:
     field_list_ts = ts_metadata.DESCRIPTOR.fields_by_name.keys()
     for i in field_list_ts:
         if i in msg["properties"]:
-            setattr(ts_metadata, i, msg["properties"][i])
+            if i == "alt_platforms":
+                for ap in msg["properties"]["alt_platforms"]:
+                    ts_metadata.alt_platforms.append(ap)
+            else:
+                setattr(ts_metadata, i, msg["properties"][i])
         elif i in msg["properties"]["content"]:
             setattr(ts_metadata, i, msg["properties"]["content"][i])
 

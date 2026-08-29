@@ -5,11 +5,12 @@ import (
 	"datastore/common"
 	"datastore/datastore"
 	"fmt"
-	"github.com/cridenour/go-postgis"
 	"log"
 	"reflect"
 	"slices"
 	"strings"
+
+	"github.com/cridenour/go-postgis"
 
 	"github.com/lib/pq"
 	"google.golang.org/grpc/codes"
@@ -27,6 +28,7 @@ func getTSColVals(tsMdata *datastore.TSMetadata) ([]interface{}, []interface{}, 
 
 	// --- BEGIN non-reflectable metadata ---------------------------
 
+	// --- BEGIN 'links' --------------------------------------
 	getLinkVals := func(key string) ([]string, error) {
 		linkVals := []string{}
 		for _, link := range tsMdata.GetLinks() {
@@ -57,9 +59,16 @@ func getTSColVals(tsMdata *datastore.TSMetadata) ([]interface{}, []interface{}, 
 		} else {
 			vals := pq.StringArray(linkVals)
 			colVals = append(colVals, vals)
-			colName2Val[common.ToSnakeCase(key)] = vals
+			colName2Val[key] = vals
 		}
 	}
+	// --- END 'links' --------------------------------------
+
+	// --- BEGIN 'alt_platforms' --------------------------------------
+	vals := pq.StringArray(tsMdata.GetAltPlatforms())
+	colVals = append(colVals, vals)
+	colName2Val["alt_platforms"] = vals
+	// --- END 'alt_platforms' --------------------------------------
 
 	// --- END non-reflectable metadata ---------------------------
 

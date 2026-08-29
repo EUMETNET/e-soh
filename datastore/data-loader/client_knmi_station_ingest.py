@@ -51,6 +51,10 @@ def netcdf_file_to_requests(file_path: Path | str) -> Tuple[List, List]:
 
                 properties = {
                     "platform": platform,
+                    "alt_platforms": [
+                        "0-0-0-0",
+                        "0-0-0-1",
+                    ],
                     "instrument": param_id,
                     "platform_name": station_name,
                     "title": param_file.long_name,
