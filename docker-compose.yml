@@ -80,7 +80,7 @@ services:
       - DSHOST=store
       - DSPORT=50050
       - TRUSTED_PROXIES=${TRUSTED_PROXIES:-127.0.0.0/8,::1}
-      - WIS2_TOPIC=${WIS2_TOPIC:-origin/a/wis2/eu-eumetnet-surface-observations/data/core/weather/surface-based-observations/synop}
+      - WIS2_TOPIC=${WIS2_TOPIC}
       - GUNICORN_CMD_ARGS=--bind 0.0.0.0:8000 --workers=4 --access-logfile -
     depends_on:
       store:
@@ -119,8 +119,8 @@ services:
       - MQTT_TLS=${MQTT_TLS:-False}
       - MQTT_PROTOCOL_VERSION=${MQTT_PROTOCOL_VERSION:-5}
       - MQTT_TOPIC_PREPEND=${MQTT_TOPIC_PREPEND}
-      - WIS2_TOPIC=${WIS2_TOPIC:-origin/a/wis2/eu-eumetnet-surface-observations/data/core/weather/surface-based-observations/synop}
-      - WIS2_METADATA_RECORD_ID=${WIS2_METADATA_RECORD_ID:-urn:wmo:md:eu-eumetnet-surface-observations:land-station-observations}
+      - WIS2_TOPIC=${WIS2_TOPIC}
+      - WIS2_METADATA_RECORD_ID=${WIS2_METADATA_RECORD_ID}
       - WIS2_MQTT_HOST=${MQTT_HOST:-mqtt_wis2}
       - WIS2_MQTT_USERNAME=${MQTT_USERNAME:-}
       - WIS2_MQTT_PASSWORD=${MQTT_PASSWORD:-}
@@ -280,18 +280,18 @@ services:
       - DATASET_PROTOCOL=${DATASET_PROTOCOL:-http}
       - DATASET_HOST=${DATASET_HOST:-api}
       - DATASET_PORT=${DATASET_PORT:-8000}
-      - DATASET_PATH=${DATASET_PATH:-/collections/observations/dataset}
-      - EXT_DATASET_HOST=${EXT_DATASET_HOST:-observaions.meteogate.eu}
+      - DATASET_PATH=${DATASET_PATH}
+      - EXT_DATASET_HOST=${EXT_DATASET_HOST}
       - EXT_DATASET_PATH=${EXT_DATASET_PATH}
       - METADATA_REP_TIME=${METADATA_REP_TIME:-1}
-      - WIS2_METADATA_TOPIC=${WIS2_METADATA_TOPIC:-origin/a/wis2/eu-eumetnet-surface-observations/metadata}
+      - WIS2_METADATA_TOPIC=${WIS2_METADATA_TOPIC}
       - WIS2_MQTT_HOST=${WIS2_MQTT_HOST:-mqtt_wis2}
       - WIS2_MQTT_USERNAME=${WIS2_MQTT_USERNAME:-}
       - WIS2_MQTT_PASSWORD=${WIS2_MQTT_PASSWORD:-}
       - WIS2_MQTT_TLS=${WIS2_MQTT_TLS:-False}
       - WIS2_MQTT_PORT=${WIS2_MQTT_PORT:-1884}
-      - WIS2_DATA_ID=${WIS2_DATA_ID:-wis2/eu-eumetnet-surface-observations/metadata}
-      - DATASET_NAME=${DATASET_NAME:-Land surface weather observations}
+      - WIS2_DATA_ID=${WIS2_DATA_ID}
+      - DATASET_NAME=${DATASET_NAME}
 
 volumes:
   ts-data:
