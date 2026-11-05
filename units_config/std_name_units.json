@@ -391,6 +391,19 @@
         ],
         "symbol": "W/m2"
     },
+    "surface_snow_area_fraction": {
+        "unit": "%",
+        "symbol": "%",
+        "alias": [
+            "percent",
+            "1/100"
+        ],
+        "conversion": {
+            "1": {
+                "mul": 100
+            }
+        }
+    },
     "surface_snow_thickness": {
         "unit": "cm",
         "symbol": "cm"
