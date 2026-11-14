@@ -209,8 +209,8 @@ type filterInfo struct {
 
 // TODO: add filter info for non-reflectable types
 
-// getPolygonFilter derives the expression used in a WHERE clause for selecting only
-// points inside a polygon.
+// getPolygonFilter derives the expression used in a WHERE clause for selecting only points inside
+// a polygon.
 //
 // Values to be used for query placeholders are appended to phVals.
 //
@@ -253,8 +253,8 @@ func getPolygonFilter(polygon *datastore.Polygon, phVals *[]interface{}) (string
 	return whereExpr, nil
 }
 
-// getCircleFilter derives the expression used in a WHERE clause for selecting only
-// points inside a circle.
+// getCircleFilter derives the expression used in a WHERE clause for selecting only points inside
+// a circle.
 //
 // Values to be used for query placeholders are appended to phVals.
 //
@@ -291,14 +291,34 @@ func getCircleFilter(circle *datastore.Circle, phVals *[]interface{}) (string, e
 	return whereExpr, nil
 }
 
-// getGeoFilter derives from polygon and circle the expression used in a WHERE clause for keeping
-// observations inside both of these areas (i.e. in their intersection).
+// getCamslRangeFilter derives the expression used in a WHERE clause for selecting only points
+// within a camsl range.
+//
+// Values to be used for query placeholders are appended to phVals.
+//
+// Returns (expression, nil) upon success, otherwise (..., error).
+func getCamslRangeFilter(camslRange string, phVals *[]interface{}) (string, error) {
+
+	whereExpr := []string{}
+
+	addWhereCondMatchAnyPatternForInt64("camsl", []string{camslRange}, &whereExpr, phVals, false)
+
+	if len(whereExpr) == 0 {
+		return "TRUE", nil
+	}
+	// assert len(whereExpr) == 1
+	return whereExpr[0], nil
+}
+
+// getGeoFilter derives from polygon, circle, and camslRange the expression used in a WHERE clause
+// for keeping observations inside these areas/ranges (i.e. in their intersection).
 //
 // Values to be used for query placeholders are appended to phVals.
 //
 // Returns (expression, nil) upon success, otherwise (..., error).
 func getGeoFilter(
-	polygon *datastore.Polygon, circle *datastore.Circle, phVals *[]interface{}) (string, error) {
+	polygon *datastore.Polygon, circle *datastore.Circle,
+	camslRange string, phVals *[]interface{}) (string, error) {
 
 	var err error
 
@@ -312,7 +332,12 @@ func getGeoFilter(
 		return "", fmt.Errorf("getCircleFilter() failed: %v", err)
 	}
 
-	return fmt.Sprintf("(%s) AND (%s)", polygonExpr, circleExpr), nil
+	camslRangeExpr, err := getCamslRangeFilter(camslRange, phVals)
+	if err != nil {
+		return "", fmt.Errorf("getCamslRangeFilter() failed: %v", err)
+	}
+
+	return fmt.Sprintf("(%s) AND (%s) AND (%s)", polygonExpr, circleExpr, camslRangeExpr), nil
 }
 
 // scanObsRow scans all columns from the current result row in rows and converts to an ObsMetadata
@@ -320,20 +345,22 @@ func getGeoFilter(
 // Returns (ObsMetadata object, time series ID, nil) upon success, otherwise (..., ..., error).
 func scanObsRow(rows *sql.Rows) (*datastore.ObsMetadata, int64, error) {
 	var (
-		tsID            int64
-		obsTimeInstant0 time.Time
-		pubTime0        sql.NullTime
-		value           sql.NullString
-		point           postgis.PointS
+		tsID           int64
+		obsTimeInstant time.Time
+		pubTime        sql.NullTime
+		value          sql.NullString
+		point          postgis.PointS
+		camsl          sql.NullInt32
 	)
 
 	// initialize colValPtrs with non-reflectable metadata
 	colValPtrs := []interface{}{
 		&tsID,
-		&obsTimeInstant0,
-		&pubTime0,
+		&obsTimeInstant,
+		&pubTime,
 		&value,
 		&point,
+		&camsl,
 	}
 
 	// extend colValPtrs with reflectable metadata of type int64
@@ -362,12 +389,15 @@ func scanObsRow(rows *sql.Rows) (*datastore.ObsMetadata, int64, error) {
 			},
 		},
 		Obstime: &datastore.ObsMetadata_ObstimeInstant{
-			ObstimeInstant: timestamppb.New(obsTimeInstant0),
+			ObstimeInstant: timestamppb.New(obsTimeInstant),
 		},
 		Value: value.String,
 	}
-	if pubTime0.Valid {
-		obsMdata.Pubtime = timestamppb.New(pubTime0.Time)
+	if pubTime.Valid {
+		obsMdata.Pubtime = timestamppb.New(pubTime.Time)
+	}
+	if camsl.Valid {
+		obsMdata.Camsl = &camsl.Int32
 	}
 
 	var err error
@@ -444,8 +474,8 @@ func getObs(
 	// get values needed for query
 	phVals := []interface{}{} // placeholder values
 	timeFilter, geoFilter, int64MdataFilter, stringMdataFilter, err := createObsQueryVals(
-		request.GetSpatialPolygon(), request.GetSpatialCircle(), request.GetFilter(), tspec,
-		&phVals)
+		request.GetSpatialPolygon(), request.GetSpatialCircle(), request.GetCamslRange(),
+		request.GetFilter(), tspec, &phVals)
 	if err != nil {
 		return nil, fmt.Errorf("createObsQueryVals() failed: %v", err)
 	}
@@ -471,6 +501,7 @@ func getObs(
 			%s,
 			point,
 			%s,
+			%s,
 			%s
 		FROM observation
 		JOIN time_series on observation.ts_id = time_series.id
@@ -481,6 +512,7 @@ func getObs(
 		distinctSpec,
 		convertSelectCol(incFields, "pubtime", "observation."),
 		convertSelectCol(incFields, "value", "observation."),
+		convertSelectCol(incFields, "camsl", "observation."),
 		strings.Join(convOI64MC, ","),
 		strings.Join(convOSMC, ","),
 		timeFilter,

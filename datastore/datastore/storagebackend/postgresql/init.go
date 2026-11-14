@@ -267,6 +267,7 @@ func init() { // automatically called once on program startup (on first import o
 		supIncRespFields.Set(strings.TrimPrefix(f, "observation."))
 	}
 	supIncRespFields.Set("geo_point")
+	supIncRespFields.Set("camsl")
 	supIncRespFields.Set("obstime_instant")
 	supIncRespFields.Set("pubtime")
 	supIncRespFields.Set("value")
